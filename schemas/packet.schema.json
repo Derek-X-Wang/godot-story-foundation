@@ -1,0 +1,321 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "packet_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "prompt_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "content_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "content_version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "scene_card": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "location": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "required_dialogues": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            },
+            "minItems": 2,
+            "uniqueItems": true
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "goal",
+        "location",
+        "required_dialogues"
+      ],
+      "additionalProperties": false
+    },
+    "personas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "voice": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "knowledge_policy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "actor",
+          "display_name",
+          "voice",
+          "knowledge_policy"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "relevant_world_context": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4000
+      },
+      "minItems": 1
+    },
+    "registry": {
+      "type": "object",
+      "properties": {
+        "actors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "scenes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "memories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "rewards": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "actors",
+        "facts",
+        "items",
+        "scenes",
+        "memories",
+        "rewards",
+        "commands"
+      ],
+      "additionalProperties": false
+    },
+    "world": {
+      "$ref": "content.schema.json#/$defs/world"
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "command": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                },
+                "action_id": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                },
+                "expect": {
+                  "enum": [
+                    "applied",
+                    "blocked",
+                    "duplicate"
+                  ]
+                }
+              },
+              "required": [
+                "command",
+                "action_id",
+                "expect"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          },
+          "expect_dialogues": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            },
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            }
+          },
+          "expect_state": {
+            "type": "object",
+            "properties": {
+              "facts": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "boolean"
+                  ],
+                  "maxLength": 256,
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                }
+              },
+              "inventory": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000
+                },
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                }
+              },
+              "coins": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000
+              },
+              "scene": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,63}$"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "steps",
+          "expect_dialogues",
+          "expect_state"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "packet_id",
+    "prompt_version",
+    "content_id",
+    "content_version",
+    "scene_card",
+    "personas",
+    "relevant_world_context",
+    "registry",
+    "world",
+    "fixtures"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "packet.schema.json",
+  "title": "Offline authoring packet v1"
+}

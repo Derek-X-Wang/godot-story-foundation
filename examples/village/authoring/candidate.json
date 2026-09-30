@@ -1,0 +1,264 @@
+{
+  "content": {
+    "content_id": "village_notice",
+    "content_version": 1,
+    "dialogues": [
+      {
+        "branches": [
+          {
+            "choices": [],
+            "claims": [
+              {
+                "fact": "bridge_closed",
+                "value": true
+              },
+              {
+                "fact": "path_marked",
+                "value": true
+              }
+            ],
+            "id": "path_marked",
+            "text": "The east bridge is closed, and the safe path is marked. Thank you.",
+            "when": [
+              {
+                "key": "path_marked",
+                "op": "fact_eq",
+                "value": true
+              },
+              {
+                "key": "path_marked",
+                "npc": "mira",
+                "op": "knows",
+                "value": true
+              },
+              {
+                "key": "bridge_closed",
+                "op": "fact_eq",
+                "value": true
+              },
+              {
+                "key": "bridge_closed",
+                "npc": "mira",
+                "op": "knows",
+                "value": true
+              }
+            ]
+          },
+          {
+            "choices": [
+              {
+                "command": "mark_path",
+                "id": "mark_safe_path",
+                "text": "Mark the safe path."
+              }
+            ],
+            "claims": [
+              {
+                "fact": "bridge_closed",
+                "value": true
+              }
+            ],
+            "id": "informed",
+            "text": "The east bridge is closed. Could you mark the safe path with your chalk?",
+            "when": [
+              {
+                "key": "bridge_closed",
+                "op": "fact_eq",
+                "value": true
+              },
+              {
+                "key": "bridge_closed",
+                "npc": "mira",
+                "op": "knows",
+                "value": true
+              }
+            ]
+          }
+        ],
+        "fallback": {
+          "choices": [
+            {
+              "command": "share_news",
+              "id": "share_bridge_news",
+              "text": "Share what you saw at the bridge."
+            }
+          ],
+          "claims": [],
+          "id": "ignorant",
+          "text": "I have no news from the east bridge. Have you seen it today?"
+        },
+        "id": "mira_notice",
+        "speaker": "mira"
+      }
+    ],
+    "schema_version": 1,
+    "world": {
+      "actors": [
+        "player",
+        "mira"
+      ],
+      "initial_facts": {
+        "bridge_closed": true,
+        "news_shared": false,
+        "path_marked": false
+      },
+      "initial_inventory": {
+        "chalk": 1,
+        "map": 0
+      },
+      "initial_scene": "village",
+      "rules": [
+        {
+          "effects": [
+            {
+              "key": "bridge_closed",
+              "npc": "player",
+              "op": "know",
+              "value": true
+            },
+            {
+              "key": "saw_bridge",
+              "npc": "player",
+              "op": "remember",
+              "value": true
+            }
+          ],
+          "event": "inspect_bridge",
+          "id": "inspect_bridge_rule",
+          "when": [
+            {
+              "op": "scene_eq",
+              "value": "village"
+            }
+          ]
+        },
+        {
+          "effects": [
+            {
+              "key": "news_shared",
+              "op": "fact",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "mira",
+              "op": "know",
+              "value": true
+            },
+            {
+              "delta": 1,
+              "npc": "mira",
+              "op": "trust"
+            },
+            {
+              "key": "heard_news",
+              "npc": "mira",
+              "op": "remember",
+              "value": true
+            }
+          ],
+          "event": "share_news",
+          "id": "share_news_rule",
+          "when": [
+            {
+              "key": "bridge_closed",
+              "op": "fact_eq",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "player",
+              "op": "knows",
+              "value": true
+            },
+            {
+              "key": "news_shared",
+              "op": "fact_eq",
+              "value": false
+            }
+          ]
+        },
+        {
+          "effects": [
+            {
+              "delta": -1,
+              "key": "chalk",
+              "op": "inventory"
+            },
+            {
+              "delta": 1,
+              "key": "map",
+              "op": "inventory"
+            },
+            {
+              "key": "path_marked",
+              "op": "fact",
+              "value": true
+            },
+            {
+              "key": "path_marked",
+              "npc": "mira",
+              "op": "know",
+              "value": true
+            },
+            {
+              "delta": 1,
+              "npc": "mira",
+              "op": "trust"
+            },
+            {
+              "coins": 5,
+              "key": "safe_path_reward",
+              "op": "reward"
+            }
+          ],
+          "event": "mark_path",
+          "id": "mark_path_rule",
+          "when": [
+            {
+              "key": "bridge_closed",
+              "op": "fact_eq",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "player",
+              "op": "knows",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "mira",
+              "op": "knows",
+              "value": true
+            },
+            {
+              "key": "path_marked",
+              "op": "fact_eq",
+              "value": false
+            },
+            {
+              "npc": "mira",
+              "op": "trust_gte",
+              "value": 1
+            },
+            {
+              "key": "chalk",
+              "op": "inventory_gte",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "version": 1
+    }
+  },
+  "content_hash": "f288fdd2e89acc825318e730977b9e4e07925e9567fa627911aafda75fe19a50",
+  "kind": "unapproved_candidate",
+  "model_declared": "offline-neutral-fixture-v1",
+  "packet_hash": "2aa6503de991bcf88caea989a292ff942bfa150a35232285a4b72a32d6302b30",
+  "prompt_version": "village-scene-v1",
+  "response_hash": "57be392a93c6a0edff35fbe6001ab567978f32f7662242d8262cba8358fdf14e",
+  "schema_version": 1,
+  "tool_version": "0.1.0"
+}

@@ -1,0 +1,11 @@
+{
+  "candidate_hash": "0597a0c3ad180b9de5fd234e8604fb30e95834f629f068900317f1f04dff723a",
+  "kind": "synthetic_test_approval",
+  "packet_hash": "2aa6503de991bcf88caea989a292ff942bfa150a35232285a4b72a32d6302b30",
+  "review_hash": "8fd9f9e5cd91b7cc4bb3a752e875dac9c2378ee5de02d3598fae06d1704f9cbb",
+  "review_status": "approved",
+  "reviewer": "SYNTHETIC PUBLIC TEST FIXTURE - NO HUMAN APPROVAL",
+  "schema_version": 1,
+  "test_fixture": true,
+  "tool_version": "0.1.0"
+}

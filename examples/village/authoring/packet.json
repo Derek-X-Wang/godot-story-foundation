@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "packet_id": "village_notice_packet",
+  "prompt_version": "village-scene-v1",
+  "content_id": "village_notice",
+  "content_version": 1,
+  "scene_card": {
+    "id": "village_notice_scene",
+    "title": "News at the village signpost",
+    "goal": "Keep Mira honestly ignorant until the player observes and shares bridge news; then offer a guarded, one-time path-marking choice.",
+    "location": "village",
+    "required_dialogues": {
+      "mira_notice": [
+        "path_marked",
+        "informed",
+        "ignorant"
+      ]
+    }
+  },
+  "personas": [
+    {
+      "actor": "mira",
+      "display_name": "Mira",
+      "voice": "A practical, considerate village notice keeper; concise and calm.",
+      "knowledge_policy": "Only assert facts explicitly present in Mira knowledge and current world truth. If uninformed, admit uncertainty."
+    }
+  ],
+  "relevant_world_context": [
+    "This is a synthetic public fixture, not a private story.",
+    "The east bridge is closed; world truth does not automatically give NPCs knowledge.",
+    "Observing the bridge teaches the player. Sharing news teaches Mira. Marking the path consumes one chalk, grants one map and a five-coin reward once."
+  ],
+  "registry": {
+    "actors": [
+      "player",
+      "mira"
+    ],
+    "facts": [
+      "bridge_closed",
+      "news_shared",
+      "path_marked"
+    ],
+    "items": [
+      "chalk",
+      "map"
+    ],
+    "scenes": [
+      "village"
+    ],
+    "memories": [
+      "saw_bridge",
+      "heard_news"
+    ],
+    "rewards": [
+      "safe_path_reward"
+    ],
+    "commands": [
+      "inspect_bridge",
+      "share_news",
+      "mark_path"
+    ]
+  },
+  "world": {
+    "version": 1,
+    "actors": [
+      "player",
+      "mira"
+    ],
+    "initial_facts": {
+      "bridge_closed": true,
+      "news_shared": false,
+      "path_marked": false
+    },
+    "initial_inventory": {
+      "chalk": 1,
+      "map": 0
+    },
+    "initial_scene": "village",
+    "rules": [
+      {
+        "id": "inspect_bridge_rule",
+        "event": "inspect_bridge",
+        "when": [
+          {
+            "op": "scene_eq",
+            "value": "village"
+          }
+        ],
+        "effects": [
+          {
+            "op": "know",
+            "npc": "player",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "remember",
+            "npc": "player",
+            "key": "saw_bridge",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "share_news_rule",
+        "event": "share_news",
+        "when": [
+          {
+            "op": "fact_eq",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "knows",
+            "npc": "player",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "fact_eq",
+            "key": "news_shared",
+            "value": false
+          }
+        ],
+        "effects": [
+          {
+            "op": "fact",
+            "key": "news_shared",
+            "value": true
+          },
+          {
+            "op": "know",
+            "npc": "mira",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "trust",
+            "npc": "mira",
+            "delta": 1
+          },
+          {
+            "op": "remember",
+            "npc": "mira",
+            "key": "heard_news",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "mark_path_rule",
+        "event": "mark_path",
+        "when": [
+          {
+            "op": "fact_eq",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "knows",
+            "npc": "player",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "knows",
+            "npc": "mira",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "fact_eq",
+            "key": "path_marked",
+            "value": false
+          },
+          {
+            "op": "trust_gte",
+            "npc": "mira",
+            "value": 1
+          },
+          {
+            "op": "inventory_gte",
+            "key": "chalk",
+            "value": 1
+          }
+        ],
+        "effects": [
+          {
+            "op": "inventory",
+            "key": "chalk",
+            "delta": -1
+          },
+          {
+            "op": "inventory",
+            "key": "map",
+            "delta": 1
+          },
+          {
+            "op": "fact",
+            "key": "path_marked",
+            "value": true
+          },
+          {
+            "op": "know",
+            "npc": "mira",
+            "key": "path_marked",
+            "value": true
+          },
+          {
+            "op": "trust",
+            "npc": "mira",
+            "delta": 1
+          },
+          {
+            "op": "reward",
+            "key": "safe_path_reward",
+            "coins": 5
+          }
+        ]
+      }
+    ]
+  },
+  "fixtures": [
+    {
+      "id": "honest_ignorance",
+      "steps": [],
+      "expect_dialogues": {
+        "mira_notice": "ignorant"
+      },
+      "expect_state": {
+        "coins": 0
+      }
+    },
+    {
+      "id": "discovery_is_personal",
+      "steps": [
+        {
+          "command": "inspect_bridge",
+          "action_id": "look",
+          "expect": "applied"
+        }
+      ],
+      "expect_dialogues": {
+        "mira_notice": "ignorant"
+      },
+      "expect_state": {
+        "facts": {
+          "news_shared": false
+        }
+      }
+    },
+    {
+      "id": "shared_knowledge",
+      "steps": [
+        {
+          "command": "share_news",
+          "action_id": "premature",
+          "expect": "blocked"
+        },
+        {
+          "command": "inspect_bridge",
+          "action_id": "look",
+          "expect": "applied"
+        },
+        {
+          "command": "share_news",
+          "action_id": "premature",
+          "expect": "applied"
+        },
+        {
+          "command": "share_news",
+          "action_id": "premature",
+          "expect": "duplicate"
+        }
+      ],
+      "expect_dialogues": {
+        "mira_notice": "informed"
+      },
+      "expect_state": {
+        "facts": {
+          "news_shared": true
+        },
+        "coins": 0
+      }
+    },
+    {
+      "id": "one_time_choice",
+      "steps": [
+        {
+          "command": "inspect_bridge",
+          "action_id": "look",
+          "expect": "applied"
+        },
+        {
+          "command": "share_news",
+          "action_id": "tell",
+          "expect": "applied"
+        },
+        {
+          "command": "mark_path",
+          "action_id": "choice",
+          "expect": "applied"
+        },
+        {
+          "command": "mark_path",
+          "action_id": "choice",
+          "expect": "duplicate"
+        },
+        {
+          "command": "mark_path",
+          "action_id": "another_choice",
+          "expect": "blocked"
+        }
+      ],
+      "expect_dialogues": {
+        "mira_notice": "path_marked"
+      },
+      "expect_state": {
+        "facts": {
+          "path_marked": true
+        },
+        "inventory": {
+          "chalk": 0,
+          "map": 1
+        },
+        "coins": 5
+      }
+    }
+  ]
+}

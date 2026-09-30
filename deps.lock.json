@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "dialogue_manager": {
+    "version": "3.10.4",
+    "repository": "https://github.com/nathanhoad/godot_dialogue_manager",
+    "release_url": "https://github.com/nathanhoad/godot_dialogue_manager/releases/tag/v3.10.4",
+    "commit": "5487c524b9eac303b059e5859e2980b134c59d79",
+    "url": "https://codeload.github.com/nathanhoad/godot_dialogue_manager/zip/5487c524b9eac303b059e5859e2980b134c59d79",
+    "sha256": "23642728066aca37ba7e124fec2b8b1723f67776b5ef8c96a039c11da4e5bb6f",
+    "archive_prefix": "godot_dialogue_manager-5487c524b9eac303b059e5859e2980b134c59d79/addons/dialogue_manager",
+    "license": "MIT",
+    "license_file": "licenses/DialogueManager-MIT.txt",
+    "max_download_bytes": 16777216,
+    "max_unpacked_bytes": 67108864
+  },
+  "godot": {
+    "version": "4.6.3-stable",
+    "platform": "linux.x86_64",
+    "repository": "https://github.com/godotengine/godot",
+    "release_url": "https://github.com/godotengine/godot-builds/releases/tag/4.6.3-stable",
+    "url": "https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip",
+    "sha256": "d0bc2113065e481c9c2c2b2c37daa4e8be3fe9e27f0ab9ab0b6096e9a37907f3",
+    "sha256_source": "https://api.github.com/repos/godotengine/godot-builds/releases/assets/425484901",
+    "sha512": "a035258da32b77f966a5376f9fa29c30a6adde826a85ba918e1605bd1fc9823eba7d85f1dd5e748956bd2ba72827c0025ffa11bb82aec91128c407a2e723c99c",
+    "sha512_source": "https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/SHA512-SUMS.txt",
+    "archive_member": "Godot_v4.6.3-stable_linux.x86_64",
+    "license": "MIT",
+    "license_file": "licenses/Godot-MIT.txt",
+    "max_download_bytes": 134217728,
+    "max_unpacked_bytes": 402653184
+  }
+}

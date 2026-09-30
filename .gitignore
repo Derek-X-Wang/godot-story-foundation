@@ -1,0 +1,12 @@
+# Build outputs and dependency downloads are recreated from pinned sources.
+.build/
+.deps/
+.godot/
+__pycache__/
+*.py[cod]
+*.tmp
+*.log
+# Credentials and local configuration never belong in this public toolkit.
+.env
+.env.*
+!.env.example

@@ -1,0 +1,117 @@
+{
+  "baseline_hash": null,
+  "candidate_hash": "0597a0c3ad180b9de5fd234e8604fb30e95834f629f068900317f1f04dff723a",
+  "diff": "--- empty-baseline\n+++ candidate-content.json\n@@ -0,0 +1,254 @@\n+{\n+  \"content_id\": \"village_notice\",\n+  \"content_version\": 1,\n+  \"dialogues\": [\n+    {\n+      \"branches\": [\n+        {\n+          \"choices\": [],\n+          \"claims\": [\n+            {\n+              \"fact\": \"bridge_closed\",\n+              \"value\": true\n+            },\n+            {\n+              \"fact\": \"path_marked\",\n+              \"value\": true\n+            }\n+          ],\n+          \"id\": \"path_marked\",\n+          \"text\": \"The east bridge is closed, and the safe path is marked. Thank you.\",\n+          \"when\": [\n+            {\n+              \"key\": \"path_marked\",\n+              \"op\": \"fact_eq\",\n+              \"value\": true\n+            },\n+            {\n+              \"key\": \"path_marked\",\n+              \"npc\": \"mira\",\n+              \"op\": \"knows\",\n+              \"value\": true\n+            },\n+            {\n+              \"key\": \"bridge_closed\",\n+              \"op\": \"fact_eq\",\n+              \"value\": true\n+            },\n+            {\n+              \"key\": \"bridge_closed\",\n+              \"npc\": \"mira\",\n+              \"op\": \"knows\",\n+              \"value\": true\n+            }\n+          ]\n+        },\n+        {\n+          \"choices\": [\n+            {\n+              \"command\": \"mark_path\",\n+              \"id\": \"mark_safe_path\",\n+              \"text\": \"Mark the safe path.\"\n+            }\n+          ],\n+          \"claims\": [\n+            {\n+              \"fact\": \"bridge_closed\",\n+              \"value\": true\n+            }\n+          ],\n+          \"id\": \"informed\",\n+          \"text\": \"The east bridge is closed. Could you mark the safe path with your chalk?\",\n+          \"when\": [\n+            {\n+              \"key\": \"bridge_closed\",\n+              \"op\": \"fact_eq\",\n+              \"value\": true\n+            },\n+            {\n+              \"key\": \"bridge_closed\",\n+              \"npc\": \"mira\",\n+              \"op\": \"knows\",\n+              \"value\": true\n+            }\n+          ]\n+        }\n+      ],\n+      \"fallback\": {\n+        \"choices\": [\n+          {\n+            \"command\": \"share_news\",\n+            \"id\": \"share_bridge_news\",\n+            \"text\": \"Share what you saw at the bridge.\"\n+          }\n+        ],\n+        \"claims\": [],\n+        \"id\": \"ignorant\",\n+        \"text\": \"I have no news from the east bridge. Have you seen it today?\"\n+      },\n+      \"id\": \"mira_notice\",\n+      \"speaker\": \"mira\"\n+    }\n+  ],\n+  \"schema_version\": 1,\n+  \"world\": {\n+    \"actors\": [\n+      \"player\",\n+      \"mira\"\n+    ],\n+    \"initial_facts\": {\n+      \"bridge_closed\": true,\n+      \"news_shared\": false,\n+      \"path_marked\": false\n+    },\n+    \"initial_inventory\": {\n+      \"chalk\": 1,\n+      \"map\": 0\n+    },\n+    \"initial_scene\": \"village\",\n+    \"rules\": [\n+      {\n+        \"effects\": [\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"npc\": \"player\",\n+            \"op\": \"know\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"saw_bridge\",\n+            \"npc\": \"player\",\n+            \"op\": \"remember\",\n+            \"value\": true\n+          }\n+        ],\n+        \"event\": \"inspect_bridge\",\n+        \"id\": \"inspect_bridge_rule\",\n+        \"when\": [\n+          {\n+            \"op\": \"scene_eq\",\n+            \"value\": \"village\"\n+          }\n+        ]\n+      },\n+      {\n+        \"effects\": [\n+          {\n+            \"key\": \"news_shared\",\n+            \"op\": \"fact\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"npc\": \"mira\",\n+            \"op\": \"know\",\n+            \"value\": true\n+          },\n+          {\n+            \"delta\": 1,\n+            \"npc\": \"mira\",\n+            \"op\": \"trust\"\n+          },\n+          {\n+            \"key\": \"heard_news\",\n+            \"npc\": \"mira\",\n+            \"op\": \"remember\",\n+            \"value\": true\n+          }\n+        ],\n+        \"event\": \"share_news\",\n+        \"id\": \"share_news_rule\",\n+        \"when\": [\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"op\": \"fact_eq\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"npc\": \"player\",\n+            \"op\": \"knows\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"news_shared\",\n+            \"op\": \"fact_eq\",\n+            \"value\": false\n+          }\n+        ]\n+      },\n+      {\n+        \"effects\": [\n+          {\n+            \"delta\": -1,\n+            \"key\": \"chalk\",\n+            \"op\": \"inventory\"\n+          },\n+          {\n+            \"delta\": 1,\n+            \"key\": \"map\",\n+            \"op\": \"inventory\"\n+          },\n+          {\n+            \"key\": \"path_marked\",\n+            \"op\": \"fact\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"path_marked\",\n+            \"npc\": \"mira\",\n+            \"op\": \"know\",\n+            \"value\": true\n+          },\n+          {\n+            \"delta\": 1,\n+            \"npc\": \"mira\",\n+            \"op\": \"trust\"\n+          },\n+          {\n+            \"coins\": 5,\n+            \"key\": \"safe_path_reward\",\n+            \"op\": \"reward\"\n+          }\n+        ],\n+        \"event\": \"mark_path\",\n+        \"id\": \"mark_path_rule\",\n+        \"when\": [\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"op\": \"fact_eq\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"npc\": \"player\",\n+            \"op\": \"knows\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"bridge_closed\",\n+            \"npc\": \"mira\",\n+            \"op\": \"knows\",\n+            \"value\": true\n+          },\n+          {\n+            \"key\": \"path_marked\",\n+            \"op\": \"fact_eq\",\n+            \"value\": false\n+          },\n+          {\n+            \"npc\": \"mira\",\n+            \"op\": \"trust_gte\",\n+            \"value\": 1\n+          },\n+          {\n+            \"key\": \"chalk\",\n+            \"op\": \"inventory_gte\",\n+            \"value\": 1\n+          }\n+        ]\n+      }\n+    ],\n+    \"version\": 1\n+  }\n+}\n",
+  "kind": "review_report",
+  "model_declared": "offline-neutral-fixture-v1",
+  "packet_hash": "2aa6503de991bcf88caea989a292ff942bfa150a35232285a4b72a32d6302b30",
+  "prompt_version": "village-scene-v1",
+  "review_notes": [
+    "NOT APPROVED. Read the complete packet, candidate, diff, and simulation before manual approval.",
+    "Gameplay policy is identical to the packet; the importer cannot modify it.",
+    "Knowledge annotations are machine-checked. A human must verify that all prose claims are annotated and honest.",
+    "Fixture coverage covers named final branches, not every possible state or all artistic quality."
+  ],
+  "schema_version": 1,
+  "simulation": {
+    "coverage": {
+      "covered": [
+        "mira_notice/ignorant",
+        "mira_notice/informed",
+        "mira_notice/path_marked"
+      ],
+      "covered_count": 3,
+      "required_count": 3
+    },
+    "fixtures": [
+      {
+        "id": "honest_ignorance",
+        "passed": true,
+        "selected_branches": {
+          "mira_notice": "ignorant"
+        },
+        "steps": []
+      },
+      {
+        "id": "discovery_is_personal",
+        "passed": true,
+        "selected_branches": {
+          "mira_notice": "ignorant"
+        },
+        "steps": [
+          {
+            "action_id": "look",
+            "command": "inspect_bridge",
+            "status": "applied"
+          }
+        ]
+      },
+      {
+        "id": "shared_knowledge",
+        "passed": true,
+        "selected_branches": {
+          "mira_notice": "informed"
+        },
+        "steps": [
+          {
+            "action_id": "premature",
+            "command": "share_news",
+            "status": "blocked"
+          },
+          {
+            "action_id": "look",
+            "command": "inspect_bridge",
+            "status": "applied"
+          },
+          {
+            "action_id": "premature",
+            "command": "share_news",
+            "status": "applied"
+          },
+          {
+            "action_id": "premature",
+            "command": "share_news",
+            "status": "duplicate"
+          }
+        ]
+      },
+      {
+        "id": "one_time_choice",
+        "passed": true,
+        "selected_branches": {
+          "mira_notice": "path_marked"
+        },
+        "steps": [
+          {
+            "action_id": "look",
+            "command": "inspect_bridge",
+            "status": "applied"
+          },
+          {
+            "action_id": "tell",
+            "command": "share_news",
+            "status": "applied"
+          },
+          {
+            "action_id": "choice",
+            "command": "mark_path",
+            "status": "applied"
+          },
+          {
+            "action_id": "choice",
+            "command": "mark_path",
+            "status": "duplicate"
+          },
+          {
+            "action_id": "another_choice",
+            "command": "mark_path",
+            "status": "blocked"
+          }
+        ]
+      }
+    ],
+    "passed": true
+  },
+  "tool_version": "0.1.0",
+  "validation_passed": true
+}

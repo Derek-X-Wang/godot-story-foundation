@@ -1,0 +1,1673 @@
+{
+  "instructions": [
+    "Return exactly one JSON object conforming to response_schema. No Markdown, reasoning, or extra fields.",
+    "Copy content_id, content_version, and world exactly from packet. Gameplay policy is human-authored.",
+    "Write every required dialogue and branch. Include a fallback with no claims.",
+    "Every factual claim annotation requires matching fact_eq and knows guards for the speaker.",
+    "Use only registered identifiers and commands. Prose must be single-line plain text without markup. Choice text must not contain colons; speaker IDs must not start with else or elif.",
+    "Do not include hidden reasoning, credentials, executable code, or unrelated world context."
+  ],
+  "kind": "provider_neutral_request",
+  "packet": {
+    "content_id": "village_notice",
+    "content_version": 1,
+    "fixtures": [
+      {
+        "expect_dialogues": {
+          "mira_notice": "ignorant"
+        },
+        "expect_state": {
+          "coins": 0
+        },
+        "id": "honest_ignorance",
+        "steps": []
+      },
+      {
+        "expect_dialogues": {
+          "mira_notice": "ignorant"
+        },
+        "expect_state": {
+          "facts": {
+            "news_shared": false
+          }
+        },
+        "id": "discovery_is_personal",
+        "steps": [
+          {
+            "action_id": "look",
+            "command": "inspect_bridge",
+            "expect": "applied"
+          }
+        ]
+      },
+      {
+        "expect_dialogues": {
+          "mira_notice": "informed"
+        },
+        "expect_state": {
+          "coins": 0,
+          "facts": {
+            "news_shared": true
+          }
+        },
+        "id": "shared_knowledge",
+        "steps": [
+          {
+            "action_id": "premature",
+            "command": "share_news",
+            "expect": "blocked"
+          },
+          {
+            "action_id": "look",
+            "command": "inspect_bridge",
+            "expect": "applied"
+          },
+          {
+            "action_id": "premature",
+            "command": "share_news",
+            "expect": "applied"
+          },
+          {
+            "action_id": "premature",
+            "command": "share_news",
+            "expect": "duplicate"
+          }
+        ]
+      },
+      {
+        "expect_dialogues": {
+          "mira_notice": "path_marked"
+        },
+        "expect_state": {
+          "coins": 5,
+          "facts": {
+            "path_marked": true
+          },
+          "inventory": {
+            "chalk": 0,
+            "map": 1
+          }
+        },
+        "id": "one_time_choice",
+        "steps": [
+          {
+            "action_id": "look",
+            "command": "inspect_bridge",
+            "expect": "applied"
+          },
+          {
+            "action_id": "tell",
+            "command": "share_news",
+            "expect": "applied"
+          },
+          {
+            "action_id": "choice",
+            "command": "mark_path",
+            "expect": "applied"
+          },
+          {
+            "action_id": "choice",
+            "command": "mark_path",
+            "expect": "duplicate"
+          },
+          {
+            "action_id": "another_choice",
+            "command": "mark_path",
+            "expect": "blocked"
+          }
+        ]
+      }
+    ],
+    "packet_id": "village_notice_packet",
+    "personas": [
+      {
+        "actor": "mira",
+        "display_name": "Mira",
+        "knowledge_policy": "Only assert facts explicitly present in Mira knowledge and current world truth. If uninformed, admit uncertainty.",
+        "voice": "A practical, considerate village notice keeper; concise and calm."
+      }
+    ],
+    "prompt_version": "village-scene-v1",
+    "registry": {
+      "actors": [
+        "player",
+        "mira"
+      ],
+      "commands": [
+        "inspect_bridge",
+        "share_news",
+        "mark_path"
+      ],
+      "facts": [
+        "bridge_closed",
+        "news_shared",
+        "path_marked"
+      ],
+      "items": [
+        "chalk",
+        "map"
+      ],
+      "memories": [
+        "saw_bridge",
+        "heard_news"
+      ],
+      "rewards": [
+        "safe_path_reward"
+      ],
+      "scenes": [
+        "village"
+      ]
+    },
+    "relevant_world_context": [
+      "This is a synthetic public fixture, not a private story.",
+      "The east bridge is closed; world truth does not automatically give NPCs knowledge.",
+      "Observing the bridge teaches the player. Sharing news teaches Mira. Marking the path consumes one chalk, grants one map and a five-coin reward once."
+    ],
+    "scene_card": {
+      "goal": "Keep Mira honestly ignorant until the player observes and shares bridge news; then offer a guarded, one-time path-marking choice.",
+      "id": "village_notice_scene",
+      "location": "village",
+      "required_dialogues": {
+        "mira_notice": [
+          "path_marked",
+          "informed",
+          "ignorant"
+        ]
+      },
+      "title": "News at the village signpost"
+    },
+    "schema_version": 1,
+    "world": {
+      "actors": [
+        "player",
+        "mira"
+      ],
+      "initial_facts": {
+        "bridge_closed": true,
+        "news_shared": false,
+        "path_marked": false
+      },
+      "initial_inventory": {
+        "chalk": 1,
+        "map": 0
+      },
+      "initial_scene": "village",
+      "rules": [
+        {
+          "effects": [
+            {
+              "key": "bridge_closed",
+              "npc": "player",
+              "op": "know",
+              "value": true
+            },
+            {
+              "key": "saw_bridge",
+              "npc": "player",
+              "op": "remember",
+              "value": true
+            }
+          ],
+          "event": "inspect_bridge",
+          "id": "inspect_bridge_rule",
+          "when": [
+            {
+              "op": "scene_eq",
+              "value": "village"
+            }
+          ]
+        },
+        {
+          "effects": [
+            {
+              "key": "news_shared",
+              "op": "fact",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "mira",
+              "op": "know",
+              "value": true
+            },
+            {
+              "delta": 1,
+              "npc": "mira",
+              "op": "trust"
+            },
+            {
+              "key": "heard_news",
+              "npc": "mira",
+              "op": "remember",
+              "value": true
+            }
+          ],
+          "event": "share_news",
+          "id": "share_news_rule",
+          "when": [
+            {
+              "key": "bridge_closed",
+              "op": "fact_eq",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "player",
+              "op": "knows",
+              "value": true
+            },
+            {
+              "key": "news_shared",
+              "op": "fact_eq",
+              "value": false
+            }
+          ]
+        },
+        {
+          "effects": [
+            {
+              "delta": -1,
+              "key": "chalk",
+              "op": "inventory"
+            },
+            {
+              "delta": 1,
+              "key": "map",
+              "op": "inventory"
+            },
+            {
+              "key": "path_marked",
+              "op": "fact",
+              "value": true
+            },
+            {
+              "key": "path_marked",
+              "npc": "mira",
+              "op": "know",
+              "value": true
+            },
+            {
+              "delta": 1,
+              "npc": "mira",
+              "op": "trust"
+            },
+            {
+              "coins": 5,
+              "key": "safe_path_reward",
+              "op": "reward"
+            }
+          ],
+          "event": "mark_path",
+          "id": "mark_path_rule",
+          "when": [
+            {
+              "key": "bridge_closed",
+              "op": "fact_eq",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "player",
+              "op": "knows",
+              "value": true
+            },
+            {
+              "key": "bridge_closed",
+              "npc": "mira",
+              "op": "knows",
+              "value": true
+            },
+            {
+              "key": "path_marked",
+              "op": "fact_eq",
+              "value": false
+            },
+            {
+              "npc": "mira",
+              "op": "trust_gte",
+              "value": 1
+            },
+            {
+              "key": "chalk",
+              "op": "inventory_gte",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "version": 1
+    }
+  },
+  "packet_hash": "2aa6503de991bcf88caea989a292ff942bfa150a35232285a4b72a32d6302b30",
+  "prompt_version": "village-scene-v1",
+  "response_schema": {
+    "$defs": {
+      "condition": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "fact_eq"
+              },
+              "value": {
+                "maxLength": 256,
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "npc": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "knows"
+              },
+              "value": {
+                "maxLength": 256,
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "npc",
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "npc": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "trust_gte"
+              },
+              "value": {
+                "maximum": 1000000,
+                "minimum": -1000000,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "op",
+              "npc",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "inventory_gte"
+              },
+              "value": {
+                "maximum": 1000000,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "op",
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "scene_eq"
+              },
+              "value": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "op",
+              "value"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "dialogue": {
+        "additionalProperties": false,
+        "properties": {
+          "branches": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "choices": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "command": {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      "id": {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      "text": {
+                        "maxLength": 4000,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "text",
+                      "command"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "claims": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "fact": {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      "value": {
+                        "maxLength": 256,
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": [
+                          "string",
+                          "integer",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "fact",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "id": {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                "text": {
+                  "maxLength": 4000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "when": {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "fact_eq"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "knows"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "trust_gte"
+                          },
+                          "value": {
+                            "maximum": 1000000,
+                            "minimum": -1000000,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "inventory_gte"
+                          },
+                          "value": {
+                            "maximum": 1000000,
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "op": {
+                            "const": "scene_eq"
+                          },
+                          "value": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "value"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "when",
+                "text",
+                "claims",
+                "choices"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "fallback": {
+            "additionalProperties": false,
+            "properties": {
+              "choices": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                      "type": "string"
+                    },
+                    "id": {
+                      "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                      "type": "string"
+                    },
+                    "text": {
+                      "maxLength": 4000,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "text",
+                    "command"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 0,
+                "type": "array"
+              },
+              "claims": {
+                "maxItems": 0,
+                "type": "array"
+              },
+              "id": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "text": {
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "claims",
+              "choices"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+            "type": "string"
+          },
+          "speaker": {
+            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "speaker",
+          "branches",
+          "fallback"
+        ],
+        "type": "object"
+      },
+      "effect": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "fact"
+              },
+              "value": {
+                "maxLength": 256,
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "npc": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "know"
+              },
+              "value": {
+                "maxLength": 256,
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "npc",
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "delta": {
+                "maximum": 1000000,
+                "minimum": -1000000,
+                "type": "integer"
+              },
+              "npc": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "trust"
+              }
+            },
+            "required": [
+              "op",
+              "npc",
+              "delta"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "npc": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "remember"
+              },
+              "value": {
+                "maxLength": 256,
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": [
+                  "string",
+                  "integer",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "npc",
+              "key",
+              "value"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "delta": {
+                "maximum": 1000000,
+                "minimum": -1000000,
+                "type": "integer"
+              },
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "inventory"
+              }
+            },
+            "required": [
+              "op",
+              "key",
+              "delta"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "coins": {
+                "maximum": 1000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "key": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              },
+              "op": {
+                "const": "reward"
+              }
+            },
+            "required": [
+              "op",
+              "key",
+              "coins"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "op": {
+                "const": "scene"
+              },
+              "value": {
+                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "op",
+              "value"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "world": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {
+            "items": {
+              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "initial_facts": {
+            "additionalProperties": {
+              "maxLength": 256,
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": [
+                "string",
+                "integer",
+                "boolean"
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "initial_inventory": {
+            "additionalProperties": {
+              "maximum": 1000000,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "initial_scene": {
+            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+            "type": "string"
+          },
+          "rules": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "effects": {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "fact"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "know"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "delta": {
+                            "maximum": 1000000,
+                            "minimum": -1000000,
+                            "type": "integer"
+                          },
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "trust"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "delta"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "remember"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "delta": {
+                            "maximum": 1000000,
+                            "minimum": -1000000,
+                            "type": "integer"
+                          },
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "inventory"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "delta"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "coins": {
+                            "maximum": 1000000,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "reward"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "coins"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "op": {
+                            "const": "scene"
+                          },
+                          "value": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "value"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "event": {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                "id": {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                "when": {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "fact_eq"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "knows"
+                          },
+                          "value": {
+                            "maxLength": 256,
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "type": [
+                              "string",
+                              "integer",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "npc": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "trust_gte"
+                          },
+                          "value": {
+                            "maximum": 1000000,
+                            "minimum": -1000000,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "npc",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "op": {
+                            "const": "inventory_gte"
+                          },
+                          "value": {
+                            "maximum": 1000000,
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "key",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "op": {
+                            "const": "scene_eq"
+                          },
+                          "value": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "op",
+                          "value"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "minItems": 0,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "event",
+                "when",
+                "effects"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "version": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "actors",
+          "initial_facts",
+          "initial_inventory",
+          "initial_scene",
+          "rules"
+        ],
+        "type": "object"
+      }
+    },
+    "$id": "content.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "content_id": {
+        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+        "type": "string"
+      },
+      "content_version": {
+        "maximum": 2147483647,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "dialogues": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "branches": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "choices": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "command": {
+                          "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                          "type": "string"
+                        },
+                        "id": {
+                          "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                          "type": "string"
+                        },
+                        "text": {
+                          "maxLength": 4000,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "text",
+                        "command"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 0,
+                    "type": "array"
+                  },
+                  "claims": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "fact": {
+                          "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                          "type": "string"
+                        },
+                        "value": {
+                          "maxLength": 256,
+                          "maximum": 9007199254740991,
+                          "minimum": -9007199254740991,
+                          "type": [
+                            "string",
+                            "integer",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "fact",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 0,
+                    "type": "array"
+                  },
+                  "id": {
+                    "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                    "type": "string"
+                  },
+                  "text": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "when": {
+                    "items": {
+                      "oneOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                              "type": "string"
+                            },
+                            "op": {
+                              "const": "fact_eq"
+                            },
+                            "value": {
+                              "maxLength": 256,
+                              "maximum": 9007199254740991,
+                              "minimum": -9007199254740991,
+                              "type": [
+                                "string",
+                                "integer",
+                                "boolean"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "op",
+                            "key",
+                            "value"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                              "type": "string"
+                            },
+                            "npc": {
+                              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                              "type": "string"
+                            },
+                            "op": {
+                              "const": "knows"
+                            },
+                            "value": {
+                              "maxLength": 256,
+                              "maximum": 9007199254740991,
+                              "minimum": -9007199254740991,
+                              "type": [
+                                "string",
+                                "integer",
+                                "boolean"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "op",
+                            "npc",
+                            "key",
+                            "value"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "npc": {
+                              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                              "type": "string"
+                            },
+                            "op": {
+                              "const": "trust_gte"
+                            },
+                            "value": {
+                              "maximum": 1000000,
+                              "minimum": -1000000,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "op",
+                            "npc",
+                            "value"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "key": {
+                              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                              "type": "string"
+                            },
+                            "op": {
+                              "const": "inventory_gte"
+                            },
+                            "value": {
+                              "maximum": 1000000,
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "op",
+                            "key",
+                            "value"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "op": {
+                              "const": "scene_eq"
+                            },
+                            "value": {
+                              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "op",
+                            "value"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "id",
+                  "when",
+                  "text",
+                  "claims",
+                  "choices"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "fallback": {
+              "additionalProperties": false,
+              "properties": {
+                "choices": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "command": {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      "id": {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      "text": {
+                        "maxLength": 4000,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "text",
+                      "command"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "claims": {
+                  "maxItems": 0,
+                  "type": "array"
+                },
+                "id": {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                "text": {
+                  "maxLength": 4000,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "text",
+                "claims",
+                "choices"
+              ],
+              "type": "object"
+            },
+            "id": {
+              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            "speaker": {
+              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "speaker",
+            "branches",
+            "fallback"
+          ],
+          "type": "object"
+        },
+        "minItems": 1,
+        "type": "array"
+      },
+      "schema_version": {
+        "const": 1
+      },
+      "world": {
+        "$ref": "#/$defs/world"
+      }
+    },
+    "required": [
+      "schema_version",
+      "content_id",
+      "content_version",
+      "world",
+      "dialogues"
+    ],
+    "title": "Story Foundation runtime content v1",
+    "type": "object"
+  },
+  "schema_version": 1,
+  "tool_version": "0.1.0"
+}

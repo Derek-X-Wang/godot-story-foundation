@@ -1,0 +1,25 @@
+{
+ "version":1,
+ "title":"Medicine at Dusk",
+ "actors":["healer","guard","patient","witness","merchant"],
+ "initial_facts":{"witness_present":true},
+ "rules":[
+  {"id":"promise","event":"promise","priority":0,"when":[{"op":"fact_eq","key":"promised","value":null}],"effects":[{"op":"fact","key":"promised","value":true},{"op":"trust","npc":"healer","delta":1},{"op":"remember","npc":"healer","key":"promise","value":"medicine before dusk"},{"op":"fact","key":"clinic_invite","value":true},{"op":"timer","delay":6,"event":{"type":"deadline"}}]},
+  {"id":"gather","event":"gather","priority":0,"when":[{"op":"scene_eq","value":"forest"},{"op":"fact_eq","key":"herb_gathered","value":null}],"effects":[{"op":"inventory","key":"herb","delta":1},{"op":"fact","key":"herb_gathered","value":true}]},
+  {"id":"brew","event":"brew","priority":0,"when":[{"op":"scene_eq","value":"village"},{"op":"inventory_gte","key":"herb","value":1}],"effects":[{"op":"inventory","key":"herb","delta":-1},{"op":"inventory","key":"medicine","delta":1},{"op":"fact","key":"medicine_brewed","value":true}]},
+  {"id":"take_medicine","event":"take_medicine","priority":0,"when":[{"op":"scene_eq","value":"village"},{"op":"fact_eq","key":"medicine_taken","value":null}],"effects":[{"op":"inventory","key":"medicine","delta":1},{"op":"fact","key":"medicine_taken","value":true},{"op":"fact","key":"stolen","value":true},{"op":"emit","event":{"type":"theft"}}]},
+  {"id":"witness_theft","event":"theft","priority":0,"when":[{"op":"fact_eq","key":"witness_present","value":true}],"effects":[{"op":"know","npc":"witness","key":"stolen","value":true},{"op":"remember","npc":"witness","key":"theft","value":"saw medicine taken"}]},
+  {"id":"deliver","event":"deliver","priority":0,"when":[{"op":"scene_eq","value":"clinic"},{"op":"inventory_gte","key":"medicine","value":1},{"op":"fact_eq","key":"healed","value":null}],"effects":[{"op":"inventory","key":"medicine","delta":-1},{"op":"fact","key":"healed","value":true},{"op":"know","npc":"patient","key":"healed","value":true},{"op":"trust","npc":"patient","delta":2},{"op":"emit","event":{"type":"delivered"}}]},
+  {"id":"patient_reward","event":"delivered","priority":0,"when":[],"effects":[{"op":"reward","key":"patient_medicine","coins":10}]},
+  {"id":"deadline","event":"deadline","priority":0,"when":[{"op":"fact_eq","key":"healed","value":null}],"effects":[{"op":"fact","key":"worsened","value":true},{"op":"trust","npc":"healer","delta":-2},{"op":"remember","npc":"healer","key":"promise","value":"missed dusk deadline"}]},
+  {"id":"travel_forest","event":"travel","priority":0,"when":[{"op":"event_eq","key":"scene","value":"forest"}],"effects":[{"op":"scene","value":"forest"}]},
+  {"id":"travel_village","event":"travel","priority":0,"when":[{"op":"event_eq","key":"scene","value":"village"}],"effects":[{"op":"scene","value":"village"}]},
+  {"id":"travel_clinic","event":"travel","priority":0,"when":[{"op":"event_eq","key":"scene","value":"clinic"},{"op":"fact_eq","key":"clinic_invite","value":true}],"effects":[{"op":"scene","value":"clinic"}]},
+  {"id":"discover","event":"discover","priority":0,"when":[{"op":"fact_eq","key":"$fact","value":true}],"effects":[{"op":"know","npc":"$npc","key":"$fact","value":true},{"op":"remember","npc":"$npc","key":"last_discovery","value":"$fact"}]},
+  {"id":"tell_guard","event":"tell_guard","priority":0,"when":[{"op":"fact_eq","key":"healed","value":true}],"effects":[{"op":"know","npc":"guard","key":"healed","value":true},{"op":"trust","npc":"guard","delta":1}]},
+  {"id":"guard_thanks","event":"talk_guard","priority":0,"when":[{"op":"knows","npc":"guard","key":"healed","value":true},{"op":"trust_gte","npc":"guard","value":1}],"effects":[{"op":"fact","key":"gate_open","value":true},{"op":"remember","npc":"guard","key":"dialogue","value":"You helped our village. The storehouse is open."}]},
+  {"id":"guard_confronts","event":"talk_guard","priority":1,"when":[{"op":"knows","npc":"guard","key":"stolen","value":true}],"effects":[{"op":"fact","key":"gate_open","value":false},{"op":"trust","npc":"guard","delta":-2},{"op":"remember","npc":"guard","key":"dialogue","value":"I learned about the theft. Return when we can trust you."}]},
+  {"id":"enter_storehouse","event":"travel","priority":0,"when":[{"op":"event_eq","key":"scene","value":"storehouse"},{"op":"fact_eq","key":"gate_open","value":true}],"effects":[{"op":"scene","value":"storehouse"}]},
+  {"id":"bench_trust","event":"greet","priority":0,"when":[],"effects":[{"op":"trust","npc":"$npc","delta":1},{"op":"remember","npc":"$npc","key":"greeting","value":"hello"}]}
+ ]
+}

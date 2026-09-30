@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "content_id": "village_notice",
+  "content_version": 1,
+  "world": {
+    "version": 1,
+    "actors": [
+      "player",
+      "mira"
+    ],
+    "initial_facts": {
+      "bridge_closed": true,
+      "news_shared": false,
+      "path_marked": false
+    },
+    "initial_inventory": {
+      "chalk": 1,
+      "map": 0
+    },
+    "initial_scene": "village",
+    "rules": [
+      {
+        "id": "inspect_bridge_rule",
+        "event": "inspect_bridge",
+        "when": [
+          {
+            "op": "scene_eq",
+            "value": "village"
+          }
+        ],
+        "effects": [
+          {
+            "op": "know",
+            "npc": "player",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "remember",
+            "npc": "player",
+            "key": "saw_bridge",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "share_news_rule",
+        "event": "share_news",
+        "when": [
+          {
+            "op": "fact_eq",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "knows",
+            "npc": "player",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "fact_eq",
+            "key": "news_shared",
+            "value": false
+          }
+        ],
+        "effects": [
+          {
+            "op": "fact",
+            "key": "news_shared",
+            "value": true
+          },
+          {
+            "op": "know",
+            "npc": "mira",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "trust",
+            "npc": "mira",
+            "delta": 1
+          },
+          {
+            "op": "remember",
+            "npc": "mira",
+            "key": "heard_news",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "mark_path_rule",
+        "event": "mark_path",
+        "when": [
+          {
+            "op": "fact_eq",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "knows",
+            "npc": "player",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "knows",
+            "npc": "mira",
+            "key": "bridge_closed",
+            "value": true
+          },
+          {
+            "op": "fact_eq",
+            "key": "path_marked",
+            "value": false
+          },
+          {
+            "op": "trust_gte",
+            "npc": "mira",
+            "value": 1
+          },
+          {
+            "op": "inventory_gte",
+            "key": "chalk",
+            "value": 1
+          }
+        ],
+        "effects": [
+          {
+            "op": "inventory",
+            "key": "chalk",
+            "delta": -1
+          },
+          {
+            "op": "inventory",
+            "key": "map",
+            "delta": 1
+          },
+          {
+            "op": "fact",
+            "key": "path_marked",
+            "value": true
+          },
+          {
+            "op": "know",
+            "npc": "mira",
+            "key": "path_marked",
+            "value": true
+          },
+          {
+            "op": "trust",
+            "npc": "mira",
+            "delta": 1
+          },
+          {
+            "op": "reward",
+            "key": "safe_path_reward",
+            "coins": 5
+          }
+        ]
+      }
+    ]
+  },
+  "dialogues": [
+    {
+      "id": "mira_notice",
+      "speaker": "mira",
+      "branches": [
+        {
+          "id": "path_marked",
+          "when": [
+            {
+              "op": "fact_eq",
+              "key": "path_marked",
+              "value": true
+            },
+            {
+              "op": "knows",
+              "npc": "mira",
+              "key": "path_marked",
+              "value": true
+            },
+            {
+              "op": "fact_eq",
+              "key": "bridge_closed",
+              "value": true
+            },
+            {
+              "op": "knows",
+              "npc": "mira",
+              "key": "bridge_closed",
+              "value": true
+            }
+          ],
+          "text": "The east bridge is closed, and the safe path is marked. Thank you.",
+          "claims": [
+            {
+              "fact": "bridge_closed",
+              "value": true
+            },
+            {
+              "fact": "path_marked",
+              "value": true
+            }
+          ],
+          "choices": []
+        },
+        {
+          "id": "informed",
+          "when": [
+            {
+              "op": "fact_eq",
+              "key": "bridge_closed",
+              "value": true
+            },
+            {
+              "op": "knows",
+              "npc": "mira",
+              "key": "bridge_closed",
+              "value": true
+            }
+          ],
+          "text": "The east bridge is closed. Could you mark the safe path with your chalk?",
+          "claims": [
+            {
+              "fact": "bridge_closed",
+              "value": true
+            }
+          ],
+          "choices": [
+            {
+              "id": "mark_safe_path",
+              "text": "Mark the safe path.",
+              "command": "mark_path"
+            }
+          ]
+        }
+      ],
+      "fallback": {
+        "id": "ignorant",
+        "text": "I have no news from the east bridge. Have you seen it today?",
+        "claims": [],
+        "choices": [
+          {
+            "id": "share_bridge_news",
+            "text": "Share what you saw at the bridge.",
+            "command": "share_news"
+          }
+        ]
+      }
+    }
+  ]
+}
