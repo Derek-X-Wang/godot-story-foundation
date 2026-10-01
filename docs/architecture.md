@@ -12,8 +12,9 @@ neutral integration fixture, not the product's narrative or design target.
 Modules and pipelines must be independently optional, composable and extensible.
 A game should be able to select a music pipeline without installing art,
 dialogue or world-state systems. That is an acceptance target for a future music
-module, not a capability shipped by v0.1. The current narrative toolkit is only
-one subset of this direction; art and music pipelines remain proposals.
+module, not a capability shipped by v0.1. The narrative toolkit and experimental character-sprite pipeline are narrow
+subsets of this direction. Portraits, scenes, UI/icons, VFX and music remain
+separate future subpipelines; see [art contracts and status](art.md).
 
 Each module must state its inputs, outputs, versions, errors, dependencies,
 state ownership and any required lifecycle steps. Keep that contract small and
@@ -112,6 +113,11 @@ below and [verification record](testing.md) describe the current narrower scope.
   queries and submits commands, never lends mutable world dictionaries to prose
 - `tools/authoring`: offline request/response files, validation, simulation, review,
   hash-bound approval and deterministic static build
+- `tools/art`: optional offline character-sprite manifests, provenance and pixel
+  validation, deterministic atlases, optional Aseprite source and Godot consumer
+  adapters. No narrative runtime dependency. Contract v1 is experimental; two
+  private native character sources have exercised static and moving export/consumer
+  reuse. Pose authoring, gait approval and game integration are separate. See [art boundaries](art.md)
 
 There is no custom editor plugin in v0.1. The runtime scripts do not need a Plugins
 checkbox and are not `@tool`. The example uses Dialogue Manager's own editor

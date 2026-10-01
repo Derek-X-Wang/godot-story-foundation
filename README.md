@@ -13,8 +13,9 @@ library. Dependencies are downloaded once from public official sources.
 Foundation's direction is a composable toolkit of independently optional modules
 and pipelines for repeatable production across distinct games. Defaults and
 templates are starting points; unique mechanics may need game-owned code. This
-release implements the narrative subset listed below. Art/music pipelines and a
-replaceable Bevy backend are future work, not shipped capabilities. See the
+release implements the narrative subset listed below plus an experimental optional
+[character-sprite art pipeline](docs/art.md). Portraits, scenes, UI/icons, VFX,
+music pipelines and a replaceable Bevy backend remain future work. See the
 [design decisions](docs/architecture.md#design-decisions) and
 [contributor guardrails](AGENTS.md).
 
@@ -69,11 +70,16 @@ through the foundation's command bridge and transaction kernel.
 - Headless Godot regression tests, Python tooling tests, pinned public dependencies
   and read-only standard-runner GitHub Actions
 - Deterministic addon bundle with upstream licenses and file hash manifest
+- Independently optional pixel-character art manifest, provenance/grid/palette/tag/
+  timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
+  no AI provider/editor required for PNG input, no art runtime dependency
 
 ## Run checks
 
 ```sh
 python3 -m unittest discover -s tests/python -v
+python3 -m unittest discover -s tests/art_godot -v
+python3 scripts/test_art_godot.py
 python3 scripts/fetch_dependencies.py
 python3 scripts/prepare_example.py
 godot --headless --path .build/village --editor --import
@@ -87,6 +93,12 @@ On a restricted Linux host, point `XDG_DATA_HOME`, `XDG_CONFIG_HOME` and
 `XDG_CACHE_HOME` at writable directories before running Godot. The CI workflow runs
 the same commands on a standard Ubuntu runner. It performs no model calls, uses no
 secrets, and has only `contents: read` permission.
+
+For standalone art usage, original synthetic fixtures and the optional licensed
+Aseprite integration test, see [art subpipelines](docs/art.md). Character source
+authoring and visual review remain manual. Real static and moving sources for a
+second character have exercised the same export and consumer code. Gait approval
+and game integration remain separate acceptance steps.
 
 ## Reuse in a game
 

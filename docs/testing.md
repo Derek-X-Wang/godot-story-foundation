@@ -4,10 +4,37 @@ The release targets Godot 4.6.3 and the pinned official Dialogue Manager 3.10.4.
 Run the complete command sequence in the README after changes, including a fresh
 project import. Python checks require no network or third-party packages.
 
-Local final verification on 2026-09-30: **82 Python tests, 118 native runtime
-checks and 43 real Dialogue Manager/native fixture checks passed**. The extracted
+Local final verification on 2026-10-01: **103 Python tests, 7 optional Godot
+serializer tests, 118 native runtime checks and 43 real Dialogue Manager/native
+fixture checks passed**. The extracted
 release bundle repeats runtime/dialogue checks and imports cleanly. These are
 local results; hosted CI is verified separately for the published commit.
+
+Optional character-art verification on 2026-10-01 additionally passed:
+
+- 247 Godot import/pixel/geometry/timing/playback checks in each of two fresh
+  projects, including relocation after removing the original project
+- 47 real Aseprite 1.3.18.6 CLI/Lua checks: two synthetic drawings plus indexed variant, PNG/native
+  equivalence, deterministic output, source preservation and rejection paths
+- Two private indexed character sources through the same committed pipeline:
+  a 24-frame walk source and a different four-direction static source. Repeated
+  exports were byte-identical and preserved both sources; the courier atlas
+  remained pixel-identical to its existing approved export
+- 318 Godot consumer checks in each of two fresh projects for those real sources,
+  including actual import/playback and relocation after removing the first project
+- The second character's subsequent 24-frame walking source through the same
+  unchanged exporter, alongside the original courier: 478 Godot checks in each
+  of two fresh projects, including nonuniform timing, loop playback and relocation.
+  Repeated outputs match its final candidate bundle byte-for-byte; both sources
+  and the existing courier raster are preserved
+
+The public CI runs PNG/manifest tests and the standalone Godot consumer tests.
+It does not install a licensed Aseprite binary; run the documented optional test
+locally. Second-character static and moving source export/consumer reuse is now
+exercised. Character-specific pose/rig authoring, human gait approval and gameplay
+integration remain separate responsibilities; raster/consumer checks do not grant
+art approval or prove universal rig reuse.
+See [art checks](art.md).
 
 Coverage includes:
 

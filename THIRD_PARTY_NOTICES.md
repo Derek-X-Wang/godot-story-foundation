@@ -55,3 +55,13 @@ MIT: https://github.com/actions/checkout/blob/08eba0b27e820071cde6df949e0beb9ba4
 CI uses the Ubuntu runner's Python standard library and the pinned Godot binary.
 It requests read-only repository contents permission and needs no application
 secrets, model credentials, paid API, export templates, or hosted model calls.
+
+## Optional character art tooling
+
+The small public art fixtures and Python/Lua/GDScript adapter/test code are
+first-party MIT work. No private character artwork or Aseprite executable is
+distributed. The optional Aseprite adapter invokes a user-provided licensed
+installation; Aseprite is not a dependency of PNG processing or game runtime.
+See [Aseprite licensing](https://www.aseprite.org/docs/license/) and
+[art pipeline boundaries](docs/art.md). Source-art rights are declared per asset;
+the code license does not grant rights to arbitrary input art.
