@@ -96,8 +96,9 @@ secrets, and has only `contents: read` permission.
 
 For standalone art usage, original synthetic fixtures and the optional licensed
 Aseprite integration test, see [art subpipelines](docs/art.md). Character source
-authoring and visual review remain manual; the real second-character art acceptance
-is pending, distinct from the implemented synthetic adapter/substitution checks.
+authoring and visual review remain manual. A real second native static character
+has exercised the same export and consumer code; animation, final visual approval
+and game integration remain separate acceptance steps.
 
 ## Reuse in a game
 

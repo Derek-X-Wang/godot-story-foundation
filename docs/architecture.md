@@ -115,8 +115,9 @@ below and [verification record](testing.md) describe the current narrower scope.
   hash-bound approval and deterministic static build
 - `tools/art`: optional offline character-sprite manifests, provenance and pixel
   validation, deterministic atlases, optional Aseprite source and Godot consumer
-  adapters. No narrative runtime dependency. Contract v1 is experimental; real
-  second-character art acceptance is pending. See [art boundaries](art.md)
+  adapters. No narrative runtime dependency. Contract v1 is experimental; two
+  private native character sources have exercised static export/consumer reuse.
+  Animation and final art acceptance are separate. See [art boundaries](art.md)
 
 There is no custom editor plugin in v0.1. The runtime scripts do not need a Plugins
 checkbox and are not `@tool`. The example uses Dialogue Manager's own editor

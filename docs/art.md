@@ -199,17 +199,44 @@ A private production source has also exercised the Aseprite adapter: 48×64,
 120/120/240/120/120/240 ms exposures. Its layered source was preserved; none of
 that game's artwork, rig/masks, prompts or private records is included here.
 
-**Real second-character acceptance remains pending appearance approval and native
-source authoring.** Concept art cannot count as native sprite reuse. After approval:
+### Real second-character static reuse test
 
-1. Author the second character's own silhouette, masks and poses; do not copy an
-   incompatible long-coat/prop rig onto a broader short-coat body
-2. Record its actual cell, palette, tags, timing, pivot and provenance in a manifest
-3. Run the same validation/export adapters unchanged on both character sources
-4. Compare native/source hashes and output checks; visually review shape, motion,
-   contact, asymmetry, props and readability at native and intended game scale
-5. Record which work was shared and which drawing/rig decisions remained manual
+After concept approval, a separately authored broader, short-coat character was
+normalized and cleaned up in its own private source. It ran through the exact same
+committed pipeline and adapters without code changes:
+
+| Actual source parameter | Existing walking character | Second static character |
+| --- | --- | --- |
+| Native cell / pivot | 48×64 / (24,60) | 48×64 / (24,60) |
+| Authored frames | 24, four six-frame walk tags | 4, four single-frame idle tags |
+| Native exposures | 120/120/240/120/120/240 ms | 1000 ms per static direction |
+| Indexed palette | 16 entries | 20 entries |
+| Editable layers | 6 | 3 |
+| Character-specific art | Original long-coat/prop source | Independently normalized short-coat silhouette and face/hair cleanup |
+
+Both used the same read-only native inspector, manifest checks, PNG normalizer,
+Godot writer and consumer tests. Only source art and manifest parameters changed.
+Repeated bundles were byte-identical, both source hashes stayed unchanged, the
+existing walking character's atlas stayed pixel-identical to its previous export,
+and the two characters passed **318 Godot checks in each of two fresh projects**,
+including actual playback and relocation after deleting the original project.
+No private sources, prompts, manifests, masks or review records are in this repo.
+
+This closes the bounded **real second-character native static export and consumer
+reuse** check. It does not establish reusable walk-pose synthesis across bodies.
+The second character's silhouette selection, reference normalization, palette
+selection, face/hair/coat cluster corrections and native-size visual review were
+character-owned work. The first character's incompatible long-coat/prop masks
+were not inherited. No universal rig was created, and no deployed game was
+changed by this check.
+
+**Native visual approval, second-character walking and gameplay integration remain
+separate gates.** A static source and single-frame idle playback do not prove
+animation quality, ground contact or in-game readiness. Any later source revision
+must update its manifest hash and repeat the checks. For an animated reuse test,
+author and review that character's own poses/rig, run the same adapters unchanged,
+and compare motion/contact/readability at native and intended game scale.
 
 The software checks do not assess style, anatomy, smoothness, grounded locomotion,
-likeness or user approval. Passing synthetic substitution tests advances the tool
-contract; it does not close the pending real-character art acceptance gate.
+likeness or user approval. They establish technical artifact compatibility and
+source preservation, not art approval or a promise that new characters are data-only.

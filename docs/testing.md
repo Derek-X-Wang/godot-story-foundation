@@ -16,13 +16,19 @@ Optional character-art verification on 2026-10-01 additionally passed:
   projects, including relocation after removing the original project
 - 47 real Aseprite 1.3.18.6 CLI/Lua checks: two synthetic drawings plus indexed variant, PNG/native
   equivalence, deterministic output, source preservation and rejection paths
-- A private 24-frame indexed production source through the same adapter, without
-  publishing its artwork or changing its source/playback policy
+- Two private indexed character sources through the same committed pipeline:
+  a 24-frame walk source and a different four-direction static source. Repeated
+  exports were byte-identical and preserved both sources; the courier atlas
+  remained pixel-identical to its existing approved export
+- 318 Godot consumer checks in each of two fresh projects for those real sources,
+  including actual import/playback and relocation after removing the first project
 
 The public CI runs PNG/manifest tests and the standalone Godot consumer tests.
 It does not install a licensed Aseprite binary; run the documented optional test
-locally. The real second character is still awaiting appearance approval/native
-authoring; synthetic tests are not its art acceptance. See [art checks](art.md).
+locally. Second-character static source export/consumer reuse is now exercised.
+Its native visual approval, animation production and game integration remain
+separate gates; neither synthetic nor raster checks grant art approval.
+See [art checks](art.md).
 
 Coverage includes:
 
