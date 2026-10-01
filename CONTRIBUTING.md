@@ -1,8 +1,12 @@
 # Contributing
 
-Run the commands in the README before proposing a change. Add regression tests for
-runtime, save, or validation changes. Keep gameplay-specific policy in content or
-the consuming game; the addon must remain reusable.
+Read the [contributor guardrails](AGENTS.md) and
+[design decisions](docs/architecture.md#design-decisions) before changing boundaries.
+Run the commands in the README before proposing a behavioral change. For
+documentation-only changes, check relative links, source claims and
+`git diff --check`. Add regression tests for runtime, save, or validation changes.
+Keep gameplay-specific policy in content or the consuming game; the addon must
+remain reusable.
 
 Do not commit credentials, personal story material, build caches, downloaded
 executables, or model transcripts. Use fictional neutral fixtures. Contributions
