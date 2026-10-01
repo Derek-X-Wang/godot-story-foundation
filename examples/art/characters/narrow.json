@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "asset_id": "fixture_narrow",
+  "kind": "character_sprite",
+  "source": {
+    "adapter": "png",
+    "path": "narrow.png",
+    "sha256": "e5b7f3dfed51a1a0375945b99f1e05a090a443f8d8a49da5bddc7fa226253126"
+  },
+  "provenance": {
+    "origin": "original",
+    "creator": "Foundation contributors",
+    "license": "MIT",
+    "rights": "recorded",
+    "notes": "Original synthetic geometry fixture; see repository LICENSE. No game character art."
+  },
+  "cell": [
+    8,
+    12
+  ],
+  "pivot": [
+    4,
+    11
+  ],
+  "columns": 2,
+  "palette": [
+    "#00000000",
+    "#293148ff",
+    "#d79544ff"
+  ],
+  "hard_alpha": true,
+  "tags": [
+    {
+      "name": "idle_down",
+      "start": 0,
+      "count": 2,
+      "durations_ms": [
+        160,
+        240
+      ],
+      "loop": true
+    }
+  ]
+}

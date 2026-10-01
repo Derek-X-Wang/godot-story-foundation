@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "asset_id": "fixture_broad",
+  "kind": "character_sprite",
+  "source": {
+    "adapter": "png",
+    "path": "broad.png",
+    "sha256": "82a327d2faf753ca4a0b83abac31d2a006cc952c46229497964a21bcd3d59425"
+  },
+  "provenance": {
+    "origin": "original",
+    "creator": "Foundation contributors",
+    "license": "MIT",
+    "rights": "recorded",
+    "notes": "Original synthetic geometry fixture; see repository LICENSE. No game character art."
+  },
+  "cell": [
+    12,
+    12
+  ],
+  "pivot": [
+    6,
+    11
+  ],
+  "columns": 3,
+  "palette": [
+    "#00000000",
+    "#243d47ff",
+    "#5d9091ff",
+    "#d5b582ff"
+  ],
+  "hard_alpha": true,
+  "tags": [
+    {
+      "name": "work_down",
+      "start": 0,
+      "count": 3,
+      "durations_ms": [
+        90,
+        130,
+        210
+      ],
+      "loop": false
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "kind": {
+      "const": "character_sprite"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "enum": [
+            "png",
+            "aseprite"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "minItems": 1,
+          "maxItems": 4096,
+          "uniqueItems": true
+        },
+        "pivot_slice": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "adapter",
+        "path",
+        "sha256"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "enum": [
+            "original",
+            "ai_assisted",
+            "licensed",
+            "unknown"
+          ]
+        },
+        "creator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "rights": {
+          "enum": [
+            "recorded",
+            "unknown"
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "origin",
+        "creator",
+        "license",
+        "rights",
+        "notes"
+      ]
+    },
+    "cell": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1024
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "pivot": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1024
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "columns": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4096
+    },
+    "palette": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^#[a-f0-9]{6}(00|ff)$"
+      },
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true
+    },
+    "hard_alpha": {
+      "const": true
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          },
+          "start": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4095
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "durations_ms": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "minItems": 1,
+            "maxItems": 4096
+          },
+          "loop": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "start",
+          "count",
+          "durations_ms",
+          "loop"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 256
+    }
+  },
+  "required": [
+    "schema_version",
+    "asset_id",
+    "kind",
+    "source",
+    "provenance",
+    "cell",
+    "pivot",
+    "columns",
+    "palette",
+    "hard_alpha",
+    "tags"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Derek-X-Wang/godot-story-foundation/schemas/character-sprite.schema.json",
+  "title": "Optional character sprite manifest v1",
+  "$comment": "Structural schema only. The CLI additionally enforces contiguous tags, timing lengths, canonical transparency, source checksum/path bounds, pivot bounds, PNG pixels and provenance policy. No other art kind is implied."
+}

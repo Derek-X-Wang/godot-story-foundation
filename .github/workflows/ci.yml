@@ -23,11 +23,15 @@ jobs:
           persist-credentials: false
       - name: Test Python tooling
         run: python3 -m unittest discover -s tests/python -v
+      - name: Test optional art Godot serializer
+        run: python3 -m unittest discover -s tests/art_godot -v
       - name: Fetch verified dependency and engine
         run: |
           python3 scripts/fetch_dependencies.py
           python3 scripts/install_godot.py
           echo "$GITHUB_WORKSPACE/.deps" >> "$GITHUB_PATH"
+      - name: Test standalone art import and relocated playback
+        run: python3 scripts/test_art_godot.py
       - name: Assemble example
         run: python3 scripts/prepare_example.py
       - name: Import project

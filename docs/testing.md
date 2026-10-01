@@ -4,10 +4,25 @@ The release targets Godot 4.6.3 and the pinned official Dialogue Manager 3.10.4.
 Run the complete command sequence in the README after changes, including a fresh
 project import. Python checks require no network or third-party packages.
 
-Local final verification on 2026-09-30: **82 Python tests, 118 native runtime
-checks and 43 real Dialogue Manager/native fixture checks passed**. The extracted
+Local final verification on 2026-10-01: **103 Python tests, 7 optional Godot
+serializer tests, 118 native runtime checks and 43 real Dialogue Manager/native
+fixture checks passed**. The extracted
 release bundle repeats runtime/dialogue checks and imports cleanly. These are
 local results; hosted CI is verified separately for the published commit.
+
+Optional character-art verification on 2026-10-01 additionally passed:
+
+- 247 Godot import/pixel/geometry/timing/playback checks in each of two fresh
+  projects, including relocation after removing the original project
+- 47 real Aseprite 1.3.18.6 CLI/Lua checks: two synthetic drawings plus indexed variant, PNG/native
+  equivalence, deterministic output, source preservation and rejection paths
+- A private 24-frame indexed production source through the same adapter, without
+  publishing its artwork or changing its source/playback policy
+
+The public CI runs PNG/manifest tests and the standalone Godot consumer tests.
+It does not install a licensed Aseprite binary; run the documented optional test
+locally. The real second character is still awaiting appearance approval/native
+authoring; synthetic tests are not its art acceptance. See [art checks](art.md).
 
 Coverage includes:
 
