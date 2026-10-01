@@ -22,12 +22,18 @@ Optional character-art verification on 2026-10-01 additionally passed:
   remained pixel-identical to its existing approved export
 - 318 Godot consumer checks in each of two fresh projects for those real sources,
   including actual import/playback and relocation after removing the first project
+- The second character's subsequent 24-frame walking source through the same
+  unchanged exporter, alongside the original courier: 478 Godot checks in each
+  of two fresh projects, including nonuniform timing, loop playback and relocation.
+  Repeated outputs match its final candidate bundle byte-for-byte; both sources
+  and the existing courier raster are preserved
 
 The public CI runs PNG/manifest tests and the standalone Godot consumer tests.
 It does not install a licensed Aseprite binary; run the documented optional test
-locally. Second-character static source export/consumer reuse is now exercised.
-Its native visual approval, animation production and game integration remain
-separate gates; neither synthetic nor raster checks grant art approval.
+locally. Second-character static and moving source export/consumer reuse is now
+exercised. Character-specific pose/rig authoring, human gait approval and gameplay
+integration remain separate responsibilities; raster/consumer checks do not grant
+art approval or prove universal rig reuse.
 See [art checks](art.md).
 
 Coverage includes:

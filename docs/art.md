@@ -230,12 +230,35 @@ character-owned work. The first character's incompatible long-coat/prop masks
 were not inherited. No universal rig was created, and no deployed game was
 changed by this check.
 
-**Native visual approval, second-character walking and gameplay integration remain
-separate gates.** A static source and single-frame idle playback do not prove
-animation quality, ground contact or in-game readiness. Any later source revision
-must update its manifest hash and repeat the checks. For an animated reuse test,
-author and review that character's own poses/rig, run the same adapters unchanged,
-and compare motion/contact/readability at native and intended game scale.
+### Real second-character moving-source reuse test
+
+The second character's subsequent walk candidate also passed the same committed
+pipeline unchanged. It has four forward walk tags with six authored poses each,
+20 indexed colors, six editable layers, a 48×64 cell and (24,60) pivot. Its
+140/140/280/140/140/280 ms exposures form a 1120 ms cycle, distinct from the first
+character's 960 ms source cycle. These are native exposures; the pipeline does
+not infer a game movement speed or apply a gameplay animation multiplier.
+
+The final candidate was exported twice and compared with its original bundle:
+all output files matched byte-for-byte and the source SHA stayed unchanged. It
+and the original courier passed **478 shared Godot consumer checks in each of two
+fresh projects**, including visible pixels/alpha, atlas rectangles, all tags,
+nonuniform durations, pivot, nearest filtering, actual loop playback and relocation
+after deleting the first project. The original courier atlas stayed pixel-identical.
+No shared tool or adapter interface needed a patch for the moving source.
+
+This establishes **real moving-character export and consumer substitution**.
+The broader short-coat body's shorter limb geometry, moderate stride, masks and
+pose drawing were still authored in its character-specific workspace. Generic
+checks/export/import were reused; a universal rig or automatic motion synthesis
+was not demonstrated. Character-owned geometric/contact checks are separate from
+this module and cannot establish screen-space, subframe foot locking.
+
+**Human gait approval and gameplay integration remain separate gates.** Successful
+playback proves that declared frames and timing are consumed correctly, not that
+the walk feels right or is ready to deploy. No live game was changed. Any later
+source revision must update its manifest hash and repeat the checks and applicable
+visual review at native and intended game scale.
 
 The software checks do not assess style, anatomy, smoothness, grounded locomotion,
 likeness or user approval. They establish technical artifact compatibility and
