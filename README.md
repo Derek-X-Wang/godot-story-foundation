@@ -10,6 +10,14 @@ addon, pinned by commit and checksum. No Rust, GECS, model service, API key or
 network connection is needed at runtime. Python tooling uses only the standard
 library. Dependencies are downloaded once from public official sources.
 
+Foundation's direction is a composable toolkit of independently optional modules
+and pipelines for repeatable production across distinct games. Defaults and
+templates are starting points; unique mechanics may need game-owned code. This
+release implements the narrative subset listed below. Art/music pipelines and a
+replaceable Bevy backend are future work, not shipped capabilities. See the
+[design decisions](docs/architecture.md#design-decisions) and
+[contributor guardrails](AGENTS.md).
+
 ## Quick start
 
 Requirements: Python **3.11+**, Godot **4.6.3**, and internet access for the first

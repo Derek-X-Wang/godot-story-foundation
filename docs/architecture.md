@@ -1,6 +1,110 @@
 # Architecture and trust boundaries
 
-## Three boundaries, one repository
+## Design decisions
+
+The goal is repeatable production across games with distinct mechanics and
+creative identities. Foundation supplies reusable low-level primitives, tools
+and contracts; it is not a mandatory universal game framework. The village is a
+neutral integration fixture, not the product's narrative or design target.
+
+### Optional composition, explicit contracts
+
+Modules and pipelines must be independently optional, composable and extensible.
+A game should be able to select a music pipeline without installing art,
+dialogue or world-state systems. That is an acceptance target for a future music
+module, not a capability shipped by v0.1. The current narrative toolkit is only
+one subset of this direction; art and music pipelines remain proposals.
+
+Each module must state its inputs, outputs, versions, errors, dependencies,
+state ownership and any required lifecycle steps. Keep that contract small and
+explicit. Shared identifiers or formats may be deliberate contracts; an
+unrelated pipeline, global singleton or incidental file layout must not become
+a hidden prerequisite. A module may have real dependencies, but they must be
+declared and confined to its function.
+
+Replace pipeline stages, generation providers, file formats and runtime
+integrations through adapters at those boundaries. Do not assume interchangeable
+implementations have identical semantics: validate the replacement's contract
+and document conversions, costs and guarantees. The current authoring workflow
+exports/imports provider-neutral files; it has not exercised a live provider.
+
+### Defaults, templates and game-specific code
+
+The included workflow and game template are optional conveniences. Games may
+bypass them, compose only useful primitives, or implement unique mechanics in
+game-owned code. Prefer composition/adapters over a separate Foundation fork for
+each game. If a reusable extension point is missing, design and test a small
+upstream contract rather than hard-coding one game's policy into the core.
+
+For example, a game-specific rhythm mechanic can own its timing model and use
+only an asset pipeline; it need not represent rhythm timing as dialogue rules.
+A second story using only changed data is a useful test of one template's reuse,
+not a universal requirement that every new game be data-only or code-free.
+
+### Definitions, state and selected guarantees
+
+Keep immutable definitions (rules, content and asset descriptions) separate from
+mutable runtime state (progress, inventory and mechanic-specific state).
+Definitions identify the behavior/version being executed; state records one
+playthrough. The native kernel copies configured definitions and exposes copied
+queries/snapshots rather than lending mutable records to presentation code.
+
+Optional composition does not weaken the guarantees of a selected module:
+
+- When using the reviewed authoring workflow, approval binds the exact input,
+  candidate and review versions/hashes. Editing text invalidates that approval
+  and requires a new review/build; generated output must not retain a stale
+  "approved" label. See [offline authoring](authoring.md)
+- When using saves, explicitly define which state is covered. Custom mechanics
+  own their serializers, schema versions and migrations, with restore/replay
+  tests. Foundation's current snapshot only covers the native kernel's state;
+  there is no automatic custom-state serializer/plugin hook or automatic
+  transaction spanning game systems. See [versions and saves](versioning.md)
+- A custom adapter/workflow must document which validation, review, transaction
+  or save guarantees it preserves and test those claims. Bypassing a workflow
+  does not imply that its guarantees still apply
+
+### Backend choice and tradeoffs
+
+Native GDScript is the implemented default. A future Bevy backend would require
+an explicit interface, adapters and equivalence tests for the promised behavior
+(including ordering, transactions, queries and save compatibility where used).
+This document does not establish that interface or promise an automatic,
+zero-cost backend switch.
+
+Alternatives and consequences:
+
+- A mandatory all-in-one framework simplifies one standard path but couples
+  unrelated features and constrains unusual games. Optional modules instead
+  require explicit integration, dependency and compatibility testing
+- One universal data schema makes a second templated story easy but cannot
+  express every mechanic well. Game-owned code preserves creative freedom at
+  the cost of its own validation, tests and serialization
+- Per-game core forks unblock local changes quickly but multiply maintenance.
+  Small shared extension contracts and game-owned adapters keep the core reusable,
+  while still requiring deliberate work for genuinely new behavior
+- The native backend minimizes today's integration surface. Backend abstraction
+  is justified by a concrete implementation and validated contract, not an
+  untested promise of portability
+
+### Acceptance examples
+
+For a new or changed module, demonstrate the relevant boundary rather than
+requiring every game to use the same stack:
+
+1. Standalone use: exercise it with only declared dependencies. Today, the native
+   runtime can be used without Dialogue Manager or offline generation; a future
+   music pipeline must also work without narrative/world-state or art modules
+2. Substitution: replace a stage/provider/format through an adapter, check its
+   contract, and show unrelated modules still work without coordinated edits
+3. Unique mechanics: integrate game-owned behavior without editing/forking core,
+   with explicit ownership and tests for any selected save/review guarantees
+
+These are design acceptance criteria, not claims that every possible substitution
+or custom mechanic is supported and tested in v0.1. The implemented boundaries
+below and [verification record](testing.md) describe the current narrower scope.
+
+## Implemented boundaries (v0.1)
 
 - `addons/story_foundation/runtime`: authoritative native GDScript world state,
   condition/effect rules, events, timers, transactions, replay IDs and saves
@@ -15,12 +119,19 @@ plugin/importer. A custom editor is unnecessary for this workflow.
 
 ## Game-owned policy
 
-Each game owns its world rules, characters, content IDs, presentation, art, saves
-and review records. Keep that material outside the reusable addon. In the example,
+Foundation owns reusable contracts, validators, tooling and neutral examples.
+Each game owns its mechanics, world rules, characters, content IDs, presentation,
+story, art/music assets, project-specific prompts, saves and review records. Keep
+that material outside the reusable addon. In the example,
 `examples/village/authoring` is a sibling of `examples/village/game`, not a folder
 inside its Godot export root. `scripts/prepare_example.py` assembles a disposable
 project with installed addons and approved static content. It never copies the
 authoring packet, raw response or approval record into that project.
+
+The public repository must exclude private story/prompt/review material, keys or
+other secrets, proprietary or license-restricted assets, and large game asset
+payloads. Keep those in the game's appropriate private storage; public examples
+must be intentionally redistributable, neutral fixtures with correct licenses.
 
 Provider output cannot change gameplay policy: candidate world rules must exactly
 match the packet's declared world. The v0.1 authoring schema deliberately supports
