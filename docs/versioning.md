@@ -1,12 +1,13 @@
 # Versions, upgrades, replay and saves
 
-Pin four independently meaningful things:
+Pin the independently meaningful boundaries that the game selects:
 
 | Boundary | v0.1 value | Meaning |
 | --- | --- | --- |
 | Foundation release/API | 0.1.0 | Code API and package |
 | Save schema | 2 | Snapshot structure; schema 1 migration supported |
 | Authoring content schema | 1 | Packet/candidate/build representation |
+| Optional scene primitive API | 1 | Geometry/ordering contract; no save ownership |
 | Game content version | Positive integer in content | Rules, stable IDs and save compatibility |
 
 The dependency lock separately pins Godot 4.6.3 and the exact Dialogue Manager
@@ -25,6 +26,11 @@ Install the runtime alone if Dialogue Manager is unnecessary. Do not fork runtim
 code into each game's business logic. A Git submodule pinned to an exact commit is
 an optional workflow; remember that a submodule checks out the whole repository,
 not just the addon subtree. Release ZIP installation is the simple default.
+
+Scene-only consumers may select either independent script and its UID instead of
+the full addon bundle. The [scene-only package](scene.md#packaging-pins-and-upgrades)
+includes deterministic file hashes and no Dialogue Manager or narrative runtime.
+Pin its exact source commit and selected hashes in the consuming game.
 
 ## Upgrade procedure
 

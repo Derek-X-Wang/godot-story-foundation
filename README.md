@@ -14,7 +14,8 @@ Foundation's direction is a composable toolkit of independently optional modules
 and pipelines for repeatable production across distinct games. Defaults and
 templates are starting points; unique mechanics may need game-owned code. This
 release implements the narrative subset listed below plus an experimental optional
-[character-sprite art pipeline](docs/art.md). Portraits, scenes, UI/icons, VFX,
+[character-sprite art pipeline](docs/art.md) and independent
+[scene navigation/depth primitives](docs/scene.md). Portraits, scene-art, UI/icons, VFX,
 music pipelines and a replaceable Bevy backend remain future work. See the
 [design decisions](docs/architecture.md#design-decisions) and
 [contributor guardrails](AGENTS.md).
@@ -70,6 +71,8 @@ through the foundation's command bridge and transaction kernel.
 - Headless Godot regression tests, Python tooling tests, pinned public dependencies
   and read-only standard-runner GitHub Actions
 - Deterministic addon bundle with upstream licenses and file hash manifest
+- Independently optional rectangle sweep/slide/routing/reachable recovery and exact
+  deterministic depth ordering; each script works without any other module
 - Independently optional pixel-character art manifest, provenance/grid/palette/tag/
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
@@ -80,6 +83,8 @@ through the foundation's command bridge and transaction kernel.
 python3 -m unittest discover -s tests/python -v
 python3 -m unittest discover -s tests/art_godot -v
 python3 scripts/test_art_godot.py
+python3 scripts/test_scene.py
+python3 scripts/package_scene.py
 python3 scripts/fetch_dependencies.py
 python3 scripts/prepare_example.py
 godot --headless --path .build/village --editor --import
@@ -91,8 +96,14 @@ python3 scripts/test_release.py
 
 On a restricted Linux host, point `XDG_DATA_HOME`, `XDG_CONFIG_HOME` and
 `XDG_CACHE_HOME` at writable directories before running Godot. The CI workflow runs
-the same commands on a standard Ubuntu runner. It performs no model calls, uses no
-secrets, and has only `contents: read` permission.
+the existing narrative/art/release checks on a standard Ubuntu runner. The new
+scene test and scene-only package commands are local verification for this proposal;
+adding them to hosted CI requires a separately approved integration. The unchanged
+workflow performs no model calls, uses no secrets, and has only `contents: read`
+permission.
+
+For scene-only installation (no narrative, art or Dialogue Manager dependency),
+contracts and the six-file deterministic bundle, see [scene primitives](docs/scene.md).
 
 For standalone art usage, original synthetic fixtures and the optional licensed
 Aseprite integration test, see [art subpipelines](docs/art.md). Character source
