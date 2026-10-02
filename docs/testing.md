@@ -4,7 +4,25 @@ The release targets Godot 4.6.3 and the pinned official Dialogue Manager 3.10.4.
 Run the complete command sequence in the README after changes, including a fresh
 project import. Python checks require no network or third-party packages.
 
-Local final verification on 2026-10-01: **103 Python tests, 7 optional Godot
+Local optional-scene verification on 2026-10-02 (Godot 4.6.3): **106 Python tests,
+7 optional Godot serializer tests, 118 native runtime checks and 43 real Dialogue
+Manager/native fixture checks passed**, plus 247 character-art checks in each of
+two fresh projects. The full release ZIP imported and repeated its runtime,
+dialogue and main-scene checks. No Aseprite binary was run for this change.
+
+The new independent scene tests passed **4,823 navigation checks and 1,188 depth
+checks per project**, each repeated after removal of the original and relocation
+into a fresh isolated project. Scene-only packaging verifies an exact six-file
+allowlist, deterministic bytes and manifest hashes. These checks use no narrative,
+art, Dialogue Manager, autoload or asset dependencies. Cases include positive
+sub-skin free channels, huge finite displacement safety and exact mixed numeric
+ordering. See [scene contracts and limits](scene.md).
+
+These scene checks are local-only for this proposal. The existing hosted workflow
+is unchanged; integration and hosted verification are deferred to a separately
+approved PR stage. No remote CI result is inferred from local success.
+
+Prior local verification on 2026-10-01: **103 Python tests, 7 optional Godot
 serializer tests, 118 native runtime checks and 43 real Dialogue Manager/native
 fixture checks passed**. The extracted
 release bundle repeats runtime/dialogue checks and imports cleanly. These are

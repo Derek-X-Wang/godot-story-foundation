@@ -13,7 +13,8 @@ Modules and pipelines must be independently optional, composable and extensible.
 A game should be able to select a music pipeline without installing art,
 dialogue or world-state systems. That is an acceptance target for a future music
 module, not a capability shipped by v0.1. The narrative toolkit and experimental character-sprite pipeline are narrow
-subsets of this direction. Portraits, scenes, UI/icons, VFX and music remain
+subsets of this direction, alongside independently optional scene navigation/depth
+primitives. Portraits, scene-art, UI/icons, VFX and music remain
 separate future subpipelines; see [art contracts and status](art.md).
 
 Each module must state its inputs, outputs, versions, errors, dependencies,
@@ -109,6 +110,9 @@ below and [verification record](testing.md) describe the current narrower scope.
 
 - `addons/story_foundation/runtime`: authoritative native GDScript world state,
   condition/effect rules, events, timers, transactions, replay IDs and saves
+- `addons/story_foundation/scene`: independently usable rectangle navigation and
+  deterministic depth sorting; no runtime, art, addon or autoload dependencies.
+  Explicit geometry configuration and game-owned adapters; see [scene contracts](scene.md)
 - `addons/story_foundation/adapters`: a narrow Dialogue Manager bridge; it reads
   queries and submits commands, never lends mutable world dictionaries to prose
 - `tools/authoring`: offline request/response files, validation, simulation, review,
