@@ -15,7 +15,7 @@ and pipelines for repeatable production across distinct games. Defaults and
 templates are starting points; unique mechanics may need game-owned code. This
 release implements the narrative subset listed below plus an experimental optional
 [character-sprite art pipeline](docs/art.md) and independent
-[scene navigation/depth primitives](docs/scene.md). Portraits, scene-art, UI/icons, VFX,
+[scene navigation/depth primitives](docs/scene.md), plus optional [regression execution](tools/regression/README.md) and [semantic replay records](docs/replay.md). Portraits, scene-art, UI/icons, VFX,
 music pipelines and a replaceable Bevy backend remain future work. See the
 [design decisions](docs/architecture.md#design-decisions) and
 [contributor guardrails](AGENTS.md).
@@ -77,9 +77,22 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
+## Optional regression toolkit
+
+The test-only Python runner wraps existing trusted commands with bounded execution,
+strict JSON results, scenario inventories, diagnostic checks, lane status and
+explicit coverage targets. The independently optional GDScript replay helper
+records version/hash/seed identity, initial semantic state and action deltas.
+Adapters own real execution and their oracle; no game framework migration or
+narrative dependency is required. See [runner contracts](tools/regression/README.md)
+and [replay contracts and synthetic example](docs/replay.md). Neither module is
+a state explorer, automatic shrinker, physical-input driver or Web test harness.
+
 ## Run checks
 
 ```sh
+python3 -m unittest discover -s tools/regression/tests -v
+python3 scripts/test_replay.py
 python3 -m unittest discover -s tests/python -v
 python3 -m unittest discover -s tests/art_godot -v
 python3 scripts/test_art_godot.py

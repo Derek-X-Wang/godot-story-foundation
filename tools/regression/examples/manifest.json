@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "required_lanes": ["source"],
+  "coverage_targets": {
+    "actions": ["inspect_gate", "open_gate"],
+    "transitions": ["closed_to_open"],
+    "guard_outcomes": ["open.allowed", "open.blocked"],
+    "endings": ["gate_open"],
+    "invariants": ["closed_gate_unchanged", "opened_once"]
+  },
+  "suites": [
+    {
+      "id": "neutral_source",
+      "lane": "source",
+      "command": ["python3", "neutral_suite.py"],
+      "cwd": ".",
+      "timeout_seconds": 10,
+      "result_prefix": "NEUTRAL_RESULT",
+      "expected_scenario_ids": ["closed_gate", "open_gate"]
+    }
+  ]
+}
