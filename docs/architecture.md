@@ -127,6 +127,23 @@ There is no custom editor plugin in v0.1. The runtime scripts do not need a Plug
 checkbox and are not `@tool`. The example uses Dialogue Manager's own editor
 plugin/importer. A custom editor is unnecessary for this workflow.
 
+## Optional test-only execution and replay
+
+`tools/regression` runs trusted local argv commands with a versioned strict result
+protocol, timeouts, exact counted diagnostic allowances, explicit missing lanes and
+coverage targets. It has only a Python standard-library dependency.
+`addons/story_foundation/testing/replay_record.gd` is independently optional and
+uses Godot built-ins only. It validates and compares semantic records; it never
+applies a gameplay action or restores a save by itself.
+
+Game adapters own scenario IDs, action/guard/ending catalogs, snapshots, initial
+state setup, real UI/runtime execution, expected results and invariants. Neither
+module depends on the narrative kernel, Dialogue Manager, scenes or art. The
+public examples are original neutral synthetic fixtures. Private story IDs and
+fixtures belong in the consuming game. See [runner protocol](../tools/regression/README.md)
+and [replay contract](replay.md). State exploration, shrinking and browser drivers
+remain unimplemented; native packed checks do not establish Web runtime coverage.
+
 ## Game-owned policy
 
 Foundation owns reusable contracts, validators, tooling and neutral examples.
