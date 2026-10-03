@@ -15,8 +15,9 @@ and pipelines for repeatable production across distinct games. Defaults and
 templates are starting points; unique mechanics may need game-owned code. This
 release implements the narrative subset listed below plus an experimental optional
 [character-sprite art pipeline](docs/art.md) and independent
-[scene navigation/depth primitives](docs/scene.md), plus optional [regression execution](tools/regression/README.md) and [semantic replay records](docs/replay.md). Portraits, scene-art, UI/icons, VFX,
-music pipelines and a replaceable Bevy backend remain future work. See the
+[scene navigation/depth primitives](docs/scene.md), independent
+[audio controls/settings/envelopes](docs/audio.md), plus optional [regression execution](tools/regression/README.md) and [semantic replay records](docs/replay.md). Portraits, scene-art, UI/icons, VFX,
+music asset pipelines and a replaceable Bevy backend remain future work. See the
 [design decisions](docs/architecture.md#design-decisions) and
 [contributor guardrails](AGENTS.md).
 
@@ -73,6 +74,9 @@ through the foundation's command bridge and transaction kernel.
 - Deterministic addon bundle with upstream licenses and file hash manifest
 - Independently optional rectangle sweep/slide/routing/reachable recovery and exact
   deterministic depth ordering; each script works without any other module
+- Independently optional native audio bus creation, caller-owned level/mute
+  preferences with explicit-path persistence, and stateless gain envelopes; no
+  players, cues, assets, autoload or other-module dependencies
 - Independently optional pixel-character art manifest, provenance/grid/palette/tag/
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
@@ -105,6 +109,8 @@ python3 -m unittest discover -s tests/art_godot -v
 python3 scripts/test_art_godot.py
 python3 scripts/test_scene.py
 python3 scripts/package_scene.py
+python3 scripts/test_audio.py
+python3 scripts/package_audio.py
 python3 scripts/fetch_dependencies.py
 python3 scripts/prepare_example.py
 godot --headless --path .build/village --editor --import
@@ -116,14 +122,18 @@ python3 scripts/test_release.py
 
 On a restricted Linux host, point `XDG_DATA_HOME`, `XDG_CONFIG_HOME` and
 `XDG_CACHE_HOME` at writable directories before running Godot. The CI workflow runs
-the existing narrative/art/release checks on a standard Ubuntu runner. The new
-scene test and scene-only package commands are local verification for this proposal;
-adding them to hosted CI requires a separately approved integration. The unchanged
-workflow performs no model calls, uses no secrets, and has only `contents: read`
-permission.
+the narrative/art/release checks and the native audio isolation/relocation runner
+(including its deterministic package checks) on a standard Ubuntu runner. Scene
+tests and scene-only packaging remain local verification for this proposal.
+The opt-in exported Web-driver audio test is local-only. The workflow performs
+no model calls, uses no secrets, and retains only `contents: read` permission.
 
 For scene-only installation (no narrative, art or Dialogue Manager dependency),
 contracts and the six-file deterministic bundle, see [scene primitives](docs/scene.md).
+
+For audio-only installation, independently selectable scripts, persisted-format
+contracts and the five-file deterministic bundle, see [audio primitives](docs/audio.md).
+These runtime controls do not implement a music asset pipeline.
 
 For standalone art usage, original synthetic fixtures and the optional licensed
 Aseprite integration test, see [art subpipelines](docs/art.md). Character source
