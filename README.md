@@ -88,6 +88,13 @@ narrative dependency is required. See [runner contracts](tools/regression/README
 and [replay contracts and synthetic example](docs/replay.md). Neither module is
 a state explorer, automatic shrinker, physical-input driver or Web test harness.
 
+## Optional durable source checkpoints
+
+The standalone [checkpoint tool](tools/checkpoints/README.md) packs source and
+authored assets, verifies a durable Library copy through a fresh restore drill,
+and gates bounded work/phase transitions. It has no runtime module dependency.
+A local commit or archive is never reported as a verified durable backup.
+
 ## Run checks
 
 ```sh

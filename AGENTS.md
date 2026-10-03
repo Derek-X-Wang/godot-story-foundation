@@ -20,3 +20,8 @@ module boundaries; use [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules
   affected boundaries. Follow the README checks for behavioral changes; for
   documentation-only changes, check relative links, source claims and
   `git diff --check`
+- For work in a transient workspace, follow the optional
+  [durable checkpoint loop](tools/checkpoints/README.md): verified off-workspace
+  source recovery before phase changes, approval waits, handoffs or releases;
+  bounded work batches between checkpoints. Pending/failed backups block further
+  risky work. A local commit/archive alone is not durable evidence
