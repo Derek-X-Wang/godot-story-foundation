@@ -169,6 +169,63 @@ when to stop a completed player. To retarget continuously, capture the current
 sample and use it as the new start. No state, timer, player or update loop is
 hidden in the helper.
 
+## Consumer-owned pause and loop policy
+
+Bus gain/mute and a player's timeline are separate contracts. The game decides
+whether silence should hold playback or let it advance, how overlapping holds
+combine (for example, menu plus focus loss), and when the final hold is released.
+Refresh settings repeatedly without issuing unchanged transport operations;
+retain the consumer's authoritative state rather than inferring it from gain.
+This avoids redundant calls but does not repair an engine's pause bookkeeping.
+
+The exact Godot 4.6.3 Web **Sample** driver's `SampleNode` has four reproducible
+negative controls in the optional test below:
+
+- Redundant `pause(false)` replaces the source and restarts at its base offset
+  (zero for a zero-offset start)
+- Repeated `pause(true)` rewrites the held offset using elapsed wall-clock time
+- Even with only real state transitions, play 3 seconds, hold 10, play 2, hold 10
+  resumes at 15 seconds rather than 5: `_unpause()` does not reset
+  `_sourceStartTime`, so the earlier hold is counted
+- Stop and start with a saved nonzero offset restores the immediate position,
+  but subsequent `ended` callbacks restart from that same offset. Full loops
+  then omit their beginning
+
+These are version-pinned observations of [official driver source](https://github.com/godotengine/godot/blob/35e80b3a8822a9df9be390814b62f44c0a9c69e8/platform/web/js/libs/library_godot_audio.js),
+not desired API behavior or a Foundation lifecycle implementation. A passing
+characterization test means these defects remain observable; neither
+transition-only pause calls nor stop/play-at-offset alone establishes a correct
+repeated-hold, full-loop contract.
+
+For a player that needs this contract, per-player `playback_type =
+AudioServer.PLAYBACK_TYPE_STREAM` is a consumer-selectable alternative to test.
+The [engine selection rule](https://github.com/godotengine/godot/blob/35e80b3a8822a9df9be390814b62f44c0a9c69e8/scene/audio/audio_stream_player_internal.h#L64-L66)
+selects the Godot mixer for explicit Stream even with a Sample Web default.
+Keep that choice scoped to the players that need it: [official Web audio guidance](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_web.html#audio-playback)
+documents the feature/latency tradeoff, especially for nonthreaded exports.
+Foundation does not change a project default or promise that Stream solves every
+browser, performance or scheduling issue. Check buffered output tails on hold and
+underruns under load in the actual browser. The Sample-driver test does not execute
+or validate Stream playback or establish audible results for those tradeoffs.
+
+### Consumer acceptance checklist
+
+Use the exact exported build, supported browsers and representative devices:
+
+- Refresh settings repeatedly while playing and while held; no unintended
+  restart, seek, duplicate player or accumulated hold-time drift
+- Perform at least **two real hold/resume cycles**, with unequal play/hold
+  intervals; check the second resumed position against played time only
+- Let at least two complete loops finish naturally after resuming from a
+  nonzero position; verify the beginning of every later loop is present
+- Hold/release just before and just after loop boundaries; repeat with menu and
+  focus holds overlapping, released in both orders
+- Combine low gain, zero gain, per-bus mute and Master mute with those holds;
+  releasing one cause must preserve other causes and the selected volume
+- Check actual output after the required user gesture, focus/tab changes and
+  reload. Listen for missing beginnings, unexpected silence, clicks and gaps;
+  position logs alone cannot establish audible correctness
+
 ## Packaging, pins and verification
 
 ```sh
@@ -177,6 +234,8 @@ python3 -m unittest discover -s tests/python -p test_audio_packaging.py -v
 python3 scripts/test_audio.py
 # Optional: pass the exact Godot 4.6.3 exported engine driver to test its graph.
 node tests/audio/test_web_bus_driver.cjs /path/to/exact/export/index.js
+# Optional: characterize the official source driver's pause/loop defects.
+node tests/audio/test_web_pause_driver.cjs /path/to/library_godot_audio.js
 ```
 
 The deterministic ZIP contains exactly three scripts, the first-party MIT license
@@ -195,11 +254,33 @@ bus preservation, exact append order, finite/default/error settings behavior,
 legacy-format persistence, smoothstep trajectories/endpoints and retargeting.
 Python tests also check missing/symlinked package inputs and isolation boundaries.
 
-The optional Node test exercises the actual supplied exported driver's sample-bus
-graph with synthetic Web Audio nodes. No engine driver is bundled here. It does
-not run a browser, hear output, verify a real device, exercise a persistence sync
-or establish playback/autoplay permissions. The existing public workflow runs
-the native audio runner and Python packaging checks using its installed Godot and
-Python. The exported-driver test remains opt-in/local-only. The workflow gains no
-new permissions, secrets, dependencies or triggers; a configured step is not an
-observed hosted result.
+The two optional Node tests use recording Web Audio nodes. The bus test exercises
+the exact supplied exported driver's sample-bus graph. The pause test evaluates
+the complete, unmodified official `platform/web/js/libs/library_godot_audio.js`,
+with Emscripten registration stubs and synthetic silence, then calls its actual
+Sample lifecycle methods. Obtain that file outside this repository from
+[immutable Godot source](https://raw.githubusercontent.com/godotengine/godot/35e80b3a8822a9df9be390814b62f44c0a9c69e8/platform/web/js/libs/library_godot_audio.js):
+
+- Release: `4.6.3-stable`; commit: `35e80b3a8822a9df9be390814b62f44c0a9c69e8`
+- File SHA-256: `46e8983be587672d11d073dc65eee0bf89cb6b43acf612de1eb16f17abb1849e`
+- Git blob: `d1c996efe46eb8191b0c8279eb40268de3b1fd8d`
+- License: [Godot MIT](../licenses/Godot-MIT.txt), also retained in the input's
+  upstream header. No engine source, private export or game audio is bundled
+
+These pins identify upstream source only. They do not establish that a locally
+installed editor or export template contains the same implementation; verify the
+consumer's binary/export provenance separately before transferring these findings.
+
+The pause harness rejects any byte mismatch **before evaluation**; obtain the
+exact file rather than changing its pin to accept a local export or edited source.
+It records source starts/stops and injects `ended` events. It does not emulate the
+C++/Wasm bridge, position-reporting processor, real browser event races or audio
+scheduling. Native mixer checks, exact Web driver/transport checks, and actual
+browser scheduling/listening checks are separate evidence layers. Neither Node
+test runs a browser, hears output, verifies a real device, exercises a persistence
+sync or establishes playback/autoplay permissions.
+
+The existing public workflow runs the native audio runner and Python packaging
+checks using its installed Godot and Python. Both driver tests remain
+opt-in/local-only. The workflow gains no new permissions, secrets, dependencies
+or triggers; a configured step is not an observed hosted result.

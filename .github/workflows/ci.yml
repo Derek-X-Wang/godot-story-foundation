@@ -22,7 +22,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Test Python tooling
-        run: python3 -m unittest discover -s tests/python -v
+        run: |
+          python3 -m unittest discover -s tests/python -v
+          python3 -m unittest discover -s tools/regression/tests -v
       - name: Test optional art Godot serializer
         run: python3 -m unittest discover -s tests/art_godot -v
       - name: Fetch verified dependency and engine
@@ -44,6 +46,11 @@ jobs:
         run: godot --headless --path .build/village --script res://tests/runtime/run.gd
       - name: Test real Dialogue Manager integration
         run: godot --headless --path .build/village --script res://tests/runtime/test_dialogue.gd
+      - name: Test isolated consequences and rendered outcome combinations
+        run: |
+          godot --headless --path .build/village --script res://tests/runtime/test_consequence_contracts.gd 2>&1 | tee .build/consequences.log
+          ! grep -E 'SCRIPT ERROR:|^[[:space:]]*ERROR:' .build/consequences.log
+          grep -E '^Consequence contracts: [0-9]+/[0-9]+ checks passed$' .build/consequences.log
       - name: Smoke test the playable main scene
         run: |
           godot --headless --path .build/village --quit-after 5 2>&1 | tee .build/demo-smoke.log

@@ -1,0 +1,16 @@
+~ recap
+if story.branch_available("recap", "p0_s0")
+    Outcome: Primary task incomplete. Secondary result unchecked.
+elif story.branch_available("recap", "p0_s1")
+    Outcome: Primary task incomplete. Secondary result checked but not shared.
+elif story.branch_available("recap", "p0_s2")
+    Outcome: Primary task incomplete. Secondary result checked and shared.
+elif story.branch_available("recap", "p1_s0")
+    Outcome: Primary task completed. Secondary result unchecked.
+elif story.branch_available("recap", "p1_s1")
+    Outcome: Primary task completed. Secondary result checked but not shared.
+elif story.branch_available("recap", "p1_s2")
+    Outcome: Primary task completed. Secondary result checked and shared.
+else
+    Outcome: Outcome unknown.
+=> END

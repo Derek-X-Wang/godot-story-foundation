@@ -116,6 +116,7 @@ python3 scripts/prepare_example.py
 godot --headless --path .build/village --editor --import
 godot --headless --path .build/village --script res://tests/runtime/run.gd
 godot --headless --path .build/village --script res://tests/runtime/test_dialogue.gd
+godot --headless --path .build/village --script res://tests/runtime/test_consequence_contracts.gd
 python3 scripts/package_release.py
 python3 scripts/test_release.py
 ```
