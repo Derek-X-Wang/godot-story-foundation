@@ -39,14 +39,22 @@ class Checkpoints(unittest.TestCase):
         c.pack(self.root, path)
         return path
 
-    def receipt(self, path):
+    def receipt(self, path, form='raw', operation='create_library_file', version=0):
         # Simulated successful application receipt for offline gate tests only.
-        receipt = {'operation': 'create_library_file', 'status': 'succeeded',
+        receipt = {'operation': operation, 'status': 'succeeded',
                    'library_file_id': 'libfile_synthetic', 'file_id': 'file_synthetic',
-                   'current_version_number': 0}
+                   'current_version_number': version}
+        if form == 'wrapped':
+            receipt = {'result': receipt}
+        elif form == 'compact':
+            receipt.pop('operation')
+            receipt = {'results': [{**receipt, 'purpose': operation,
+                       'local_path': c.get_state(self.root)['pending']['archive'],
+                       'file_name': 'recovery.zip', 'path': '/recovery.zip',
+                       'local_metadata_applied': True}]}
         out = self.base / 'receipt.json'; out.write_text(json.dumps(receipt))
         os.setxattr(path, 'user.library-file-id', b'libfile_synthetic')
-        os.setxattr(path, 'user.library-file-version', b'0')
+        os.setxattr(path, 'user.library-file-version', str(version).encode())
         return out
 
     def sealed(self):
@@ -189,6 +197,129 @@ class Checkpoints(unittest.TestCase):
         receipt = self.receipt(downloaded); record = json.loads(receipt.read_text()); record['status'] = 'failed'; receipt.write_text(json.dumps(record))
         with self.assertRaisesRegex(ValueError, 'successful Library'): c.seal(self.root, downloaded, receipt, self.base / 'restore')
         self.assertEqual(c.get_state(self.root)['pending']['status'], 'pending')
+
+    def test_legacy_and_compact_create_replace_receipts_preserve_verified_state(self):
+        for form in ('raw', 'wrapped', 'compact'):
+            for operation in ('create_library_file', 'replace_library_file'):
+                for version in (0, 3):
+                    with self.subTest(form=form, operation=operation, version=version):
+                        name = f'{form}-{operation}-{version}'
+                        pack = self.packed(name + '.zip')
+                        downloaded = self.base / (name + '-download.zip'); shutil.copyfile(pack, downloaded)
+                        receipt = self.receipt(downloaded, form, operation, version)
+                        original = receipt.read_bytes()
+                        result = c.seal(self.root, downloaded, receipt, self.base / (name + '-restore'))
+                        self.assertEqual(receipt.read_bytes(), original)
+                        self.assertEqual(result['status'], 'verified')
+                        self.assertEqual(result['library_version'], str(version))
+                        self.assertEqual(result['file_id'], 'file_synthetic')
+                        self.assertEqual((self.base / (name + '-restore/source.txt')).read_text(), 'version one\n')
+                        self.assertEqual(c.guard(self.root, 'release')['status'], 'verified')
+                        state = c.get_state(self.root)
+                        self.assertEqual(set(state), {'verified'})
+                        self.assertEqual(set(state['verified']), {
+                            'status', 'archive', 'archive_sha256', 'head', 'source_sha256',
+                            'policy_sha256', 'created_unix', 'files_restored', 'dirty_tracked',
+                            'files', 'verified_unix', 'library_file_id', 'library_version',
+                            'file_id', 'restore_path'})
+
+    def test_compact_receipt_rejects_ambiguous_incomplete_and_wrong_type_results(self):
+        pack = self.packed(); downloaded = self.base / 'materialized.zip'; shutil.copyfile(pack, downloaded)
+        receipt = self.receipt(downloaded, 'compact')
+        valid = json.loads(receipt.read_text()); row = valid['results'][0]
+        invalid = [None, [], True, 'receipt', {}, {'results': []},
+                   {'results': row}, {'results': [None]}, {'results': [row, row]},
+                   {'results': [row, {**row, 'status': 'failed'}]},
+                   {'results': [row], 'result': row}, {'result': valid},
+                   {'results': [row], 'operation': 'create_library_file'}]
+        for key in row:
+            invalid.append({'results': [{k: v for k, v in row.items() if k != key}]})
+        for key, values in {
+            'status': ['failed', 'pending', 'prepared', 'partially_succeeded', True, None],
+            'purpose': ['prepare_uploads', 'finalize_uploads', 'delete_library_file', None, []],
+            'local_metadata_applied': [False, 1, 'true', None],
+            'local_path': ['', ' ', None, 1, str(downloaded), 'recovery.zip', 'bad\0path'],
+            'library_file_id': ['', ' ', None, 1, [], {}],
+            'file_id': ['', ' ', None, 1, [], {}],
+            'current_version_number': [-1, True, False, '0', 0.0, None, [], {}],
+            'file_name': ['', None, 1, 'different.zip', '../recovery.zip'],
+            'path': ['', None, 1, 'recovery.zip', '/different.zip', '/a/../recovery.zip'],
+        }.items():
+            invalid.extend({'results': [{**row, key: value}]} for value in values)
+        invalid.extend({'results': [{**row, key: value}]} for key, value in {
+            'operation': 'create_library_file', 'result': {}, 'results': [], 'unknown': True,
+        }.items())
+        for number, record in enumerate(invalid):
+            with self.subTest(number=number, record=record):
+                receipt.write_text(json.dumps(record))
+                destination = self.base / 'must-stay-absent'
+                with self.assertRaises(ValueError): c.seal(self.root, downloaded, receipt, destination)
+                self.assertFalse(destination.exists())
+                self.assertEqual(c.get_state(self.root)['pending']['status'], 'pending')
+                with self.assertRaisesRegex(ValueError, 'no verified'): c.guard(self.root)
+
+    def test_legacy_receipt_identity_version_and_mixed_envelopes_fail_closed(self):
+        pack = self.packed(); downloaded = self.base / 'materialized.zip'; shutil.copyfile(pack, downloaded)
+        receipt = self.receipt(downloaded); valid = json.loads(receipt.read_text())
+        invalid = [{**valid, 'results': []}, {**valid, 'purpose': 'create_library_file'},
+                   {**valid, 'result': valid}, {'result': valid, 'status': 'failed'},
+                   {'result': {'result': valid}}, {'result': None}]
+        for key in ('file_id', 'library_file_id'):
+            invalid.extend({**valid, key: value} for value in ('', ' ', None, 1, [], {}))
+        invalid.extend({**valid, 'current_version_number': value} for value in (-1, True, '0', 0.0, None))
+        for record in invalid:
+            with self.subTest(record=record):
+                receipt.write_text(json.dumps(record))
+                with self.assertRaises(ValueError): c.seal(self.root, downloaded, receipt, self.base / 'absent')
+                self.assertFalse((self.base / 'absent').exists())
+
+    def test_duplicate_json_receipt_fields_are_rejected(self):
+        pack = self.packed(); downloaded = self.base / 'materialized.zip'; shutil.copyfile(pack, downloaded)
+        for form in ('raw', 'wrapped', 'compact'):
+            with self.subTest(form=form):
+                receipt = self.receipt(downloaded, form)
+                text = receipt.read_text().replace('"status": "succeeded"', '"status": "failed", "status": "succeeded"')
+                receipt.write_text(text)
+                with self.assertRaisesRegex(ValueError, 'Duplicate'): c.seal(self.root, downloaded, receipt, self.base / 'absent')
+                self.assertFalse((self.base / 'absent').exists())
+
+    def test_compact_receipt_cannot_bypass_materialization_identity_or_archive_checks(self):
+        pack = self.packed(); receipt = self.receipt(pack, 'compact')
+        for name, link in (('hardlink.zip', os.link), ('symlink.zip', os.symlink)):
+            alias = self.base / name; link(pack, alias)
+            with self.assertRaisesRegex(ValueError, 'separately'): c.seal(self.root, alias, receipt, self.base / 'absent')
+        downloaded = self.base / 'materialized.zip'; shutil.copyfile(pack, downloaded)
+        with self.assertRaisesRegex(ValueError, 'lack Library'): c.seal(self.root, downloaded, receipt, self.base / 'absent')
+        for attr, value in (('user.library-file-id', b'libfile_different'), ('user.library-file-version', b'1')):
+            receipt = self.receipt(downloaded, 'compact'); os.setxattr(downloaded, attr, value)
+            with self.assertRaisesRegex(ValueError, 'differs'): c.seal(self.root, downloaded, receipt, self.base / 'absent')
+        receipt = self.receipt(downloaded, 'compact'); downloaded.write_bytes(b'corrupt archive')
+        with self.assertRaisesRegex(ValueError, 'Archive checksum'): c.seal(self.root, downloaded, receipt, self.base / 'absent')
+        self.assertFalse((self.base / 'absent').exists())
+        self.assertEqual(c.get_state(self.root)['pending']['status'], 'pending')
+
+    def test_compact_receipt_cannot_bypass_source_head_or_policy_checks(self):
+        pack = self.packed(); downloaded = self.base / 'materialized.zip'; shutil.copyfile(pack, downloaded)
+        receipt = self.receipt(downloaded, 'compact')
+        (self.root / 'source.txt').write_text('advanced source')
+        with self.assertRaisesRegex(ValueError, 'working source advanced'):
+            c.seal(self.root, downloaded, receipt, self.base / 'source-restore')
+        (self.root / 'source.txt').write_text('version one\n')
+        policy = self.base / 'policy.json'; policy.write_text(json.dumps({'max_minutes': 60})); c.POLICY_OVERRIDE = policy
+        with self.assertRaisesRegex(ValueError, 'working source advanced'):
+            c.seal(self.root, downloaded, receipt, self.base / 'policy-restore')
+        c.POLICY_OVERRIDE = None
+        self.git('commit', '--allow-empty', '-qm', 'advanced head')
+        with self.assertRaisesRegex(ValueError, 'working source advanced'):
+            c.seal(self.root, downloaded, receipt, self.base / 'head-restore')
+        self.assertEqual(c.get_state(self.root)['pending']['status'], 'pending')
+
+    def test_compact_dirty_emergency_checkpoint_cannot_authorize_release(self):
+        (self.root / 'source.txt').write_text('emergency unfinished work')
+        pack = self.base / 'emergency.zip'; c.pack(self.root, pack, allow_dirty=True)
+        downloaded = self.base / 'materialized.zip'; shutil.copyfile(pack, downloaded)
+        c.seal(self.root, downloaded, self.receipt(downloaded, 'compact'), self.base / 'restore')
+        with self.assertRaisesRegex(ValueError, 'dirty snapshot'): c.guard(self.root, 'release')
 
     def test_bundle_requires_real_fresh_clone_and_checkout(self):
         full = self.base / 'full.bundle'; self.git('bundle', 'create', str(full), '--all')

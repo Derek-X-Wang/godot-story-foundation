@@ -214,6 +214,60 @@ def restore(archive_path, destination, expected_hash=None):
             'dirty_tracked': manifest['dirty_tracked'], 'files': manifest['files'], 'policy_sha256': manifest['policy_sha256']}
 
 
+def library_receipt(receipt_path, pending_archive):
+    """Read one unchanged successful adapter result; never select a batch row."""
+    def unique_fields(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                fail('Duplicate Library receipt field: ' + key)
+            value[key] = item
+        return value
+
+    receipt = json.loads(Path(receipt_path).read_text(), object_pairs_hook=unique_fields)
+    error = 'Require the unchanged successful Library create/replace result'
+    if not isinstance(receipt, dict):
+        fail(error)
+    if 'results' in receipt:
+        if set(receipt) != {'results'} or not isinstance(receipt['results'], list) or len(receipt['results']) != 1:
+            fail(error + ': prepared receipt must contain exactly one result')
+        receipt = receipt['results'][0]
+        fields = {'local_path', 'purpose', 'status', 'file_id', 'library_file_id',
+                  'file_name', 'local_metadata_applied', 'path', 'current_version_number'}
+        if not isinstance(receipt, dict) or set(receipt) != fields:
+            fail(error + ': malformed prepared receipt')
+        if receipt['local_metadata_applied'] is not True:
+            fail(error + ': prepared local metadata was not applied')
+        for key in ('local_path', 'file_name', 'path'):
+            if not isinstance(receipt[key], str) or not receipt[key].strip() or '\0' in receipt[key]:
+                fail(error + ': invalid ' + key)
+        local_path = Path(receipt['local_path'])
+        if not local_path.is_absolute() or local_path.resolve() != Path(pending_archive).resolve():
+            fail(error + ': prepared local path differs from pending archive')
+        library_path = PurePosixPath(receipt['path'])
+        if (not library_path.is_absolute() or '..' in library_path.parts
+                or str(library_path) != receipt['path'] or library_path.name != receipt['file_name']):
+            fail(error + ': invalid Library path/file name')
+        operation = receipt['purpose']
+    else:
+        if 'result' in receipt:
+            if set(receipt) != {'result'} or not isinstance(receipt['result'], dict):
+                fail(error + ': conflicting receipt envelope')
+            receipt = receipt['result']
+        if any(key in receipt for key in ('result', 'results', 'purpose', 'local_path', 'local_metadata_applied')):
+            fail(error + ': conflicting receipt formats')
+        operation = receipt.get('operation')
+    if receipt.get('status') != 'succeeded' or operation not in ('create_library_file', 'replace_library_file'):
+        fail(error)
+    for key in ('library_file_id', 'file_id'):
+        if not isinstance(receipt.get(key), str) or not receipt[key].strip():
+            fail(error + ': invalid ' + key)
+    version = receipt.get('current_version_number')
+    if type(version) is not int or version < 0:
+        fail(error + ': version must be a nonnegative integer')
+    return receipt
+
+
 def seal(root, downloaded, receipt_path, restore_to):
     state = get_state(root)
     pending = state.get('pending')
@@ -222,10 +276,7 @@ def seal(root, downloaded, receipt_path, restore_to):
     downloaded = Path(downloaded).resolve()
     if downloaded == Path(pending['archive']).resolve() or (Path(pending['archive']).exists() and os.path.samefile(downloaded, pending['archive'])):
         fail('Verification requires separately materialized durable bytes, not the local pack')
-    receipt = read_json(receipt_path)
-    receipt = receipt.get('result', receipt)
-    if receipt.get('status') != 'succeeded' or receipt.get('operation') not in ('create_library_file', 'replace_library_file') or not receipt.get('library_file_id') or not receipt.get('file_id') or receipt.get('current_version_number') is None:
-        fail('Require the unchanged successful Library create/replace result')
+    receipt = library_receipt(receipt_path, pending['archive'])
     try:
         identity = os.getxattr(downloaded, 'user.library-file-id').decode()
         version = os.getxattr(downloaded, 'user.library-file-version').decode()
