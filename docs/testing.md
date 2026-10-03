@@ -4,6 +4,20 @@ The release targets Godot 4.6.3 and the pinned official Dialogue Manager 3.10.4.
 Run the complete command sequence in the README after changes, including a fresh
 project import. Python checks require no network or third-party packages.
 
+Local optional-audio verification on 2026-10-03 (Godot 4.6.3): **8 focused Python
+packaging/isolation tests passed**, plus **234 bus checks, 485 settings checks and
+7,407 gain-envelope checks per project**, each repeated after removing the original
+and relocating into a fresh isolated project without caches or UID sidecars.
+The five-file module-only package is byte-deterministic and hash verified. Cases
+include exact existing-bus preservation, append order, zero-level hard mute with
+a −80 dB floor, old-format/missing-new-bus defaults, invalid values, persistence
+failures and native smoothstep trajectories. See [audio contracts and limits](audio.md).
+These are local native results, not hosted CI, browser listening or device
+playback evidence. The existing public workflow now runs the native audio runner
+and Python packaging checks with its already installed dependencies; its remote
+result must be verified for the published commit. The opt-in exported-driver graph
+test has separate inputs and remains local-only.
+
 Local optional-scene verification on 2026-10-02 (Godot 4.6.3): **106 Python tests,
 7 optional Godot serializer tests, 118 native runtime checks and 43 real Dialogue
 Manager/native fixture checks passed**, plus 247 character-art checks in each of

@@ -12,9 +12,10 @@ neutral integration fixture, not the product's narrative or design target.
 Modules and pipelines must be independently optional, composable and extensible.
 A game should be able to select a music pipeline without installing art,
 dialogue or world-state systems. That is an acceptance target for a future music
-module, not a capability shipped by v0.1. The narrative toolkit and experimental character-sprite pipeline are narrow
+asset pipeline. The separate [audio runtime primitives](audio.md) implement bus
+creation, caller-owned preferences and gain sampling only. The narrative toolkit and experimental character-sprite pipeline are narrow
 subsets of this direction, alongside independently optional scene navigation/depth
-primitives. Portraits, scene-art, UI/icons, VFX and music remain
+primitives. Portraits, scene-art, UI/icons, VFX and music assets remain
 separate future subpipelines; see [art contracts and status](art.md).
 
 Each module must state its inputs, outputs, versions, errors, dependencies,
@@ -95,8 +96,9 @@ For a new or changed module, demonstrate the relevant boundary rather than
 requiring every game to use the same stack:
 
 1. Standalone use: exercise it with only declared dependencies. Today, the native
-   runtime can be used without Dialogue Manager or offline generation; a future
-   music pipeline must also work without narrative/world-state or art modules
+   runtime can be used without Dialogue Manager or offline generation; the audio
+   primitives each work alone with Godot built-ins. A future music asset pipeline
+   must also work without narrative/world-state or art modules
 2. Substitution: replace a stage/provider/format through an adapter, check its
    contract, and show unrelated modules still work without coordinated edits
 3. Unique mechanics: integrate game-owned behavior without editing/forking core,
@@ -113,6 +115,10 @@ below and [verification record](testing.md) describe the current narrower scope.
 - `addons/story_foundation/scene`: independently usable rectangle navigation and
   deterministic depth sorting; no runtime, art, addon or autoload dependencies.
   Explicit geometry configuration and game-owned adapters; see [scene contracts](scene.md)
+- `addons/story_foundation/audio`: independently usable native bus creation,
+  caller-owned level/mute preferences and explicit-path ConfigFile persistence,
+  and stateless smoothstep gain sampling. No game buses/defaults, player lifecycle,
+  cues, track trim, assets or other-module dependency; see [audio contracts](audio.md)
 - `addons/story_foundation/adapters`: a narrow Dialogue Manager bridge; it reads
   queries and submits commands, never lends mutable world dictionaries to prose
 - `tools/authoring`: offline request/response files, validation, simulation, review,

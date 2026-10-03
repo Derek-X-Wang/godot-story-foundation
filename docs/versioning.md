@@ -8,6 +8,7 @@ Pin the independently meaningful boundaries that the game selects:
 | Save schema | 2 | Snapshot structure; schema 1 migration supported |
 | Authoring content schema | 1 | Packet/candidate/build representation |
 | Optional scene primitive API | 1 | Geometry/ordering contract; no save ownership |
+| Optional audio primitive API | 1 | Bus creation/preferences/gain sampling; caller owns defaults and migrations |
 | Game content version | Positive integer in content | Rules, stable IDs and save compatibility |
 
 The dependency lock separately pins Godot 4.6.3 and the exact Dialogue Manager
@@ -31,6 +32,12 @@ Scene-only consumers may select either independent script and its UID instead of
 the full addon bundle. The [scene-only package](scene.md#packaging-pins-and-upgrades)
 includes deterministic file hashes and no Dialogue Manager or narrative runtime.
 Pin its exact source commit and selected hashes in the consuming game.
+
+Audio-only consumers may select any of the three independent scripts without UID
+sidecars or the full addon bundle. The [audio-only package](audio.md#packaging-pins-and-verification)
+includes deterministic hashes. Its bus-name ConfigFile sections retain missing
+caller defaults; renamed buses and changed preference semantics require explicit
+game-owned migration. Pin the source commit and selected file/archive hashes.
 
 ## Upgrade procedure
 
