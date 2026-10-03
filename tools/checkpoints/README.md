@@ -92,3 +92,33 @@ that rejects risky boundaries; repository instructions make using it mandatory f
 transient-workspace work. No permanent platform guarantee is claimed.
 
 Run neutral tests with `python3 -m unittest discover -s tests/python -p test_checkpoints.py -v`.
+
+## Library receipt compatibility
+
+`seal` accepts the unchanged successful raw create/replace result (also wrapped
+in a single `result` field), or the current prepared-upload helper's compact
+`{"results":[{...}]}` envelope. The compact form must contain exactly one result,
+with `purpose` equal to `create_library_file` or `replace_library_file`,
+`status` equal to `succeeded`, `local_metadata_applied` equal to JSON `true`, and
+an absolute `local_path` resolving to the pending pack. Its authoritative
+`path` and `file_name` must agree. Both formats require nonempty string
+`library_file_id` and `file_id` values and a nonnegative integer
+`current_version_number` (not a boolean or string).
+
+The compact result has exactly those nine fields. Empty/multiple results, mixed
+formats, duplicate JSON fields, failed/partial/prepared-only results, missing
+fields, and wrong types fail closed. Do not edit a receipt, invent missing fields,
+select one row out of a batch, or repeat a successful upload to change its receipt
+format. Keep checkpoint uploads as single-item operations. Receipt acceptance
+does not replace independent materialization, matching identity/version metadata,
+archive/source checksums, a fresh restore drill, or current source/head/policy
+checks. A source or tool-pin change needs a new checkpoint.
+
+When updating this verifier itself, preserve the prior verified tool and use it
+to restore the newly uploaded, independently materialized source pack into a
+fresh directory before relying on the candidate's `seal`. Independently compare
+the recovered source inventory and tool bytes with the reviewed candidate; record
+which tool performed each check. This bootstrap uses the unchanged archive
+format and restore implementation, not a candidate-generated success claim.
+Consumer wrappers must update their exact tool commit/hash pins explicitly after
+review; never silently replace a pinned tool or weaken its guard to accept drift.
