@@ -25,6 +25,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tests/python -v
           python3 -m unittest discover -s tools/regression/tests -v
+          python3 -m unittest discover -s tools/impact/tests -v
       - name: Test optional art Godot serializer
         run: python3 -m unittest discover -s tests/art_godot -v
       - name: Fetch verified dependency and engine

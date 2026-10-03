@@ -92,6 +92,14 @@ narrative dependency is required. See [runner contracts](tools/regression/README
 and [replay contracts and synthetic example](docs/replay.md). Neither module is
 a state explorer, automatic shrinker, physical-input driver or Web test harness.
 
+## Optional impact-based test selection
+
+The standalone [impact selector](tools/impact/README.md) plans trusted local suites
+from an explicit Git base/head and a consumer-owned dependency map. It recognizes
+whole-file allowlisted numeric-constant edits, expands shared dependencies and
+falls back conservatively for unknown paths. Selection is not passing evidence;
+unselected tests remain unclaimed. It does not add a runtime dependency.
+
 ## Optional durable source checkpoints
 
 The standalone [checkpoint tool](tools/checkpoints/README.md) packs source and
@@ -103,6 +111,7 @@ A local commit or archive is never reported as a verified durable backup.
 
 ```sh
 python3 -m unittest discover -s tools/regression/tests -v
+python3 -m unittest discover -s tools/impact/tests -v
 python3 scripts/test_replay.py
 python3 -m unittest discover -s tests/python -v
 python3 -m unittest discover -s tests/art_godot -v
