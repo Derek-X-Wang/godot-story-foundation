@@ -4,6 +4,42 @@ The release targets Godot 4.6.3 and the pinned official Dialogue Manager 3.10.4.
 Run the complete command sequence in the README after changes, including a fresh
 project import. Python checks require no network or third-party packages.
 
+## Consumer consequence and presentation contracts
+
+Run `godot --headless --path .build/village --script res://tests/runtime/test_consequence_contracts.gd`
+after the normal fresh assembly/import. This neutral test recipe uses the existing
+kernel and the existing sample view; it adds no planner or runtime API.
+
+- Clone the full authoritative snapshot, configure the same definitions and replay
+  real guarded commands, inventory changes, costs and due timers. Compare every
+  live state field before/after advisory queries, including retry receipts
+- Share a game's actual effect/cost ordering. The synthetic negative control shows
+  a commit started before a cutoff succeeds when effects precede its time cost;
+  reversing them lets the real timer close the gate first. Foundation itself does
+  not own a game's costs or make two dispatch calls jointly atomic
+- Preserve the real operation-ID semantics. `ok` with `duplicate: true` may mean
+  the required transition never happened. An accepted saved receipt is exercised;
+  replacing/erasing it in a query is an explicitly failing design control
+- Return unknown for simulation/restore errors, missing prerequisites, exhausted
+  budget or no witnessed route. This recipe validates a proposed sequence; it is
+  not a search algorithm and failure is not proof of impossibility. Partial probe
+  state is never returned as a successful consequence. Cancel preserves live
+  state; continuing through the same boundary reproduces the witness exactly
+- Verify fact combinations in the real presentation path. Six synthetic recaps
+  traverse the imported Dialogue Manager resource, real bridge and sample
+  `_show_line` method, then assert the attached visible Label's final text. They
+  cover failed primary work with completed secondary work, plus checked-but-not-
+  shared versus unchecked results. These are headless UI-state assertions, not
+  pixel-layout, browser, localization or human prose-review evidence
+
+The existing native CI lane runs these cases and the extracted release repeats
+them. The Python CI lane also runs the optional regression runner's self-tests,
+including its real-process CLI final-report tests. A passing inner assertion count
+alone is insufficient: final report status, process exit, complete logs and exact
+selected evidence scope must agree. See the [consumer gate recipe](../tools/regression/README.md).
+
+## Verification records
+
 Local optional-audio verification on 2026-10-03 (Godot 4.6.3): **8 focused Python
 packaging/isolation tests passed**, plus **234 bus checks, 485 settings checks and
 7,407 gain-envelope checks per project**, each repeated after removing the original

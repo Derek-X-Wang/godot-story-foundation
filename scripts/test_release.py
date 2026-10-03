@@ -37,6 +37,7 @@ def check(godot: str = 'godot') -> None:
         ['--editor', '--import'],
         ['--script', 'res://tests/runtime/run.gd'],
         ['--script', 'res://tests/runtime/test_dialogue.gd'],
+        ['--script', 'res://tests/runtime/test_consequence_contracts.gd'],
         ['--quit-after', '5'],
     ]
     for index, arguments in enumerate(commands):

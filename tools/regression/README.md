@@ -276,3 +276,22 @@ per-lane evidence, clean command phases, nested logs, CLI policy, and standalone
 use, plus stale-report invalidation on rejected/interrupted runs and atomic
 report replacement. These are runner correctness checks; they are not real-engine, browser,
 native PCK, game-mechanic, or proprietary-game coverage.
+
+## Consumer final-gate checklist
+
+A consumer-owned integrity suite should keep its reviewed predecessor inventory
+outside every mutable regeneration/repinning path. Record the exact reviewed
+file set, hashes, and permitted deltas; regenerating candidate pins is not review
+approval. Exercise negative cases for changed/deleted files, additions (including
+hidden paths), symlinks, self-consistent repinning, and legacy entrypoints. Check
+that rejected mutations actually execute and that failures cannot skip later
+independent suites or the final result/report. Review every delta against that
+immutable predecessor, rather than trusting only the files a candidate lists.
+
+Gate the actual CLI exit, final structured summary, completed `report.json`, and
+preserved suite results/logs together. Inject late result, diagnostic, and report
+write failures; verify none leave a current passing report or summary. The
+subprocess tests in `tests/test_gate_completion.py` demonstrate this boundary
+with neutral source mutations and final-write fault injection. This is a
+consumer test recipe, not automatic source-integrity enforcement by the runner;
+consumer adapters still own complete inventories, symlink policy, and coverage.
