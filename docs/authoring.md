@@ -148,6 +148,33 @@ An asserted fact is annotated as `{"fact":"bridge_closed","value":true}` in `cla
 
 The player's knowledge does not stand in for the NPC's. A fallback cannot contain factual claim annotations. The validator checks these declarations; it cannot infer every assertion from natural-language prose. A human must ensure claims are complete, uncertainty is honest, and lines do not imply forbidden knowledge. Do not treat machine validation as a prose truth detector or a full narrative-quality check.
 
+### Consumer review when adding content
+
+For a new actor, scene or interactable, a short game-owned note can connect intent
+to observable behavior: what the actor wants, what they know and how they learned
+it, where they can be encountered, what an interaction changes, and what the UI
+may truthfully report. Mark unsettled story details as proposed or unknown rather
+than silently turning them into facts. This is an optional design-review aid,
+not a new schema or a guarantee that motives and causal relationships make sense.
+
+Keep distinct transitions distinct in the game's chosen state model. For example,
+an item offered, handed to a carrier, received at its destination, and reported
+back to the player need not occur together. Custody does not establish receipt;
+world truth does not establish an actor's knowledge. Check dialogue, visible
+actors/targets, journal and ending text against the same authoritative state.
+
+Add only the scenarios relevant to that addition: first visit after progress
+elsewhere, revisit after an actor moves or a route closes, or an item whose
+custody changes before confirmation arrives. Assert the selected branch and
+actual displayed text, not just that the content parses. An earlier briefing may
+remain historical, but must not be worded as an unchanged present condition.
+
+Record which additions used existing data contracts and which needed game-owned
+code. New movement, multi-item custody, scheduling or presentation can require
+custom adapters and save validation; do not label the whole expansion data-only.
+See [state ownership](architecture.md#definitions-state-and-selected-guarantees)
+and the [consumer build recipe](testing.md#consumer-content-build-and-capture-recipe).
+
 ### Branch simulations
 
 Every fixture starts from the initial world with empty actor knowledge/memory, zero trust, and zero coins. Its steps dispatch named commands with stable `action_id` values and expected statuses (`applied`, `blocked`, or `duplicate`). Failed guards must leave state unchanged and do not consume the action ID. Accepted duplicate IDs have exactly-once semantics. The final assertions check selected dialogue branches and optional world facts, inventory, coins, and scene.

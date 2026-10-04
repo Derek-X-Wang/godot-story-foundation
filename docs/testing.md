@@ -38,6 +38,42 @@ including its real-process CLI final-report tests. A passing inner assertion cou
 alone is insufficient: final report status, process exit, complete logs and exact
 selected evidence scope must agree. See the [consumer gate recipe](../tools/regression/README.md).
 
+## Consumer content build and capture recipe
+
+Use the applicable checks when a game adds runtime content. These are consumer
+integration lessons, not new Foundation validators or extra mandatory CI lanes.
+
+- **Cold generation:** generate into a fresh output directory with the pinned
+  tools and compare emitted runtime bytes with the candidate. Include any later
+  engine compilation; deterministic JSON or dialogue source alone does not prove
+  deterministic engine resources. If serialization introduces a random resource
+  identifier, fix only that understood, pinned adapter boundary, preserve all
+  references and re-load/test the result. Broad text scrubbing can hide changes.
+- **Real packed inputs:** build a fresh pack before checks and run affected
+  behavior in both source and packed lanes. For newly loaded JSON or other raw
+  assets, read their actual runtime paths inside the pack and compare hashes with
+  source. An export filter that looks correct, a source-only pass or an old pack
+  is insufficient. Native packed success does not establish Web execution.
+- **Isolated execution:** give concurrent lanes separate writable user/config/
+  cache paths and serialize shared import/export writes. Check the intended
+  source inventory before and after; tests must not silently rewrite approved
+  inputs. Record failures, blocked lanes and unrun checks explicitly.
+- **Current-frame captures:** a headless label assertion proves UI state, not
+  rendered pixels. On a rendered display, refresh the actual view and request
+  redraw; if the harness suspended processing, temporarily restore what the view
+  needs. Wait for its update and `RenderingServer.frame_post_draw` before reading
+  the viewport texture, then restore the harness settings. Confirm the capture
+  shows the intended state. A successful PNG write can still capture a stale
+  frame; a rendered screenshot does not establish audible playback or art approval.
+
+Keep timing evidence small: record content authoring/compilation, custom runtime
+work, review/fixes, packaging and verification separately, with source identity,
+tools, cache conditions and executed scope. Distinguish human/agent elapsed work
+from command wall time; parallel intervals overlap and cannot be added as total
+elapsed time. Without an equivalent baseline under matched conditions, report
+observed durations rather than a percentage speedup. A fast focused check is not
+evidence that unrelated suites ran or that an unfinished asset pipeline works.
+
 ## Verification records
 
 Local optional-audio verification on 2026-10-03 (Godot 4.6.3): **8 focused Python
