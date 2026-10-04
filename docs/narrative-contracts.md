@@ -128,6 +128,37 @@ Coverage excludes omitted actions, seeds/state, asynchronous UI scheduling,
 other platforms and unbounded play. Restore fidelity proves only equality of the
 selected snapshot, not its completeness or production save behavior.
 
+## Entry-state information order
+
+A downstream fixture whose `reset` has already granted introductory knowledge
+cannot certify how that knowledge was acquired. State the entry point explicitly.
+For an opening-order requirement, start through the game's actual fresh-start
+setup before the first relevant interaction, with no progress or knowledge seeded
+past that boundary. Keep the downstream contract for its own scope.
+
+Author both sides of the information boundary independently of implementation:
+
+- Which options must be absent before the player receives the prerequisite, and
+  which must be offered afterward? Distinguish world truth, actor knowledge and
+  information presented to the player; one does not establish the others
+- What readable event and acknowledgment, if required by the design, commit that
+  knowledge? Split macros at those observable boundaries so a single action does
+  not hide premature choices or side effects between opening and acknowledgment
+- Which ordinary alternatives must remain available without optional discovery?
+  For example, if a neutral terminal requires acknowledging an access notice
+  before offering a restricted route, optional inspection of a diagnostic panel
+  must not become a hidden prerequisite for the independently allowed help route
+- Can cancellation, reentry or a loaded save skip the prerequisite or lose an
+  already earned option? Check the game's declared persistence policy through
+  its real setup/save path, rather than assuming explorer restore covers it
+
+Assert forbidden-before and required-after choices at each relevant state, and
+retain a witness for intended routes with optional investigation omitted. Merely
+reaching an ending or enumerating existing commands cannot establish these
+requirements. Include presentation/progress state when it affects the oracle or
+future actions. A synchronous macro graph does not cover real UI callback timing;
+pair it with the [interrupted-UI recipe](testing.md#consumer-interrupted-ui-contracts).
+
 ## Actual update and projection boundary
 
 [`kernel_adapter.gd`](../examples/narrative_contracts/kernel_adapter.gd) uses the
