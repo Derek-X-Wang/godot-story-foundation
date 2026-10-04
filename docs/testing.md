@@ -62,6 +62,47 @@ browser, pixel, packed-export or human narrative-review evidence. See the
 this runner and standalone replay; hosted success must be checked separately for
 the exact published commit.
 
+## Consumer interrupted UI contracts
+
+This is a game-owned integration recipe, not an implemented Foundation UI
+lifecycle guarantee or a new runtime API. Pair it with
+[entry-state information order](narrative-contracts.md#entry-state-information-order)
+when the design requires readable acknowledgment before knowledge is committed.
+
+- **Bind the presented interaction:** retain the owning dialogue/session identity
+  and presentation generation in each choice, continue, confirmation and cancel
+  callback. Compare both against the current view before acting, then revalidate
+  current command guards. A still-valid choice ID or branch does not prove that
+  the callback belongs to the current interaction
+- **Invalidate obsolete work:** change the relevant identity/generation when a
+  line is replaced, dialogue closes or reopens, a save loads, or the scene changes.
+  Check asynchronous results before applying them too. Hiding or freeing a button
+  alone does not invalidate a callable retained elsewhere
+- **Gate readability and input:** reject a dialogue callback while its owning
+  interaction is hidden, unreadable or suspended by a blocking modal/pause state.
+  A modal's own controls can follow their separate contract. If knowledge requires
+  acknowledgment, opening, previewing, cancelling or invoking a hidden callback
+  must not grant it. Define this event in game-owned policy rather than treating
+  rendered text as proof that a person read it
+- **Exercise the real view:** capture actual control callbacks, cancel and reopen
+  the same dialogue and a different dialogue, replace the line, and load/reenter.
+  Invoke retained choice, continue, confirmation and cancel callbacks after each
+  applicable invalidation. Assert no authoritative state change and no advance,
+  close or success projection in the current interaction. Use the actual guarded
+  UI boundary, not only direct command dispatch or a synthetic callback stub
+- **Test blocked and resumed controls:** while a blocking modal is open, invoke
+  retained underlying callbacks and assert the same invariants. After dismissal,
+  verify current visible controls still work exactly as intended; a guard that
+  permanently disables interaction is not a passing repair
+
+Capture a valid-interface semantic RED, repair the narrow owning boundary, and
+rerun the same assertions to GREEN. A mutation that removes identity, generation
+or readability checks should reproduce the named defect; a crash or disconnected
+test path is not useful RED evidence. Record the source identity, actual callback
+path, state and displayed output, and which source/packed/platform lanes ran.
+Headless control/Label checks do not prove rendered readability, physical input
+delivery or browser behavior; use rendered/playthrough checks for those claims.
+
 ## Consumer content build and capture recipe
 
 Use the applicable checks when a game adds runtime content. These are consumer
