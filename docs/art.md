@@ -29,6 +29,36 @@ contract/pipeline logic is in `tools/art/characters`. Editor/runtime integration
 live in `tools/art/adapters`. Future modules should reuse only genuinely matching
 contracts; they must not inherit pixel-sprite assumptions just to use provenance.
 
+## Character design: concept before pixels
+
+For new characters, this optional game-owned authoring sequence precedes the
+existing technical sprite pipeline; it adds no generator or runtime dependency.
+
+1. **Write a brief.** Establish the character's role, visual identity and intended
+   game scale before drawing details.
+2. **Develop a concept/reference.** Choose reference effort to suit the character:
+   a major individual may need several views; a minor character may need only one
+   full-body view; background figures may share a reference. These are options,
+   not mandatory view counts or a requirement for expensive concept production.
+3. **Approve and retain the reference.** Have the owner or designated reviewer
+   explicitly accept its version before native-pixel authoring. Keep the concept,
+   editable source, prompts when used, provenance and a compact reference page in
+   the game's private authoring storage. Capture defining palette, silhouette,
+   hair, clothing and props; follow the existing
+   [provenance limits](#provenance-is-evidence-not-legal-clearance).
+4. **Author native pixels from that reference.** Link the sprite source/version to
+   the accepted reference/version and record intentional adaptations. Concept
+   approval does not automatically approve the resulting pixel art.
+5. **Check the actual game.** Review recognition, readability, relative scale and
+   relevant poses/motion with the real scene and UI, then record visual acceptance.
+   Export compatibility and concept approval do not replace this review.
+
+For an existing accepted sprite, a reference made afterward is a **retrospective
+reference**: record that the pixels came first and link the actual source version.
+Do not invent an earlier concept, prompt or production origin, or silently redesign
+accepted pixels to match the backfilled concept. Any redesign is a separate,
+explicitly reviewed change.
+
 ## Scene design: structure before detail
 
 Use this optional game-owned design workflow before a scene's pixel/detail pass.
