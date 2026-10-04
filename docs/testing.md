@@ -38,6 +38,30 @@ including its real-process CLI final-report tests. A passing inner assertion cou
 alone is insufficient: final report status, process exit, complete logs and exact
 selected evidence scope must agree. See the [consumer gate recipe](../tools/regression/README.md).
 
+## Optional bounded narrative-contract checks
+
+`python3 scripts/test_narrative_contracts.py` runs the independently optional
+exact-state BFS helper in an isolated project, repeats it after fresh relocation,
+and then exercises a separate native-kernel/attached-Label consumer. It uses the
+existing strict regression runner for process, diagnostics and result evidence.
+Author-supplied actions/goals remain independent of implementation catalogs.
+
+Local verification on 2026-10-04 (Godot 4.6.3): **43 helper checks** in each
+isolated/relocated project; **24 exact neutral states** and **9 exact kernel
+states** within declared bounds, all required goals reached. Four valid-interface
+mutations were caught: missing required option, defer lock, stale committed
+projection and success text after command rejection. The latter preserves the
+full authoritative kernel snapshot while changing an actual attached Label.
+The unchanged fixed fixtures pass again; no game-private material is included.
+
+Reports state the bounded scope, shortest macro traces, missing goals and state
+limits. State-cap exhaustion is inconclusive; absent bounded witnesses do not
+prove global impossibility. These are source/headless UI-state results, not
+browser, pixel, packed-export or human narrative-review evidence. See the
+[contract and author workflow](narrative-contracts.md). The hosted workflow runs
+this runner and standalone replay; hosted success must be checked separately for
+the exact published commit.
+
 ## Consumer content build and capture recipe
 
 Use the applicable checks when a game adds runtime content. These are consumer
