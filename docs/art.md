@@ -29,6 +29,50 @@ contract/pipeline logic is in `tools/art/characters`. Editor/runtime integration
 live in `tools/art/adapters`. Future modules should reuse only genuinely matching
 contracts; they must not inherit pixel-sprite assumptions just to use provenance.
 
+## Scene design: structure before detail
+
+Use this optional game-owned design workflow before a scene's pixel/detail pass.
+It is a human review recipe, not an implemented scene-art generator or a new
+Foundation runtime contract.
+
+1. **Establish purpose and context.** State who uses the place, what they do there,
+   how they arrive and leave, and which environmental conditions matter. Give
+   important structures and objects a function before assigning decorative shapes.
+   Separate confirmed requirements from proposals that still need a decision.
+2. **Draw the structure first.** Use a simple plan, blockout or perspective diagram
+   with human-scale references, major masses, floor/water boundaries, entrances,
+   activity areas and movement routes. Keep texture and small decoration out of
+   this pass so scale, perspective, circulation and functional placement remain
+   easy to change. Revise object placement and routes together before freezing
+   collision rectangles, anchors or export layout; fitting every object outside
+   an inherited walking rectangle is not a substitute for designing the place.
+3. **Review function and physical relationships.** Check what supports each roof,
+   platform and raised object, where surfaces meet, and what people can actually
+   reach. A gangway should meet supported landing surfaces at both ends. A bench
+   intended as a rain-sheltered waiting area needs suitable weather protection in
+   that context; this is not a rule that every outdoor bench must have a canopy.
+   Keep cargo, mooring fixtures and supports visually distinct. If a canopy is
+   meant to be independent, show that relationship rather than accidentally
+   turning it into another building. Review these meanings, not just empty-space
+   clearance or plausible-looking outlines.
+4. **Accept the structural version explicitly.** Before detailed native art, have
+   the owner or designated reviewer inspect the diagram and record the version,
+   decision and unresolved points. Do not infer acceptance from a passing test or
+   the existence of a draft. Structural revisions need renewed review of the
+   affected relationships; approval of a layout does not approve its final art.
+5. **Add detail, then review at actual game scale.** Preserve the accepted spatial
+   relationships while authoring editable semantic layers. Inspect both relevant
+   layers and the composed view: an opaque background can hide unintended holes
+   in a roof layer. Check that silhouettes, materials and contact cues still make
+   objects readable with actors and UI present. Return to the structure pass when
+   detail exposes a functional contradiction instead of disguising it with texture.
+
+Palette, alpha, hashes, navigation and export checks establish their declared
+technical properties; they do not approve architecture, shelter, object identity
+or spatial logic. Keep this design review separate from
+[drawing/input integration](scene.md#consumer-drawing-and-input-integration)
+and record final visual acceptance explicitly as well.
+
 ## Quick start: no editor or game runtime needed
 
 Python 3.11+ and its standard library are sufficient:
