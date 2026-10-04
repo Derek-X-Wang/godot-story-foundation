@@ -143,6 +143,11 @@ checks below in the game-owned adapter; no scene-art pipeline is added here.
 - Decorative solids need game-owned navigation/depth treatment or placement clear
   of the walking lane plus the actor's footprint. Inspect the real game at its
   intended scale for obstructed clues, labels and accessible interaction points.
+- Compare object labels and prose with the actual exported art and placement.
+  Claims such as "behind", "covering" or "out of reach" need support in the
+  displayed arrangement and relevant state, not just source IDs or an intended
+  concept. Check before/after removal as applicable; correct the art or the claim
+  when they disagree. Geometry tests cannot establish a clue's narrative meaning.
 
 Use the existing [art review limits](art.md) and
 [packed-resource/capture recipe](testing.md#consumer-content-build-and-capture-recipe)

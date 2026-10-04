@@ -62,6 +62,31 @@ browser, pixel, packed-export or human narrative-review evidence. See the
 this runner and standalone replay; hosted success must be checked separately for
 the exact published commit.
 
+## Consumer causal-action contracts
+
+Use the [author-reviewed causal record](narrative-contracts.md#author-owned-action-causality)
+to specify expectations before repairing a game's action path. This is a consumer
+recipe, not another Foundation runtime module or a new neutral sample test claim.
+
+- Test the real command boundary and actual dialogue/view separately. For an
+  authored handover, assert unchanged custody before the agreed exchange, the
+  relevant objection and response in their intended order, and exactly one
+  transfer at the declared commit boundary. A final inventory assertion alone
+  misses a transfer that occurred before the actor yielded
+- Cancel or interrupt before that boundary, retry, and revisit afterward; apply
+  the game's stated persistence policy and the interrupted-UI checks below.
+  The action's success text, options and actor response must match committed state
+- Exercise objective completion without optional investigation, optional clues
+  in different orders, and return visits with and without an explicit report.
+  Assert that an unwitnessed result remains unknown until communicated and that
+  a promised report option has a reachable, appropriate response. A condition
+  finding must not silently grant unrelated motive knowledge
+- Retain a meaningful RED counterexample and rerun the unchanged requirements
+  after repair. Use valid-interface mutations such as early transfer, skipped
+  reaction, absent report option or premature knowledge to challenge the relevant
+  predicates. Review prose and rendered art separately; passing state/UI tests
+  do not prove that an actor's motivation is convincing
+
 ## Consumer interrupted UI contracts
 
 This is a game-owned integration recipe, not an implemented Foundation UI
