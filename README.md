@@ -16,7 +16,9 @@ templates are starting points; unique mechanics may need game-owned code. This
 release implements the narrative subset listed below plus an experimental optional
 [character-sprite art pipeline](docs/art.md) and independent
 [scene navigation/depth primitives](docs/scene.md), independent
-[audio controls/settings/envelopes](docs/audio.md), plus optional [regression execution](tools/regression/README.md) and [semantic replay records](docs/replay.md). Portraits, scene-art, UI/icons, VFX,
+[audio controls/settings/envelopes](docs/audio.md), plus optional
+[regression execution](tools/regression/README.md), [semantic replay records](docs/replay.md)
+and [bounded narrative contracts](docs/narrative-contracts.md). Portraits, scene-art, UI/icons, VFX,
 music asset pipelines and a replaceable Bevy backend remain future work. See the
 [design decisions](docs/architecture.md#design-decisions) and
 [contributor guardrails](AGENTS.md).
@@ -89,8 +91,12 @@ explicit coverage targets. The independently optional GDScript replay helper
 records version/hash/seed identity, initial semantic state and action deltas.
 Adapters own real execution and their oracle; no game framework migration or
 narrative dependency is required. See [runner contracts](tools/regression/README.md)
-and [replay contracts and synthetic example](docs/replay.md). Neither module is
-a state explorer, automatic shrinker, physical-input driver or Web test harness.
+and [replay contracts and synthetic example](docs/replay.md). The separate optional
+[narrative-contract helper](docs/narrative-contracts.md) reuses replay canonicalization
+for exact-state bounded BFS, authored required goals/options and shortest macro
+counterexamples. Its neutral sample exercises real kernel/update/Label projection
+boundaries and meaningful mutations. These tools are not automatic prose oracles,
+general failure shrinkers, physical-input drivers or Web test harnesses.
 
 ## Optional impact-based test selection
 
@@ -113,6 +119,7 @@ A local commit or archive is never reported as a verified durable backup.
 python3 -m unittest discover -s tools/regression/tests -v
 python3 -m unittest discover -s tools/impact/tests -v
 python3 scripts/test_replay.py
+python3 scripts/test_narrative_contracts.py
 python3 -m unittest discover -s tests/python -v
 python3 -m unittest discover -s tests/art_godot -v
 python3 scripts/test_art_godot.py
@@ -132,7 +139,8 @@ python3 scripts/test_release.py
 
 On a restricted Linux host, point `XDG_DATA_HOME`, `XDG_CONFIG_HOME` and
 `XDG_CACHE_HOME` at writable directories before running Godot. The CI workflow runs
-the narrative/art/release checks and the native audio isolation/relocation runner
+the narrative/art/release checks, standalone replay and bounded-contract checks,
+and the native audio isolation/relocation runner
 (including its deterministic package checks) on a standard Ubuntu runner. Scene
 tests and scene-only packaging remain local verification for this proposal.
 The opt-in exported Web-driver audio test is local-only. The workflow performs

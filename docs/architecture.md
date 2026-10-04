@@ -147,8 +147,12 @@ state setup, real UI/runtime execution, expected results and invariants. Neither
 module depends on the narrative kernel, Dialogue Manager, scenes or art. The
 public examples are original neutral synthetic fixtures. Private story IDs and
 fixtures belong in the consuming game. See [runner protocol](../tools/regression/README.md)
-and [replay contract](replay.md). State exploration, shrinking and browser drivers
-remain unimplemented; native packed checks do not establish Web runtime coverage.
+and [replay contract](replay.md). The independently optional
+`narrative_contract.gd` helper reuses replay canonicalization for exact-state bounded BFS and shortest macro counterexamples.
+Its adapters own author-reviewed goals, required choices, complete snapshots and
+real command/update/projection boundaries; see [bounded contracts](narrative-contracts.md).
+There is no general shrinker or browser driver; native packed checks do not
+establish Web runtime coverage.
 
 ## Game-owned policy
 

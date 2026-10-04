@@ -33,6 +33,10 @@ jobs:
           python3 scripts/fetch_dependencies.py
           python3 scripts/install_godot.py
           echo "$GITHUB_WORKSPACE/.deps" >> "$GITHUB_PATH"
+      - name: Test standalone semantic replay and bounded narrative contracts
+        run: |
+          python3 scripts/test_replay.py
+          python3 scripts/test_narrative_contracts.py
       - name: Test standalone art import and relocated playback
         run: python3 scripts/test_art_godot.py
       - name: Test standalone audio primitives and relocated settings
