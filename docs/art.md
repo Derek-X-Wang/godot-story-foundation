@@ -46,6 +46,13 @@ Foundation runtime contract.
    easy to change. Revise object placement and routes together before freezing
    collision rectangles, anchors or export layout; fitting every object outside
    an inherited walking rectangle is not a substitute for designing the place.
+   Use the in-game character as a visual ruler with the intended gameplay camera:
+   compare door openings, seat height/depth, headroom, walking clearances and
+   the size of supporting structures. Account for perspective when comparing
+   objects at different depths. Stylization may compress or exaggerate proportions,
+   but people should still appear able to use the place as intended. This is a
+   believability review, not a requirement for architectural precision or exact
+   real-world measurements.
 3. **Review function and physical relationships.** Check what supports each roof,
    platform and raised object, where surfaces meet, and what people can actually
    reach. A gangway should meet supported landing surfaces at both ends. A bench
