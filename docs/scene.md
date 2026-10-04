@@ -119,6 +119,36 @@ Object/Resource payload references follow Godot's normal `duplicate(true)`
 semantics and remain references; this is not arbitrary object cloning or a save
 serializer. Records should not contain cyclic containers.
 
+## Consumer drawing and input integration
+
+These primitives own scene-space geometry and ordering, not the game's renderer,
+screen transform or art state. When integrating native scene art, use the relevant
+checks below in the game-owned adapter; no scene-art pipeline is added here.
+
+- Share one aspect-preserving scale and offset across scenery, actor anchors,
+  labels and hit targets; apply its inverse to pointer coordinates. Use the actual
+  scene content area's size, including its UI layout, rather than the outer
+  window size. Mask unused gutters and reject their input before hit testing or
+  movement. Exercise wide and tall layouts through actual input handlers: a
+  mathematical round trip alone does not prove clicks reach the displayed target.
+- Reconcile new sprite bounds with its pivot, placement and display scale. If
+  the game's hit policy follows occupied pixels, test that policy against the
+  exported art rather than retaining placeholder rectangles. Visible alpha bounds
+  are not automatically the correct navigation footprint or collision geometry.
+- Verify the renderer actually consumes authored layers; a loaded manifest can
+  still be bypassed by a procedural special case. Replaced props should draw once.
+  Exercise relevant present/absent state combinations, including attached visual
+  parts and interaction targets; verify draw calls or rendered output rather than
+  only the visibility predicate. Leave a valid background behind removed objects.
+- Decorative solids need game-owned navigation/depth treatment or placement clear
+  of the walking lane plus the actor's footprint. Inspect the real game at its
+  intended scale for obstructed clues, labels and accessible interaction points.
+
+Use the existing [art review limits](art.md) and
+[packed-resource/capture recipe](testing.md#consumer-content-build-and-capture-recipe)
+alongside these checks; neither imported assets nor a concept image prove gameplay
+integration or visual acceptance.
+
 ## Packaging, pins and upgrades
 
 ```sh
