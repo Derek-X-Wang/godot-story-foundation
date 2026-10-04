@@ -159,6 +159,51 @@ requirements. Include presentation/progress state when it affects the oracle or
 future actions. A synchronous macro graph does not cover real UI callback timing;
 pair it with the [interrupted-UI recipe](testing.md#consumer-interrupted-ui-contracts).
 
+## Author-owned action causality
+
+A reachable, state-consistent action can still lack a believable reason for the
+people involved to allow it. Before encoding each consequential action, have an
+author review a short causal record independent of the implemented choices:
+
+- **Evidence:** what has the player actually learned, and what does it justify?
+  Separate observation, inference and an unproven accusation
+- **Affected actor:** who gains or loses something, are they present, and what
+  do they want? If the action conflicts with that interest, what objection,
+  reaction or previously established reason makes their response understandable?
+- **Decision and handover:** what request, answer or event changes the actor's
+  position? Name the exact boundary at which custody, permission or another
+  consequence changes. Do not grant the result before the exchange that earns it
+- **Later knowledge:** who witnessed the result, who still does not know, and
+  what could the player explicitly report back? When follow-through matters,
+  author the report option and response as well as the knowledge-isolation rule
+
+These are authoring questions, not a required runtime state model. An action may
+legitimately proceed without agreement or without every actor present; author
+that reason and its consequences rather than forcing a negotiation template.
+For a neutral archive example, an attendant can reluctantly permit a map loan
+after a handling concern is answered. The loan need not depend on discovering
+the attendant's private reason for hesitating. A later condition inspection can
+establish whether the map is usable without establishing that private motive.
+Returning to the archive alone must not silently tell the attendant the result;
+an optional report can supply it and receive an appropriate response.
+
+Review each clue's distinct contribution: which new fact or inference does it
+enable, and which competing explanation does it actually rule out? An empty
+display does not contradict an earlier statement that its contents were moved.
+If an introductory line already supplies the same observation, a second click
+is not new evidence. Keep deliberate flavor if useful, but do not turn redundant
+inspection into an unexplained gate or claim it proves more than it does.
+Cross-check spatial claims against the
+[displayed scene](scene.md#consumer-drawing-and-input-integration).
+
+Translate the reviewed record into forbidden-before/required-after predicates
+and named goals, then use the [causal-action test recipe](testing.md#consumer-causal-action-contracts).
+The existing optional explorer can check those authored requirements; it cannot
+invent missing motivation, judge whether dialogue is persuasive, or certify
+narrative quality. Read the actual exchange and play the low-investigation route
+as well as the fully informed route. Preserve intentional paths that complete
+the practical objective without proving an optional motive.
+
 ## Actual update and projection boundary
 
 [`kernel_adapter.gd`](../examples/narrative_contracts/kernel_adapter.gd) uses the
