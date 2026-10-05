@@ -98,6 +98,10 @@ counterexamples. Its neutral sample exercises real kernel/update/Label projectio
 boundaries and meaningful mutations. These tools are not automatic prose oracles,
 general failure shrinkers, physical-input drivers or Web test harnesses.
 
+For consumer-owned prose and information-flow review, use the optional
+[general-review and isolated-reader worksheet](docs/narrative-review.md). It is
+a manual review aid, with no runtime dependency or mandatory multi-agent gate.
+
 ## Optional impact-based test selection
 
 The standalone [impact selector](tools/impact/README.md) plans trusted local suites
