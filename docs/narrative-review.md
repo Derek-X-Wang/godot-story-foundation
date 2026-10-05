@@ -19,6 +19,8 @@ Choose the mode explicitly:
   are not proof that the game displayed them or that a route is playable.
 - **Actual play:** record the build, platform, fresh-start/save state, actions and
   captured observations. Claim only the route and interactions actually exercised.
+  Sequential runtime text/choice interaction can establish that route's reachability;
+  it does not establish rendered visibility, discoverability, spatial cues or audio.
 
 Prepare two separate packets, with different permitted access:
 
@@ -28,8 +30,10 @@ Prepare two separate packets, with different permitted access:
   Include relevant source excerpts and test evidence. Keep fact, belief and
   inference distinct. Do not derive requirements solely from existing options.
 - **Reader packet:** only observations and offered actions available to the player
-  on this route, in encounter order, plus the player's chosen actions. For play,
-  reveal each observation only after its action. Exclude source, debug state,
+  on this route, in encounter order, plus the player's chosen actions. Include
+  accessible HUD, objectives, inventory, disabled-action labels/tooltips and
+  scrollable hints, not only dialogue. Reveal observations only as encountered;
+  do not show later text before an earlier choice. Exclude source, debug state,
   hidden flags, future content, other branches, author explanations, answer keys
   and other reviewers' findings. Neutral excerpt IDs can map privately to source.
 
@@ -56,7 +60,9 @@ log audit or an operating-system isolation guarantee.
    happened, what is known versus inferred, what remains confusing, and what the
    next offered actions appear to mean. Cite the visible words/action. Do not
    invent author contracts or infer unseen story truth. Freeze this response
-   before the author/general reviewer reconciles it against intent.
+   before the author/general reviewer reconciles it against intent. An operator
+   may advance reader-authorized Continue/End-reading steps while preserving every
+   observation, but must stop at each new substantive choice or confirmation.
 
 Set a budget first: one general pass, one reader pass per selected independent
 history, at most one focused dispute recheck, plus explicit time/token/cost
