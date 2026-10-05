@@ -175,6 +175,10 @@ custom adapters and save validation; do not label the whole expansion data-only.
 See [state ownership](architecture.md#definitions-state-and-selected-guarantees)
 and the [consumer build recipe](testing.md#consumer-content-build-and-capture-recipe).
 
+For an optional general review and route-isolated read, use the
+[narrative-review worksheet](narrative-review.md). Keep author-only intent separate
+from player-visible observations; this aid does not create an approval record.
+
 ### Branch simulations
 
 Every fixture starts from the initial world with empty actor knowledge/memory, zero trust, and zero coins. Its steps dispatch named commands with stable `action_id` values and expected statuses (`applied`, `blocked`, or `duplicate`). Failed guards must leave state unchanged and do not consume the action ID. Accepted duplicate IDs have exactly-once semantics. The final assertions check selected dialogue branches and optional world facts, inventory, coins, and scene.
