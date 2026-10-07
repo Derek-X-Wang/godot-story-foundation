@@ -56,6 +56,14 @@ log audit or an operating-system isolation guarantee.
    [causal record](narrative-contracts.md#author-owned-action-causality) and
    [information-order questions](narrative-contracts.md#entry-state-information-order)
    rather than inventing another state model.
+
+   At a branch join, read the shared continuation separately against every selected
+   incoming history. Carry forward established object custody and condition,
+   completed action order and each character's information sources; a join does
+   not reset them. If no explicit disclosure occurred, observation, earlier
+   knowledge or a warranted inference may still explain a reaction. Keep certainty
+   levels explicit. Repair the narrow transition or route-specific line rather
+   than rewriting approved facts or making a character forget.
 2. **Isolated reader, when selected:** before seeing explanations, record what
    happened, what is known versus inferred, what remains confusing, and what the
    next offered actions appear to mean. Cite the visible words/action. Do not
