@@ -17,7 +17,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 VERSION = 1
-MAX_DOCUMENT_BYTES = 8 * 1024 * 1024
+MAX_DOCUMENT_BYTES = 16 * 1024 * 1024
+MAX_REPORT_BYTES = 8 * 1024 * 1024
 MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 MAX_REPORTS = 256
 MAX_ITEMS = 4096
@@ -312,7 +313,7 @@ def ingest(round_record, reports):
     for report in array(reports, "reports"):
         validate_report(r, report)
         total_bytes += len(json.dumps(report, ensure_ascii=False, allow_nan=False).encode())
-        require(total_bytes <= MAX_DOCUMENT_BYTES, "aggregate reports exceed byte limit")
+        require(total_bytes <= MAX_REPORT_BYTES, "aggregate reports exceed byte limit")
     unique([x["id"] for x in reports], "session ids")
     # Duplicate contexts are retained but never treated as independent repeats.
     unique([(x["profile_id"], x["model_id"], x["mode"], x["entry_point"], x["prompt_sha256"], x["start_state_sha256"], x["repeat_index"])
@@ -535,13 +536,13 @@ def main(argv=None):
             for path in args.reports:
                 report = load(path)
                 total_bytes += len(json.dumps(report, ensure_ascii=False, allow_nan=False).encode())
-                require(total_bytes <= MAX_DOCUMENT_BYTES, "aggregate reports exceed byte limit")
+                require(total_bytes <= MAX_REPORT_BYTES, "aggregate reports exceed byte limit")
                 reports.append(report)
             result = ingest(r, reports)
         else:
             result = recommend(r, load(args.bundle), load(args.review) if args.review else None)
         output = json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False)
-        require(len(output.encode("utf-8")) <= MAX_OUTPUT_BYTES, "output exceeds byte limit; split the round")
+        require(len(output.encode("utf-8")) + 1 <= MAX_OUTPUT_BYTES, "output exceeds byte limit; split the round")
         print(output)
         return 0
     except (ContractError, OSError, ValueError, TypeError, KeyError, RecursionError) as error:

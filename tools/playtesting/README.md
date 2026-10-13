@@ -80,9 +80,10 @@ All commands print JSON to stdout without changing inputs. Exit 0 means a valid
 plan/bundle/recommendation, not a passed playtest. Invalid/stale records, duplicate
 JSON keys, unknown fields, non-finite numbers and unavailable inputs exit 2.
 Inputs must be regular files (symlinks are rejected where `O_NOFOLLOW` exists).
-Bounds: 8 MiB per input and aggregate session records, 256 reports, 4,096 entries
+Bounds: 16 MiB per input, 8 MiB aggregate session records, 256 reports, 4,096 entries
 per array/object, 16,384 characters per string, 32 nesting levels, numeric values
-at most 10^12, and 16 MiB serialized CLI output. Oversized records fail closed;
+at most 10^12, and 16 MiB serialized CLI output (including its trailing newline). Successful
+`ingest` output fits the input ceiling for `recommend`. Oversized records fail closed;
 split the round or keep excerpts with opaque references to private full logs.
 CLI limits protect accidental large local inputs, not a hostile-data sandbox.
 

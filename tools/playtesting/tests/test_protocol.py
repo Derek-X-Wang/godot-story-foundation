@@ -378,6 +378,36 @@ class ProtocolTests(unittest.TestCase):
         finally:
             p.MAX_OUTPUT_BYTES = old
 
+    def test_near_limit_ingest_bundle_can_be_reloaded(self):
+        # Compact records are <8 MiB; pretty CLI output exceeds the former
+        # 8 MiB input ceiling. Successful ingest must be consumable as-is.
+        import contextlib
+        import io
+        template = copy.deepcopy(self.s["evidence"][0])
+        for key in ("visible_observation", "action", "feedback"):
+            template[key] = "x"
+        records = []
+        with tempfile.TemporaryDirectory() as d:
+            paths = []
+            for index in range(40):
+                session = copy.deepcopy(self.s)
+                session["id"] = "near-limit-" + str(index)
+                session["repeat_index"] = index + 1
+                session["context_id"] = "context-" + str(index)
+                session["evidence"] = [{**template, "id": "e" + str(i + 1)} for i in range(500)]
+                records.append(session)
+                path = Path(d) / (session["id"] + ".json")
+                path.write_text(json.dumps(session))
+                paths.append(str(path))
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(p.main(["ingest", "--round", str(ROOT / "examples/round.json"), "--reports", *paths]), 0)
+            serialized = output.getvalue()
+            self.assertGreater(len(serialized.encode()), 8 * 1024 * 1024)
+            bundle_path = Path(d) / "bundle.json"
+            bundle_path.write_text(serialized)
+            bundle = p.load(bundle_path)
+            self.assertEqual(p.recommend(self.r, bundle)["counts"]["sessions"], 40)
+
     def test_standalone_cli_without_repository_imports(self):
         with tempfile.TemporaryDirectory() as d:
             script = Path(d) / "protocol.py"
