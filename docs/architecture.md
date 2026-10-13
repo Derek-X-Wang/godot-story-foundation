@@ -154,6 +154,17 @@ real command/update/projection boundaries; see [bounded contracts](narrative-con
 There is no general shrinker or browser driver; native packed checks do not
 establish Web runtime coverage.
 
+## Experimental offline playtest planning
+
+`tools/playtesting` is an independently optional Python standard-library record
+validator and advisory planner. Its version-1 round/session/review contracts keep
+audience configurations, fresh-context repeats, model/configuration provenance
+and natural/chapter/targeted coverage separate. Games own the real engine adapter,
+blind input boundary, evidence audit, story, prompts, reports, budgets and creative
+decisions. The tool neither executes gameplay nor calls models, verifies external
+references, authenticates records or replaces human validation. Public examples
+are neutral synthetic fixtures. See [the experimental protocol](../tools/playtesting/README.md).
+
 ## Game-owned policy
 
 Foundation owns reusable contracts, validators, tooling and neutral examples.

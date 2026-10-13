@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "round_sha256": "851e5fe3d374093a6628deb7e4c8bccfa27682b4a750799e58201e7ff6270dbd",
+  "reviewer": "synthetic-example-reviewer",
+  "questions": [
+    {
+      "id": "route_meaning",
+      "ready": true,
+      "answer": "The single synthetic record supports the literal label interpretation only.",
+      "decision": "Retain provisionally; human validation and unobserved routes remain open.",
+      "evidence_refs": [
+        {
+          "session_id": "session-curious-1",
+          "evidence_id": "e1"
+        }
+      ]
+    }
+  ],
+  "signals": [],
+  "bundle_sha256": "32441fe773cbc588ec20171f4eb29483d7ffb7c549430c37de11251234238126"
+}

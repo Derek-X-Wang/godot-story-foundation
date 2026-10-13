@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-round-1",
+  "candidate": {
+    "id": "neutral-wayfinding-fixture",
+    "build_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "engine": "synthetic offline fixture; no game execution claimed",
+    "adapter": "consumer-owned adapter contract v1"
+  },
+  "audience": {
+    "core": "People who enjoy short exploration-led interactive stories.",
+    "adjacent": "People curious about the format but less familiar with its conventions.",
+    "non_target": "People seeking reflex challenges; diagnostic comments stay separate.",
+    "intended_experience": "Understand an offered action and choose a route without an answer key."
+  },
+  "axes": [
+    {
+      "id": "motivation",
+      "reason": "Different reasons to explore can expose different misunderstandings.",
+      "values": [
+        "curiosity",
+        "relationships",
+        "immediate_consequences"
+      ],
+      "relevant_values": [
+        "curiosity",
+        "relationships"
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "id": "curious",
+      "segment": "core",
+      "role": "motivated",
+      "preferences": {
+        "motivation": "curiosity"
+      },
+      "rationale": "Likes forming and revising interpretations; may stop if interest is lost."
+    },
+    {
+      "id": "relational",
+      "segment": "core",
+      "role": "motivated",
+      "preferences": {
+        "motivation": "relationships"
+      },
+      "rationale": "Notices what actions mean to other characters; no prescribed route."
+    },
+    {
+      "id": "neutral",
+      "segment": "core",
+      "role": "neutral",
+      "preferences": {},
+      "rationale": "Same instructions and controls without imposed motivation."
+    },
+    {
+      "id": "diagnostic",
+      "segment": "non_target",
+      "role": "motivated",
+      "preferences": {
+        "motivation": "immediate_consequences"
+      },
+      "rationale": "Optional diagnostic perspective; never pooled into core audience judgment."
+    }
+  ],
+  "models": [
+    {
+      "id": "offline-a",
+      "model": "hand-authored-synthetic-fixture",
+      "configuration": "No model called; examples only.",
+      "provenance": "Original neutral test data."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "entry",
+      "description": "Initial route choice."
+    },
+    {
+      "id": "side_path",
+      "description": "An optional path not yet observed."
+    }
+  ],
+  "questions": [
+    {
+      "id": "route_meaning",
+      "question": "Is the initial route action understandable?",
+      "next_decision": "Clarify the label or retain it pending a human playtest.",
+      "scenarios": [
+        "entry"
+      ],
+      "modes": [
+        "natural"
+      ],
+      "segments": [
+        "core"
+      ]
+    },
+    {
+      "id": "side_path_feedback",
+      "question": "Does the optional route give useful feedback?",
+      "next_decision": "Decide whether a focused route check is needed.",
+      "scenarios": [
+        "side_path"
+      ],
+      "modes": [
+        "targeted"
+      ],
+      "segments": [
+        "core"
+      ]
+    }
+  ],
+  "budget": {
+    "max_sessions": 6,
+    "max_total_minutes": 60,
+    "max_session_minutes": 15,
+    "max_turns": 80
+  },
+  "starting_point": "narrow_segment"
+}

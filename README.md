@@ -102,6 +102,16 @@ For consumer-owned prose and information-flow review, use the optional
 [general-review and isolated-reader worksheet](docs/narrative-review.md). It is
 a manual review aid, with no runtime dependency or mandatory multi-agent gate.
 
+## Experimental audience-first virtual playtesting
+
+The optional offline [playtesting protocol](tools/playtesting/README.md) starts
+with the intended audience and round questions, validates consumer-owned session
+reports, and recommends when to add a relevant profile, repeat an unstable run,
+cross-check a model, investigate a route gap, reduce redundancy, or stop.
+Natural, chapter-entry and targeted evidence remain separate. It calls no model,
+needs no credentials and runs no game. Synthetic counts are not human statistics;
+the method is experimental and has not been validated as a human-playtest substitute.
+
 ## Optional impact-based test selection
 
 The standalone [impact selector](tools/impact/README.md) plans trusted local suites
@@ -122,6 +132,7 @@ A local commit or archive is never reported as a verified durable backup.
 ```sh
 python3 -m unittest discover -s tools/regression/tests -v
 python3 -m unittest discover -s tools/impact/tests -v
+python3 -m unittest discover -s tools/playtesting/tests -v
 python3 scripts/test_replay.py
 python3 scripts/test_narrative_contracts.py
 python3 -m unittest discover -s tests/python -v

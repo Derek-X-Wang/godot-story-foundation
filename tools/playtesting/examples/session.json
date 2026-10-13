@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "session-curious-1",
+  "round_sha256": "851e5fe3d374093a6628deb7e4c8bccfa27682b4a750799e58201e7ff6270dbd",
+  "profile_id": "curious",
+  "model_id": "offline-a",
+  "mode": "natural",
+  "entry_point": "fresh_start",
+  "context_id": "synthetic-context-1",
+  "fresh_context": true,
+  "prior_exposure": "none",
+  "repeat_index": 1,
+  "start_state_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "prompt_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "seed": "synthetic-not-executed",
+  "fidelity": {
+    "actual_engine_observations": true,
+    "choice_roundtrip_verified": true,
+    "feedback_before_outcome": true,
+    "blind_inputs_only": true,
+    "vanilla_controls_preserved": true
+  },
+  "audit_refs": [
+    "synthetic://fixture-audit-not-real-engine-proof"
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "scenario_id": "entry",
+      "location": "route_sign",
+      "source_ref": "synthetic://observation-1",
+      "source_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "observation_seq": 0,
+      "feedback_seq": 1,
+      "outcome_seq": 2,
+      "visible_observation": "Two signs offer the garden path and the courtyard path.",
+      "action": "Choose garden path.",
+      "feedback": "I expect the garden path to lead to the garden; I want to inspect it."
+    }
+  ],
+  "choices": [
+    {
+      "location": "route_sign",
+      "option_id": "garden",
+      "evidence_ids": [
+        "e1"
+      ]
+    }
+  ],
+  "interpretations": [
+    {
+      "location": "route_sign",
+      "meaning": "The labels name destinations.",
+      "evidence_ids": [
+        "e1"
+      ]
+    }
+  ],
+  "findings": [],
+  "counterexamples": [],
+  "end": {
+    "reason": "resource_limit",
+    "detail": "Synthetic harness budget ended before the optional path; no player-quit claim.",
+    "evidence_ids": []
+  },
+  "usage": {
+    "minutes": 4,
+    "turns": 1,
+    "model_calls": 0,
+    "tokens": null,
+    "cost": null,
+    "currency": null
+  }
+}
