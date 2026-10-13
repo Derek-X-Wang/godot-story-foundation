@@ -118,3 +118,12 @@ Human judgment and deterministic tests remain necessary. A review pass, an
 AI-authored provisional label, or success on a few synthetic cases establishes
 neither production accuracy nor narrative quality. Static reading does not claim
 runtime, rendering, browser, audio, or human playtest coverage.
+
+## Audience-first actual-play rounds
+
+For a separate bounded round of virtual actual play, the experimental
+[audience-first protocol](../tools/playtesting/README.md) adds reusable planning,
+report validation and evidence-linked adaptive recommendations. It preserves this
+worksheet's author/reader separation, while distinguishing core/adjacent/non-target
+perspectives, fresh-context repeats, model configurations and route coverage. It
+is optional; neither a mandatory panel nor validated evidence about real people.
