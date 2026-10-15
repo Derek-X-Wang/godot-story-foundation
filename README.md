@@ -112,6 +112,13 @@ Natural, chapter-entry and targeted evidence remain separate. It calls no model,
 needs no credentials and runs no game. Synthetic counts are not human statistics;
 the method is experimental and has not been validated as a human-playtest substitute.
 
+## Optional creative-library snapshots
+
+The optional offline [creative-library snapshot contract](tools/library_sync/README.md)
+links private project revisions, pinned library cards and script artifacts. It
+checks supplied evidence for drift; it does not synchronize a live service or
+make author decisions.
+
 ## Optional impact-based test selection
 
 The standalone [impact selector](tools/impact/README.md) plans trusted local suites
@@ -133,6 +140,7 @@ A local commit or archive is never reported as a verified durable backup.
 python3 -m unittest discover -s tools/regression/tests -v
 python3 -m unittest discover -s tools/impact/tests -v
 python3 -m unittest discover -s tools/playtesting/tests -v
+python3 -m unittest discover -s tools/library_sync/tests -v
 python3 scripts/test_replay.py
 python3 scripts/test_narrative_contracts.py
 python3 -m unittest discover -s tests/python -v
