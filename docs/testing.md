@@ -164,6 +164,25 @@ elapsed time. Without an equivalent baseline under matched conditions, report
 observed durations rather than a percentage speedup. A fast focused check is not
 evidence that unrelated suites ran or that an unfinished asset pipeline works.
 
+## Consumer change and evidence handoff
+
+For a human or AI-assisted change, retain a small causal explanation with the
+consumer's review record: triggering input and entry state, owning state/commit
+boundary, relevant rule or callback order, expected state transition, and actual
+presentation. Name any ordering dependency explicitly; component composition,
+signals and ordinary object calls can all hide it. This is a review recipe, not
+an ECS migration or a new tracing API. The kernel's bounded trace is diagnostic
+evidence, not a complete recording of UI callbacks or cross-system causality.
+
+Link that explanation to a minimal reproducing action sequence, the relevant
+existing contract above, and the unchanged assertion that failed before the
+repair and passed afterward. Record the exact source/build, executed lane and
+remaining untested scope. A plausible explanation or passing final-state check
+alone does not establish the input-to-visible-result chain. Reuse existing
+[semantic replay](replay.md) where it fits, and keep consumer-specific evidence
+outside this public toolkit. For restoration changes, also use the
+[save ownership checklist](versioning.md#save-ownership-and-reconstruction).
+
 ## Verification records
 
 Local optional-audio verification on 2026-10-03 (Godot 4.6.3): **8 focused Python

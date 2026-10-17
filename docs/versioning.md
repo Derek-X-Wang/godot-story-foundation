@@ -39,6 +39,37 @@ includes deterministic hashes. Its bus-name ConfigFile sections retain missing
 caller defaults; renamed buses and changed preference semantics require explicit
 game-owned migration. Pin the source commit and selected file/archive hashes.
 
+## Save ownership and reconstruction
+
+A save should record the authoritative facts needed to continue the game under
+its declared policy. Rebuild derived presentation from those facts where possible:
+labels, available-choice lists, cached routes and animation projections should not
+silently become competing sources of truth. This distinction is about ownership,
+not a requirement to adopt ECS or serialize every engine object.
+
+Define the continuation boundary explicitly. A checkpoint-only game may reopen a
+conversation from a safe authored entry. A game promising mid-interaction resume
+must own and serialize the additional semantic state it needs, such as a stable
+conversation/step ID, acknowledgment status and pending commitment. Preserve
+timers, RNG state or custom mechanic progress when they affect future outcomes;
+do not discard them merely because they are outside the narrative kernel.
+Callbacks, live node references and animation handles are not durable substitutes
+for that contract. On restore, invalidate old callbacks and reconstruct the view
+from restored state before accepting new input.
+
+Foundation's snapshot covers only its kernel state. It does not save a consumer's
+dialogue position, UI lifecycle or custom mechanics, nor does it make restoration
+across multiple game-owned systems atomic. Declare those owners, versions and
+restore order in the consumer; validate compatibility before replacing live state.
+
+For each supported continuation boundary, compare an uninterrupted run with a
+save/fresh-load/continue run using the same subsequent actions. Assert semantic
+outcomes and the actual presented options/text, plus no duplicate rewards,
+commits or time charges. Include interruption before and after the commit point,
+and explicitly test rejected or migrated old saves. Pair these checks with the
+[interrupted UI recipe](testing.md#consumer-interrupted-ui-contracts) and
+[semantic replay scope](replay.md); replay alone is not save/restore evidence.
+
 ## Upgrade procedure
 
 1. Commit a clean baseline and preserve representative save fixtures
