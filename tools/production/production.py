@@ -37,6 +37,7 @@ import tempfile
 
 GATES = ("flow", "brief", "composition", "integration", "release")
 REVIEW_GATES = GATES[2:]
+RELEASE_LANES = {"normal_export_entry", "settled_ui_geometry"}
 KINDS = {"rendered_still", "rendered_sequence", "playback", "check_report"}
 
 AGENT_GUIDE = """# Production guardrails for this game
@@ -45,6 +46,10 @@ Before implementing or resuming work, read authoring/production.json and run:
 
     python3 tools/production.py check authoring/production.json --gate flow
 
+Before testing, declare verification.primary_target and optional_targets; for Web,
+start with Chrome on the cloud computer when capable, unless this game explicitly
+chooses another target. Native-only games name their native target. Safari is not
+an implicit requirement. Read authoring/release-smoke.md before release work.
 Before visual design or asset production, complete the production brief and run --gate brief.
 Before expanding the art batch, inspect a small actual rendered playable slice
 and close --gate composition. Before claiming integrated, close --gate integration;
@@ -66,6 +71,12 @@ Flow-only work may proceed without art approval; say that it is flow-only.
 - Record provisional/missing assets honestly. Do not mark visual acceptance from
   automated checks. Keep reviewer decisions, rendered evidence and automated
   results separate; passing the checker validates records, not their truth.
+- Execute required setup/actions outside assert expressions: release builds may
+  omit them. Use explicit failure paths and test the actual exported normal entry,
+  not just a debug fixture. Validate JS/engine types through the actual bridge.
+- Inspect settled Control rectangles after text, resize and layout changes, not
+  only declared sizes. Browser focus, app-scoped AX and global OS evidence have
+  different scopes; none proves a person's attention.
 - Keep source/build identities current. Changed brief/revision or evidence needs
   renewed review. Do not update hashes merely to conceal a stale approval.
 - Keep authoring sources, private reviews and captures outside game/, the intended
@@ -109,9 +120,78 @@ its exact failure, scope and next action instead of asking the user to rediscove
 """
 
 
+RELEASE_SMOKE_GUIDE = """# Release smoke: use the real entry on the declared primary target
+
+Before testing, fill verification.primary_target, optional_targets and
+javascript_bridge (present or none). Web defaults to Chrome on the cloud computer
+when capable; explicitly choose another browser/environment when the game needs it.
+Native-only games name a native target. Optional targets, including Safari, are
+not implicit release gates or substitutes for the primary target. Report incidental
+runs separately, not as support claims. List any additional required targets as
+explicit game-owned checks. A test environment failure is not automatically a game
+failure or permission to change security settings.
+
+## Freeze once, then preserve distinct evidence lanes
+
+Keep the exact source and exported deliverable under candidate_path, with
+verification.export_path relative to that directory (for example build/web).
+Keep evidence outside it in authoring/. Record candidate_sha256 when checks/captures
+run, including dirty/untracked source and the export. Freeze it for review. A new
+runtime/export needs affected checks and rendered evidence again; do not rerun an
+unchanged passing lane without a changed dependency, nor rebind old captures to new
+bytes. Existing composition acceptance is historical direction, not release proof.
+
+Release checks use the names below, result passed, and evidence_path to a hashed
+check_report whose platform exactly matches verification.primary_target. Keep
+source/debug tests, actual export tests and rendered/browser observations separate
+inside that report. A report can cover several lanes if it actually exercises them.
+Passing the record checker proves declared evidence consistency, not execution.
+
+- normal_export_entry: launch the frozen release export through the normal shipped
+  title/start path, without diagnostic-main overrides, fixture seeds or debug-only
+  initialization. Exercise the first meaningful action and its visible result.
+  Include artifact identity, target/version and steps/results in the report.
+  Required setup and state-changing calls must execute outside assert expressions;
+  a release build may strip assert entirely. Store the result, then use an explicit
+  failure branch (push_error + nonzero exit in a harness, or a game-owned error path
+  that aborts initialization). Assertions remain useful for side-effect-free debug
+  invariants; this is not a blanket assertion ban or a regex source linter.
+- settled_ui_geometry: on the same export/target, after layout settles, inspect
+  actual Control global rectangles, clipping and input coverage at declared
+  viewports/states. Repeat long/wrapped text, resize and reopen/transition cases.
+  Compare actual rectangles to visible pixels and required cues; a declared size
+  or headless Label test misses stale autowrap/minimum-size phantom rectangles.
+- javascript_bridge (only when present): probe the actual Godot Web bridge in the
+  primary browser/export, including success and false/error paths. Record returned
+  Variant types and values; Node/JS mocks alone do not cover JS-to-engine conversion.
+  A real bridge has returned JS true/false as integer 1/0, so strict bool assumptions
+  need actual validation. Prefer a versioned JSON object across the boundary with
+  explicitly validated fields/types; reject malformed/missing/unexpected values.
+  Do not silently truthiness-coerce them or claim typed JSON alone proves the bridge.
+
+## Visibility and interruption evidence has a scope
+
+Record separately: own-app/engine focus notifications; managed-browser tab/document
+visibility and focus; and independently obtained actual OS frontmost/occlusion
+observations, if the promised feature needs them. App-scoped accessibility (AX)
+menus/windows are not global-frontmost evidence. A managed-browser app/tab action
+may leave visibility APIs unchanged; label the mismatch and unvalidated native
+coverage rather than claiming a passing hidden-tab test or forcing a workaround.
+Browser-observable visibility does not promise arbitrary OS occlusion detection,
+and visible pixels never prove human attention or understanding. Test interruption,
+resume/cancel, duplicate input and stale callbacks within the game's actual contract.
+
+Required lanes that are failed, blocked or unrun do not pass. Preserve their exact
+artifact and scope. Optional diagnostics never silently become required; an honest
+unsupported/limited claim is better than manufacturing evidence or broadening scope.
+"""
+
+
 def template() -> dict:
     return {
-        "schema_version": 1, "test_fixture": False,
+        "schema_version": 2, "test_fixture": False,
+        "verification": {"primary_target": "Chrome (cloud)", "optional_targets": [],
+                         "javascript_bridge": "", "export_path": ""},
         "project": "", "scope": "", "revision": "", "candidate_path": "game",
         "assets": [],
         "references": {
@@ -130,7 +210,9 @@ def template() -> dict:
                    "basis_sha256": "",
                    "evidence": [{"path": "", "sha256": "", "candidate_sha256": "", "kind": "",
                                  "scope": "", "platform": "", "viewport": "", "route_state": ""}],
-                   "checks": [] if gate == "composition" else [{"name": "", "result": "unrun", "evidence_path": ""}]}
+                   "checks": ([] if gate == "composition" else
+                              [{"name": name, "result": "unrun", "evidence_path": ""}
+                               for name in (sorted(RELEASE_LANES) if gate == "release" else [""])])}
             for gate in REVIEW_GATES
         },
     }
@@ -178,6 +260,12 @@ def identity(data: dict, gate: str) -> str:
     # Direction survives unrelated source changes. A later gate still needs its
     # own current candidate fingerprint and rendered evidence.
     basis = {key: data.get(key) for key in ("schema_version", "test_fixture", "project", "scope", "references", "presentation")}
+    if data.get("schema_version") == 2:
+        # Export location is release-only; choosing a target is a brief decision.
+        verification = dict(obj(data.get("verification"), "verification"))
+        if gate != "release":
+            verification.pop("export_path", None)
+        basis["verification"] = verification
     basis["review"] = {key: review.get(key) for key in ("reviewer", "reviewer_kind", "reviewed_at", "scope", "candidate_revision", "candidate_sha256", "evidence", "checks")}
     if gate != "composition":
         basis["assets"] = data.get("assets")
@@ -228,7 +316,9 @@ def artifact(root: Path, record: dict, label: str) -> None:
 
 def check(data: dict, root: Path, gate: str, allow_test_fixture: bool = False) -> None:
     require(gate in GATES, "unknown gate")
-    require(type(data.get("schema_version")) is int and data["schema_version"] == 1, "schema_version: expected 1")
+    require(type(data.get("schema_version")) is int and data["schema_version"] in {1, 2}, "schema_version: expected 1 or 2")
+    require(gate != "release" or data["schema_version"] == 2,
+            "schema_version: release now needs version 2 verification; keep v1 history, add the primary target/bridge/export declaration and renew review bindings (see tools/production README migration)")
     require(type(data.get("test_fixture")) is bool, "test_fixture: declare true or false")
     require(not data["test_fixture"] or allow_test_fixture,
             "synthetic fixture is not production approval; use --allow-test-fixture only for demonstration/tests")
@@ -249,6 +339,22 @@ def check(data: dict, root: Path, gate: str, allow_test_fixture: bool = False) -
                 f"references.{role}.status: choose accepted, provisional or not_applicable; explain the role in use")
     if gate == "flow":
         return
+    if data["schema_version"] == 2:
+        verification = obj(data.get("verification"), "verification")
+        filled(verification.get("primary_target"), "verification.primary_target")
+        optional = verification.get("optional_targets")
+        require(isinstance(optional, list), "verification.optional_targets: expected a list (empty is valid)")
+        for target in optional:
+            filled(target, "verification.optional_targets entry")
+        require(len(optional) == len(set(optional)) and verification["primary_target"] not in optional,
+                "verification.optional_targets: targets must be distinct from each other and the primary target")
+        require(verification.get("javascript_bridge") in {"present", "none"},
+                "verification.javascript_bridge: declare present or none; mocks are not actual bridge coverage")
+        if gate == "release":
+            filled(verification.get("export_path"), "verification.export_path")
+            export = Path(verification["export_path"])
+            require(not export.is_absolute() and not any(part in {"..", ".git", ".godot"} for part in export.parts)
+                    and bool(export.parts), "verification.export_path: use a nonempty path inside candidate_path, not an excluded cache")
     p = obj(data.get("presentation"), "presentation")
     require(p.get("convention") in {"symbolic_grid", "scene_perspective", "custom"},
             "presentation.convention: choose symbolic_grid, scene_perspective or custom")
@@ -282,6 +388,14 @@ def check(data: dict, root: Path, gate: str, allow_test_fixture: bool = False) -
         if gate in {"integration", "release"}:
             require(asset["status"] == "accepted", "assets: placeholder/candidate acceptance cannot stand in for integrated final assets; limit the declared scope or finish review")
     current_candidate = candidate_digest(data, root)
+    if gate == "release":
+        # The digest already validates the root/symlinks. Use its cache exclusions
+        # here too: a directory containing only .godot data is not a hashed export.
+        built = root.resolve().parent / data["candidate_path"] / verification["export_path"]
+        require(built.is_file() or (built.is_dir() and any(
+            p.is_file() for p in built.rglob("*")
+            if not {".git", ".godot"}.intersection(p.relative_to(built).parts))),
+            "verification.export_path: exported deliverable must exist inside the fingerprinted candidate")
     reviews = obj(data.get("reviews"), "reviews")
     for stage in REVIEW_GATES[:REVIEW_GATES.index(gate) + 1]:
         label = f"reviews.{stage}"
@@ -304,6 +418,9 @@ def check(data: dict, root: Path, gate: str, allow_test_fixture: bool = False) -
             for field in ("scope", "platform", "viewport", "route_state"):
                 filled(item.get(field), f"{label}.evidence.{field}")
             if item["kind"] != "check_report":
+                if stage == "release":
+                    require(item["platform"] == verification["primary_target"],
+                            f"{label}: rendered evidence must use the primary target; keep optional diagnostics separate")
                 require(item["viewport"] in p["viewports"] and item["route_state"] in p["states"], f"{label}.evidence: viewport/state is outside declared targets")
                 targets.add((item["viewport"], item["route_state"]))
             require(item.get("candidate_sha256") == review["candidate_sha256"], f"{label}.evidence: capture/report belongs to a different candidate; do not rebind old evidence")
@@ -326,6 +443,14 @@ def check(data: dict, root: Path, gate: str, allow_test_fixture: bool = False) -
             require(result.get("result") == "passed", f"{label}.checks: a failed, blocked or unrun check cannot close this gate")
             require(result.get("evidence_path") in {e["path"] for e in evidence if e["kind"] == "check_report"},
                     f"{label}.checks.evidence_path: reference a hashed check_report artifact")
+        if stage == "release":
+            required = RELEASE_LANES | ({"javascript_bridge"} if verification["javascript_bridge"] == "present" else set())
+            for lane in sorted(required):
+                matches = [result for result in checks if result["name"] == lane]
+                require(len(matches) == 1, f"{label}.checks: record exactly one {lane} lane for the actual export")
+                report = next(e for e in evidence if e["path"] == matches[0]["evidence_path"] and e["kind"] == "check_report")
+                require(report["platform"] == verification["primary_target"],
+                        f"{label}.checks.{lane}: report must name the declared primary target, not a mock or optional browser")
         require(review.get("basis_sha256") == identity(data, stage),
                 f"{label}.basis_sha256: stale/missing review binding; re-review changed scope, revision and evidence, then run identity --gate {stage}")
 
@@ -343,6 +468,7 @@ def start(output: Path) -> None:
         (stage / "game").mkdir()
         (stage / "AGENTS.md").write_text(AGENT_GUIDE, encoding="utf-8")
         (stage / "authoring/production.json").write_bytes(canonical(template()))
+        (stage / "authoring/release-smoke.md").write_text(RELEASE_SMOKE_GUIDE, encoding="utf-8")
         shutil.copyfile(Path(__file__), stage / "tools/production.py")
         (stage / "game/README.md").write_text("Place selected runtime modules and approved runtime assets here.\nKeep production records and captures in ../authoring, outside this export root.\n", encoding="utf-8")
         # No engine project, dependency fetch, credentials or accepted review is created.

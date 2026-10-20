@@ -30,6 +30,9 @@ class ProductionTests(unittest.TestCase):
             ref['status'] = 'accepted'
         self.data['assets'][0]['status'] = 'accepted'
         (self.workspace / 'game/scene.txt').write_text('SYNTHETIC candidate; not a running game')
+        (self.workspace / 'game/build').mkdir()
+        (self.workspace / 'game/build/game.pck').write_text('SYNTHETIC export; not executable')
+        self.data['verification']['export_path'] = 'build/game.pck'
 
     def save(self):
         self.record.write_bytes(production.canonical(self.data))
@@ -48,13 +51,16 @@ class ProductionTests(unittest.TestCase):
                 name = f'{gate}-{view}-{state}.txt'
                 raw = b'SYNTHETIC declared playback: not rendered gameplay'
                 (self.authoring / name).write_bytes(raw)
-                r['evidence'].append(dict(path=name, sha256=hashlib.sha256(raw).hexdigest(), kind='playback', scope='Synthetic', platform='synthetic', viewport=view, route_state=state, candidate_sha256=sha))
+                r['evidence'].append(dict(path=name, sha256=hashlib.sha256(raw).hexdigest(), kind='playback', scope='Synthetic', platform=self.data['verification']['primary_target'], viewport=view, route_state=state, candidate_sha256=sha))
         if gate != 'composition':
             name = f'{gate}-check.txt'
             raw = b'SYNTHETIC check report'
             (self.authoring / name).write_bytes(raw)
-            r['evidence'].append(dict(path=name, sha256=hashlib.sha256(raw).hexdigest(), kind='check_report', scope='Synthetic', platform='synthetic', viewport='not applicable', route_state='not applicable', candidate_sha256=sha))
-            r['checks'].append(dict(name='synthetic check', result='passed', evidence_path=name))
+            r['evidence'].append(dict(path=name, sha256=hashlib.sha256(raw).hexdigest(), kind='check_report', scope='Synthetic', platform=self.data['verification']['primary_target'], viewport='not applicable', route_state='not applicable', candidate_sha256=sha))
+            lanes = {'synthetic check'}
+            if gate == 'release':
+                lanes = production.RELEASE_LANES | ({'javascript_bridge'} if self.data['verification']['javascript_bridge'] == 'present' else set())
+            r['checks'].extend(dict(name=lane, result='passed', evidence_path=name) for lane in sorted(lanes))
         self.seal(gate)
 
     def ready(self):
@@ -74,6 +80,115 @@ class ProductionTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn('project: fill', result.stderr)
         self.assertFalse((self.workspace / 'game/project.godot').exists())
+
+    def test_generated_release_guide_is_portable_and_pending(self):
+        guide = (self.authoring / 'release-smoke.md').read_text()
+        for phrase in ('normal_export_entry', 'settled_ui_geometry', 'javascript_bridge',
+                       'outside assert expressions', 'Node/JS mocks alone', 'integer 1/0',
+                       'versioned JSON', 'phantom rectangles', 'global-frontmost',
+                       'human attention', 'Safari', 'not implicit release gates'):
+            self.assertIn(phrase, guide)
+        data = production.load(self.record)
+        self.assertEqual(data['schema_version'], 2)
+        self.assertEqual(data['verification']['primary_target'], 'Chrome (cloud)')
+        self.assertEqual({c['name'] for c in data['reviews']['release']['checks']}, production.RELEASE_LANES)
+        self.assertTrue(all(c['result'] == 'unrun' for c in data['reviews']['release']['checks']))
+        relocated = self.workspace.parent / 'moved'
+        self.workspace.rename(relocated)
+        self.assertEqual((relocated / 'authoring/release-smoke.md').read_text(), guide)
+        subprocess.run([sys.executable, relocated / 'tools/production.py', 'init',
+                        '--output', relocated.parent / 'another'], check=True, capture_output=True)
+        self.assertEqual((relocated.parent / 'another/authoring/release-smoke.md').read_text(), guide)
+
+    def test_v1_history_still_checks_until_release_with_actionable_migration(self):
+        self.ready()
+        self.data['schema_version'] = 1
+        del self.data['verification']
+        for gate in production.REVIEW_GATES:
+            self.seal(gate)
+        for gate in ('flow', 'brief', 'composition', 'integration'):
+            self.check(gate)
+        with self.assertRaisesRegex(production.Invalid, 'version 2 verification'):
+            self.check()
+
+    def test_primary_target_and_bridge_are_brief_decisions_not_flow_blockers(self):
+        for field, value in [('primary_target', ''), ('javascript_bridge', ''),
+                             ('optional_targets', ['Safari', 'Safari']),
+                             ('optional_targets', [self.data['verification']['primary_target']])]:
+            with self.subTest(field=field, value=value):
+                data = copy.deepcopy(self.data)
+                data['verification'][field] = value
+                production.check(data, self.authoring, 'flow', True)
+                with self.assertRaises(production.Invalid):
+                    production.check(data, self.authoring, 'brief', True)
+        self.data['verification']['export_path'] = ''
+        self.check('brief')
+        self.accept('composition'); self.check('composition')
+
+    def test_native_and_web_primary_targets_do_not_require_safari(self):
+        for target, bridge in [('Godot native (Linux)', 'none'), ('Chrome (cloud)', 'present'), ('Firefox (Linux)', 'present')]:
+            with self.subTest(target=target):
+                self.data['verification'].update(primary_target=target, javascript_bridge=bridge,
+                                                 optional_targets=['Safari (not planned)'])
+                self.ready(); self.check()
+
+    def test_release_requires_export_and_settled_ui_lanes_on_primary(self):
+        for lane in production.RELEASE_LANES:
+            self.ready()
+            r = self.data['reviews']['release']
+            r['checks'] = [c for c in r['checks'] if c['name'] != lane]
+            self.seal('release')
+            with self.assertRaisesRegex(production.Invalid, lane): self.check()
+        self.ready()
+        self.data['reviews']['release']['checks'].append(copy.deepcopy(self.data['reviews']['release']['checks'][0]))
+        self.seal('release')
+        with self.assertRaisesRegex(production.Invalid, 'exactly one'): self.check()
+        for platform in ('Node mock', 'Safari', 'source debug'):
+            self.ready()
+            report = next(e for e in self.data['reviews']['release']['evidence'] if e['kind'] == 'check_report')
+            report['platform'] = platform
+            self.seal('release')
+            with self.assertRaisesRegex(production.Invalid, 'declared primary target'): self.check()
+
+    def test_actual_bridge_lane_required_only_when_declared_present(self):
+        self.ready(); self.check()  # Native/no bridge needs no invented bridge check.
+        self.data['verification'].update(primary_target='Chrome (cloud)', javascript_bridge='present')
+        self.ready(); self.check()
+        r = self.data['reviews']['release']
+        r['checks'] = [c for c in r['checks'] if c['name'] != 'javascript_bridge']
+        self.seal('release')
+        with self.assertRaisesRegex(production.Invalid, 'javascript_bridge'): self.check()
+
+    def test_release_export_path_is_required_inside_fingerprinted_candidate(self):
+        for path in ('', '.', '../other.pck', '/tmp/game.pck', 'missing.pck', '.godot/game.pck', '.git/objects'):
+            with self.subTest(path=path):
+                self.ready()
+                self.data['verification']['export_path'] = path
+                self.seal('release')
+                with self.assertRaisesRegex(production.Invalid, 'verification.export_path'): self.check()
+        self.data['verification']['export_path'] = 'build'  # Multi-file Web export directory.
+        self.ready(); self.check()
+        (self.workspace / 'game/build/game.pck').write_text('changed export')
+        with self.assertRaisesRegex(production.Invalid, 'candidate source/build changed'): self.check()
+
+    def test_export_directory_cannot_contain_only_excluded_cache_bytes(self):
+        cache = self.workspace / 'game/cache-only/.godot'
+        cache.mkdir(parents=True)
+        (cache / 'not-a-release.pck').write_text('not fingerprinted')
+        self.data['verification']['export_path'] = 'cache-only'
+        self.ready()
+        with self.assertRaisesRegex(production.Invalid, 'verification.export_path'): self.check()
+
+    def test_target_policy_change_invalidates_review_binding(self):
+        self.ready()
+        self.data['verification']['optional_targets'] = ['Safari (optional)']
+        with self.assertRaisesRegex(production.Invalid, 'stale/missing review binding'): self.check()
+
+    def test_release_rendered_evidence_cannot_substitute_optional_target(self):
+        self.ready()
+        self.data['reviews']['release']['evidence'][0]['platform'] = 'Safari'
+        self.seal('release')
+        with self.assertRaisesRegex(production.Invalid, 'rendered evidence must use the primary target'): self.check()
 
     def test_flow_only_does_not_require_art_or_visual_acceptance(self):
         self.data['presentation'] = {}
@@ -245,10 +360,10 @@ class ProductionTests(unittest.TestCase):
         for raw in ('{"a":1,"a":2}', '{"a":NaN}', '[]', '{'):
             self.record.write_text(raw)
             self.assertEqual(production.main(['check',str(self.record),'--gate','flow']), 1)
-        for version in (2, True, '1'):
+        for version in (3, True, '1'):
             self.data['schema_version'] = version
             with self.assertRaisesRegex(production.Invalid, 'schema_version'): self.check('flow')
-        self.data['schema_version'] = 1; self.ready(); self.data['test_fixture'] = False
+        self.data['schema_version'] = 2; self.ready(); self.data['test_fixture'] = False
         with self.assertRaisesRegex(production.Invalid, 'synthetic reviewer'): self.check()
 
 

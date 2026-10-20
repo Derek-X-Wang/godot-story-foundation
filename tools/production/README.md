@@ -22,6 +22,8 @@ art approval. The starter never overwrites an existing workspace. It creates:
 - `AGENTS.md`: concrete startup, composition and completion instructions for the
   next contributor/agent, including spatial, dialogue and visibility review.
 - `authoring/production.json`: a game-owned brief and pending review records.
+- `authoring/release-smoke.md`: a portable normal-export, layout and bridge recipe;
+  generated contributor instructions link it before release work.
 - `tools/production.py`: the same portable checker, with no Foundation checkout,
   packages, engine or network required after relocation.
 - `game/`: the intended runtime/export root, separate from authoring and evidence.
@@ -34,10 +36,10 @@ first and explicitly adopt the brief/checker without overwriting its AGENTS.md.
 | Gate | Required before claiming this stage |
 | --- | --- |
 | `flow` | Project/scope/revision and the semantics-only flow reference |
-| `brief` | Deliberate reference roles, presentation convention, scale/contact/continuity, movement, UI/visibility, viewports and representative states |
+| `brief` | Declared primary target/optional targets/bridge applicability, deliberate reference roles, presentation convention, scale/contact/continuity, movement, UI/visibility, viewports and representative states |
 | `composition` | Brief, selected asset maturity, explicit scoped review and current rendered candidate evidence; stand-ins may be accepted for composition only |
 | `integration` | Composition prerequisite, accepted in-scope assets, current composed candidate review and applicable focused checks |
-| `release` | Earlier prerequisites, current final-candidate rendered review and all declared applicable final check lanes passed |
+| `release` | Earlier prerequisites, fingerprinted export, primary-target rendered review and named actual-export/layout/conditional bridge lanes plus all declared applicable final checks passed |
 
 A populated field is only a recorded decision. A reviewer must assess the actual
 [spatial relationships](../../docs/art.md#representation-aware-spatial-coherence)
@@ -58,6 +60,57 @@ python3 tools/production/production.py check tools/production/examples/symbolic-
 python3 tools/production/production.py check tools/production/examples/perspective-scene.json --gate brief --allow-test-fixture
 python3 -m unittest discover -s tests/python -p test_production_workflow.py -v
 ```
+
+## Declare the target before testing; smoke the shipped entry
+
+New records use schema version 2. `verification` adds four small declarations:
+
+- `primary_target`: browser/platform plus environment, for example `Chrome (cloud)`
+  or `Godot native (Linux)`. Choose this before tests, not after finding a pass.
+  Chrome on the cloud computer is the default **Web** target when capable; another
+  explicit project target is valid. Native-only games do not need a browser.
+- `optional_targets`: an empty list is valid. Safari is not an implicit requirement;
+  incidental diagnostics do not establish support. Keep optional results separate.
+  Additional required targets are explicit game-owned checks, not inferred here.
+- `javascript_bridge`: `present` or `none`, determined from the game, not a mock.
+- `export_path`: file/directory relative to `candidate_path`, filled by release
+  (for example `build/web`). Its files must exist within the candidate fingerprint;
+  the checker cannot identify executable formats or attest which build ran.
+
+The first three are brief decisions. Flow work remains possible without them.
+Only release needs the export. Read the generated `authoring/release-smoke.md`:
+required setup/actions run outside `assert`, because release exports may omit it;
+use explicit failure handling and exercise the normal shipped entry. Do not ban
+side-effect-free assertions or infer release success from debug/source tests.
+
+Release `checks` must contain exactly one `normal_export_entry` and one
+`settled_ui_geometry` entry, plus `javascript_bridge` when present. Their hashed
+`check_report` evidence must use the exact `primary_target` string as `platform`.
+Use the same target for release rendered evidence. A single report may cover
+several lanes; record source, exported and rendered results distinctly inside it.
+The starter leaves these checks unrun; it never fabricates a pass. When a game has
+no Control/UI, the geometry report can record the inspected absence and its scope,
+not pretend to have exercised controls. Add other applicable checks as before.
+
+Probe actual JS-to-Godot types, including false/error paths; Node mocks can hide
+integer `1`/`0` arriving where a strict boolean was expected. The guide calls for
+validated typed JSON plus an actual bridge probe, settled layout rectangles after
+wrapping/resizing, and separate own-app, managed-browser and actual OS visibility
+evidence. App-scoped AX does not prove global frontmost status or human attention.
+Do not repeat an unchanged passing lane without an affected dependency, and do not
+relabel evidence from a changed candidate. The existing hashes preserve that boundary.
+
+### Version 1 records
+
+Existing v1 flow, brief, composition and integration records still work unchanged.
+Release checking gives an actionable migration error, rather than silently claiming
+the stronger coverage. Preserve the v1 history; adopt `schema_version: 2` and the
+four `verification` fields above in the current record. Add the release lanes and
+export, review whether existing evidence actually meets the chosen target/scope,
+and renew affected review bindings. Do not merely refresh hashes or invent runs;
+unchanged genuine evidence can be retained after that review, while missing export,
+layout or bridge evidence must be obtained. No migration edits a record automatically.
+The scaffold never overwrites an existing project's instructions or policy.
 
 ## Record a real review
 
@@ -131,6 +184,7 @@ Synthetic fixtures require an explicit opt-in and cannot pass production by defa
 
 The tool is read-only except for explicit fresh-workspace initialization. It runs
 no supplied commands. Tests run in the existing Python CI lane, covering the
-scaffold, relocation, stage boundaries, both representation examples, stale input
+scaffold, relocation, v1 migration, primary-target release lanes, conditional bridge
+coverage, exported artifact changes, stage boundaries, both representation examples, stale input
 and evidence rejection, eligibility, asset maturity, paths and malformed records.
 The normal Foundation runtime/release suites remain unchanged and independent.

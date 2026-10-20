@@ -37,3 +37,11 @@ composition and close the appropriate record/evidence gate, not just state tests
 For an existing game, read its instructions and adopt or deliberately replace
 these checks without overwriting local policy. Keep runtime modules independently
 optional; a replacement workflow must name the checks it preserves.
+
+For Web releases, declare the primary browser/environment before testing (Chrome
+on the cloud computer by default when capable); native-only games choose a native
+target. Safari is optional, never an implicit gate. The starter's portable release
+smoke guide and named checks cover normal exported entry, settled Control geometry
+and an actual JS/engine bridge when used. Required setup/actions must not depend
+on assertion execution. Preserve exact artifact and evidence scopes; app-scoped AX
+is not global OS focus evidence and visible pixels do not establish attention.

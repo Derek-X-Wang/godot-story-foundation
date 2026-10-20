@@ -92,7 +92,13 @@
     }
   },
   "revision": "synthetic-brief-v1",
-  "schema_version": 1,
+  "schema_version": 2,
   "scope": "Synthetic brief only; no runtime or accepted visual evidence.",
-  "test_fixture": true
+  "test_fixture": true,
+  "verification": {
+    "primary_target": "Godot native (Linux)",
+    "optional_targets": [],
+    "javascript_bridge": "none",
+    "export_path": ""
+  }
 }

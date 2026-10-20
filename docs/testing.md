@@ -14,6 +14,20 @@ art image and a successful export do not establish rendered composition approval
 After changes, recheck the affected actual scene with actors, movement, dialogue
 and choices at the intended viewports; record placeholders and unverified scope.
 
+## Consumer exported-entry and browser boundary review
+
+Before testing a Web game, declare its primary target (Chrome on the cloud computer
+by default when capable) and optional targets; native-only projects choose their
+native target. Safari is not an implicit gate. Use the production starter's
+[release recipe and named checks](../tools/production/README.md#declare-the-target-before-testing-smoke-the-shipped-entry)
+for the actual normal exported entry, settled UI geometry and actual JS/engine
+bridge when used. The generated guide travels with the consumer, so these checks
+do not depend on remembering this document. Source/debug checks, exported runtime
+checks and primary-target rendered/browser evidence are distinct. App-scoped AX,
+managed-browser signals and actual OS-frontmost evidence are not interchangeable;
+none establishes a person's attention. These record checks do not add Web runtime
+support or browser execution to Foundation CI.
+
 ## Consumer spatial and motion review
 
 Apply the declared [representation convention](art.md#representation-aware-spatial-coherence),
