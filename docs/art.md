@@ -115,6 +115,54 @@ or spatial logic. Keep this design review separate from
 [drawing/input integration](scene.md#consumer-drawing-and-input-integration)
 and record final visual acceptance explicitly as well.
 
+## Representation-aware spatial coherence
+
+Declare the game's representation convention before judging proportions. This is
+an authoring/review rule, not strict realism for every game or an implemented
+physics/scale validator. The [production starter](../tools/production/README.md)
+asks for the decision before visual production and carries it into review gates.
+
+- **Symbolic/tile RPG:** a person, house and town can use intentionally compressed
+  ratios. Keep the chosen tile scale, entrances, contact, overlap and object use
+  internally understandable; a small symbolic house is not itself a defect.
+- **Scene-perspective interactive narrative:** actors and props inhabit the drawn
+  space. Relate their world scale to depth, floor contacts, doors and furniture.
+  A distant doorway should not contain the same-sized world actor as the near
+  foreground unless the declared camera/projection or story deliberately supports
+  it. Isometric, orthographic and other stylized conventions can declare their own
+  consistent rule; not every upward screen movement implies greater depth.
+- **Foreground portraits and UI:** dialogue busts, closeups and interface icons
+  are presentation layers, not giants standing inside the room. Review their
+  identity, readability and world-view occlusion separately from world-actor scale.
+
+Within that convention, check a few concrete relationships:
+
+1. **Contact and function:** feet rest on the intended floor plane; supported
+   objects do not float accidentally; a person can plausibly reach/use the relevant
+   door, seat or prop. Stylization is allowed, unexplained contradictions are not.
+2. **Depth and overlap:** near/far actors and props have coherent relative scale,
+   and foreground surfaces occlude the correct parts. A body should not cut through
+   a table because the draw order uses the wrong anchor or layer.
+3. **Identity and continuity:** the same object retains its place and ownership
+   across dialogue, camera changes and interaction states unless a visible or
+   explicitly communicated event changes them. A carried prop should not also
+   remain on the table; presentation must agree with the owning state transition.
+4. **Movement through depth:** inspect start, end and intermediate frames. For a
+   perspective approach toward a distant door, size changes with the implied depth
+   while feet remain grounded. Scaling must not produce foot drift, sudden size
+   pops or distortion. Use an authored scale curve, depth bands or another
+   game-owned technique suited to the art; Foundation prescribes no formula.
+5. **Honest limited animation:** if a convincing transition is unavailable, prefer
+   a deliberate pose cut or fade between correctly placed and sized endpoints over
+   sliding an unchanged sprite through perspective space. A cut omits motion; it
+   does not excuse an oversized far pose or alter action/cancel semantics. Record
+   that presentation choice instead of claiming a walk cycle was implemented.
+
+Review the actual composed game at its target viewports, including dialogue and
+choices. These judgments do not follow from atlas dimensions, valid pivots, correct
+navigation or successful exports. Use the [spatial and motion review checks](testing.md#consumer-spatial-and-motion-review)
+and keep their scope distinct from automated tests.
+
 ## Quick start: no editor or game runtime needed
 
 Python 3.11+ and its standard library are sufficient:

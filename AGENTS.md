@@ -25,3 +25,15 @@ module boundaries; use [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules
   source recovery before phase changes, approval waits, handoffs or releases;
   bounded work batches between checkpoints. Pending/failed backups block further
   risky work. A local commit/archive alone is not durable evidence
+
+## Starting or advancing a consuming game
+
+Use the [production starter](tools/production/README.md) by default for new game
+work, before copying a demo's layout or producing an asset batch. Its generated
+consumer AGENTS.md and stage-aware brief/checker make prior production lessons
+part of the next project's startup. Flow-only prototyping does not require art
+approval. Before claiming art integration or release readiness, inspect the actual
+composition and close the appropriate record/evidence gate, not just state tests.
+For an existing game, read its instructions and adopt or deliberately replace
+these checks without overwriting local policy. Keep runtime modules independently
+optional; a replacement workflow must name the checks it preserves.

@@ -14,6 +14,40 @@ art image and a successful export do not establish rendered composition approval
 After changes, recheck the affected actual scene with actors, movement, dialogue
 and choices at the intended viewports; record placeholders and unverified scope.
 
+## Consumer spatial and motion review
+
+Apply the declared [representation convention](art.md#representation-aware-spatial-coherence),
+not a universal realism test. The [production checker](../tools/production/README.md)
+can require decisions, current input hashes and eligible evidence records; it cannot
+see whether a character actually looks grounded or the review is truthful.
+
+- Stage a nearby actor and a far actor/pose against known floor/door/furniture
+  anchors. Inspect proportional fit and foot contact at each depth. For symbolic
+  tile games, check consistency with the tile convention instead of real-world
+  building/person ratios. Inspect UI portraits separately from world actors.
+- Play depth movement in both relevant directions. Inspect intermediate frames,
+  arrival, cancellation and a resumed/repeated route where supported. Check scale,
+  contact and overlap together; matching endpoint numbers alone misses a size pop
+  or sliding foot. For a deliberate cut, inspect both poses and the actual cut.
+- Observe a prop before, during and after a relevant interaction; verify world
+  placement, visibility and custody agree with the game's actual commit boundary.
+  Reopen dialogue or revisit if supported. Look for duplicates or unexplained jumps.
+- Review the same important states at each declared viewport, especially the long
+  dialogue/choice overlay. Essential actors, action targets and knowledge-bearing
+  cues must actually be visible under the game's position/focus/timing policy.
+  A hidden sampler, offscreen draw, loaded texture or elapsed timer cannot prove
+  that the player was shown the event. Visibility is not proof of comprehension.
+- Retain a clear failing example where useful: an unchanged near-size actor at the
+  far door, a foot lifted from the floor, a prop behind the wrong surface or a cue
+  concealed by dialogue. Recheck the same route/state after repair. This is rendered
+  review evidence, not an assertion that Foundation detects those defects itself.
+
+Record the exact candidate, asset versions, convention, viewport, route/state and
+review scope. Still frames support composition; movement requires playback or a
+suitable rendered sequence. Recheck changed candidates rather than reusing old
+captures with new labels. Import, state, collision and packaging checks remain
+separate requirements and cannot close the visual acceptance gate.
+
 ## Consumer consequence and presentation contracts
 
 Run `godot --headless --path .build/village --script res://tests/runtime/test_consequence_contracts.gd`
