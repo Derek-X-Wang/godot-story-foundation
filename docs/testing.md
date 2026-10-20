@@ -4,6 +4,16 @@ The release targets Godot 4.6.3 and the pinned official Dialogue Manager 3.10.4.
 Run the complete command sequence in the README after changes, including a fresh
 project import. Python checks require no network or third-party packages.
 
+## Consumer visual acceptance during art integration
+
+Use the optional [production handoff worksheet](production-handoff.md) to review
+a real composed scene early, before expanding assets and exhaustive regression.
+Keep import and focused semantic checks active; run applicable final regression
+and packaging checks before release. Headless state/Label assertions, an isolated
+art image and a successful export do not establish rendered composition approval.
+After changes, recheck the affected actual scene with actors, movement, dialogue
+and choices at the intended viewports; record placeholders and unverified scope.
+
 ## Consumer consequence and presentation contracts
 
 Run `godot --headless --path .build/village --script res://tests/runtime/test_consequence_contracts.gd`

@@ -29,6 +29,11 @@ contract/pipeline logic is in `tools/art/characters`. Editor/runtime integration
 live in `tools/art/adapters`. Future modules should reuse only genuinely matching
 contracts; they must not inherit pixel-sprite assumptions just to use provenance.
 
+When moving from a story/flow prototype to an art-integrated game, use the
+[production handoff worksheet](production-handoff.md). Prototype screenshots are
+not automatically art/layout references; review the composed scene with actors,
+movement and UI separately from individual asset compatibility.
+
 ## Character design: concept before pixels
 
 For new characters, this optional game-owned authoring sequence precedes the

@@ -83,6 +83,13 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
+## Optional prototype-to-production handoff
+
+The consumer-owned [production handoff worksheet](docs/production-handoff.md)
+separates story/flow references from art direction, reviews a real composed scene
+before asset expansion, and keeps visual acceptance distinct from state tests.
+It adds no scene-art generator or mandatory UI format.
+
 ## Optional regression toolkit
 
 The test-only Python runner wraps existing trusted commands with bounded execution,
