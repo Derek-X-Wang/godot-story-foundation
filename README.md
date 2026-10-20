@@ -23,6 +23,23 @@ music asset pipelines and a replaceable Bevy backend remain future work. See the
 [design decisions](docs/architecture.md#design-decisions) and
 [contributor guardrails](AGENTS.md).
 
+## Start a new game
+
+Start with the [production starter](tools/production/README.md), rather than
+inheriting the village demo's UI or art assumptions:
+
+```sh
+python3 tools/production/production.py init --output ../my-game
+```
+
+It creates consumer instructions, a game-owned production brief, a portable
+stage-aware checker and separate authoring/runtime directories. The next agent
+encounters representation, references, movement, dialogue and visible-evidence
+checks at startup. Flow-only work remains possible without art approval; later
+stages require explicit scoped review and current candidate/evidence identities.
+The checker validates records, not artistic truth. Runtime modules remain optional
+and the game may explicitly adopt an equivalent workflow.
+
 ## Quick start
 
 Requirements: Python **3.11+**, Godot **4.6.3**, and internet access for the first
@@ -71,6 +88,8 @@ through the foundation's command bridge and transaction kernel.
   branch simulations and reviewer diffs
 - Exact input/candidate/review hash binding, explicit manual approval and
   deterministic static JSON + Dialogue Manager builds
+- Portable production starter and stage-aware record/evidence gates; actual
+  composition and artistic acceptance remain reviewer responsibilities
 - Headless Godot regression tests, Python tooling tests, pinned public dependencies
   and read-only standard-runner GitHub Actions
 - Deterministic addon bundle with upstream licenses and file hash manifest
@@ -83,12 +102,13 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
-## Optional prototype-to-production handoff
+## Prototype-to-production handoff
 
 The consumer-owned [production handoff worksheet](docs/production-handoff.md)
 separates story/flow references from art direction, reviews a real composed scene
 before asset expansion, and keeps visual acceptance distinct from state tests.
-It adds no scene-art generator or mandatory UI format.
+The [starter and gates](tools/production/README.md) operationalize this worksheet
+for new projects without adding a scene-art generator or mandatory UI format.
 
 ## Optional regression toolkit
 

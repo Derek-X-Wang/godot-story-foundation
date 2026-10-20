@@ -1,0 +1,98 @@
+{
+  "assets": [
+    {
+      "id": "neutral-actor",
+      "note": "Synthetic composition stand-in, not accepted production art.",
+      "status": "placeholder"
+    }
+  ],
+  "candidate_path": "game",
+  "presentation": {
+    "continuity": "One prop identity with a stable position and exactly one owner before/after handover.",
+    "convention": "symbolic_grid",
+    "grounding_occlusion": "Consistent tile floor contact and front/back overlap; furniture use remains readable.",
+    "movement": {
+      "depth_policy": "Grid traversal keeps the declared symbolic scale; no perspective shrink is implied.",
+      "mode": "animated"
+    },
+    "rationale": "A tile symbol represents a person or building; ratios are deliberately compressed.",
+    "states": [
+      "entry"
+    ],
+    "ui": {
+      "dialogue_and_choices": "Advance readable dialogue explicitly; choices represent decisions, not a flow-debug button list.",
+      "essential_visibility": "Keep the relevant speaker, prop and doorway cue visible with the overlay; hidden samplers do not grant knowledge.",
+      "portraits": "Optional foreground portrait is UI, not a giant world actor."
+    },
+    "viewports": [
+      "960x540"
+    ],
+    "world_scale": "Constant tile actor scale; symbolic door threshold remains legible."
+  },
+  "project": "Neutral tile village",
+  "references": {
+    "art": {
+      "source": "synthetic-art-v1",
+      "status": "provisional",
+      "use": "Provisional neutral palette and character identity.",
+      "kind": "external",
+      "identity": "synthetic-art-v1"
+    },
+    "composition": {
+      "source": "synthetic-composition-v1",
+      "status": "provisional",
+      "use": "Provisional camera and interaction staging, separate from flow.",
+      "kind": "external",
+      "identity": "synthetic-composition-v1"
+    },
+    "flow": {
+      "source": "synthetic-flow-v1",
+      "status": "provisional",
+      "use": "Dialogue and exit semantics only; not a layout reference.",
+      "kind": "external",
+      "identity": "synthetic-flow-v1"
+    }
+  },
+  "reviews": {
+    "composition": {
+      "basis_sha256": "",
+      "candidate_revision": "",
+      "candidate_sha256": "",
+      "checks": [],
+      "decision": "pending",
+      "evidence": [],
+      "reviewer": "",
+      "reviewer_kind": "",
+      "scope": "",
+      "reviewed_at": ""
+    },
+    "integration": {
+      "basis_sha256": "",
+      "candidate_revision": "",
+      "candidate_sha256": "",
+      "checks": [],
+      "decision": "pending",
+      "evidence": [],
+      "reviewer": "",
+      "reviewer_kind": "",
+      "scope": "",
+      "reviewed_at": ""
+    },
+    "release": {
+      "basis_sha256": "",
+      "candidate_revision": "",
+      "candidate_sha256": "",
+      "checks": [],
+      "decision": "pending",
+      "evidence": [],
+      "reviewer": "",
+      "reviewer_kind": "",
+      "scope": "",
+      "reviewed_at": ""
+    }
+  },
+  "revision": "synthetic-brief-v1",
+  "schema_version": 1,
+  "scope": "Synthetic brief only; no runtime or accepted visual evidence.",
+  "test_fixture": true
+}

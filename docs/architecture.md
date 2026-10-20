@@ -33,7 +33,10 @@ exports/imports provider-neutral files; it has not exercised a live provider.
 
 ### Defaults, templates and game-specific code
 
-The included workflow and game template are optional conveniences. Games may
+The [production starter](../tools/production/README.md) is the default new-game
+entry path, with generated contributor instructions and stage-aware record checks.
+It does not install runtime modules or choose a universal presentation. The
+included workflows and game template remain replaceable conveniences. Games may
 bypass them, compose only useful primitives, or implement unique mechanics in
 game-owned code. Prefer composition/adapters over a separate Foundation fork for
 each game. If a reusable extension point is missing, design and test a small

@@ -4,8 +4,9 @@ Use this consumer-owned worksheet when a validated story/flow prototype becomes
 an art-integrated playable scene. It connects the existing
 [authoring review](authoring.md), [art design reviews](art.md) and
 [scene integration checks](scene.md#consumer-drawing-and-input-integration).
-It adds no generator, runtime API, approval command or mandatory presentation
-template. Keep filled briefs, editable asset sources, review captures and decisions
+The [production starter and gates](../tools/production/README.md) make this the
+default new-project workflow with a portable brief/checker. They add no art
+generator, runtime API, automatic visual approval or mandatory presentation format. Keep filled briefs, editable asset sources, review captures and decisions
 in the consuming game's authoring storage, outside its export root. Stage selected
 runtime art/resources into the game separately, as described in the
 [art pipeline's export boundary](art.md#provenance-is-evidence-not-legal-clearance).
@@ -40,7 +41,11 @@ authoring/contract review rather than calling it a cosmetic change.
 
 Write a short art-integration brief: scope and entry/exit states, accepted
 references, provisional decisions, target viewports, intended camera and UI
-relationship, essential visible actions and missing assets. Reuse
+relationship, essential visible actions and missing assets. Declare the
+[representation convention](art.md#representation-aware-spatial-coherence): symbolic
+tile scale, scene perspective or another explicit projection/stylization. Record
+world-scale actors separately from foreground portraits/UI, depth/movement policy,
+contact/occlusion and object-continuity expectations. Reuse
 [structure-before-detail review](art.md#scene-design-structure-before-detail)
 instead of drawing detail around an inherited debug layout.
 
@@ -60,6 +65,9 @@ When the approved direction is a fullscreen, scene-led game:
 - If approach, retreat or another movement is part of the approved interaction,
   show its progress and cancellation coherently. Actor movement, camera movement
   and other staging choices are game-owned alternatives, not Foundation mandates.
+  In perspective staging, review scale through the route as well as its endpoints.
+  Prefer a deliberate correctly sized pose cut to an unconvincing movement; do not
+  disguise an incomplete animation or change action meaning to accommodate it.
 
 This is a conditional composition checklist, not a ban on visual novels, panels
 or another deliberately selected format. Do not prescribe universal resolutions,
@@ -153,7 +161,9 @@ Scope: scene / entry and exit / selected routes / excluded or unfinished work
 Identity: source/build revision; asset/reference versions or hashes
 Flow reference: accepted semantics; relevant action/knowledge/cancel contracts
 Art reference: intended use; accepted/provisional/rejected; decision owner
-Composition: camera/scene/UI relationship; target viewports; visible key actions
+Representation: symbolic / perspective / custom; world scale vs UI portraits
+Composition: camera/scene/UI relationship; target viewports/states; visible key actions
+Spatial policy: depth scale; grounding/occlusion; object identity/custody; movement/cut
 Assets: accepted / candidate / placeholder; missing work and temporary bridges
 Rendered evidence: actual build/platform/viewport/state; captures/playback links
 Decision: reviewer; date; accepted aspects and limits; unresolved mismatches
