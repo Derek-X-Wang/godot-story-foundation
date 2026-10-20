@@ -2,6 +2,11 @@
 
 The v0.1 CLI is Python 3.10+ and standard-library only. It never calls a model, reads credentials, makes network requests, or sends story data to a provider. You may use the checked-in original village response entirely offline. A provider integration, if you choose to build one, is an explicit export/import boundary.
 
+Story/flow approval establishes the reviewed semantic scope, not the prototype's
+final visual layout. For the transition into art production, use the optional
+[production handoff worksheet](production-handoff.md); keep art/composition
+acceptance separate from the exact-version content approval described here.
+
 ## Quick start: the synthetic demo
 
 Run from the repository root:
