@@ -5,8 +5,10 @@ an art-integrated playable scene. It connects the existing
 [authoring review](authoring.md), [art design reviews](art.md) and
 [scene integration checks](scene.md#consumer-drawing-and-input-integration).
 It adds no generator, runtime API, approval command or mandatory presentation
-template. Keep filled briefs, game assets, captures and decisions in the consuming
-game's appropriate authoring storage, outside its export root.
+template. Keep filled briefs, editable asset sources, review captures and decisions
+in the consuming game's authoring storage, outside its export root. Stage selected
+runtime art/resources into the game separately, as described in the
+[art pipeline's export boundary](art.md#provenance-is-evidence-not-legal-clearance).
 
 **A flow prototype is a semantic reference, not automatically an art reference.**
 Story/flow acceptance, composition acceptance, asset acceptance and release
