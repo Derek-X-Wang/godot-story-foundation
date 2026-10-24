@@ -100,6 +100,25 @@ class ProductionTests(unittest.TestCase):
                         '--output', relocated.parent / 'another'], check=True, capture_output=True)
         self.assertEqual((relocated.parent / 'another/authoring/release-smoke.md').read_text(), guide)
 
+    def test_generated_timed_recipe_preserves_scope_and_evidence_boundaries(self):
+        guide = (self.authoring / 'release-smoke.md').read_text()
+        section = guide.split('## Timed presentation: input intent and recoverable facts\n', 1)[1].split('## Visibility and interruption', 1)[0]
+        normalized = ' '.join(section.split())
+        for boundary in ('not a universal permanent transcript requirement',
+                         'finite measurement window', 'fresh press/release',
+                         'separately from held/repeated input and stale callbacks',
+                         'first manual result', 'independently earned fact',
+                         'Missing earned content and revealing unearned content must fail',
+                         'must not grant knowledge or duplicate effects',
+                         'normal-entry rendered transition evidence',
+                         'adds no schema, runtime or mandatory release lane'):
+            self.assertIn(boundary, normalized)
+        self.assertIn('input epochs alone are not proof',
+                      (self.workspace / 'AGENTS.md').read_text())
+        # Template persistence only: not execution of consumer input/receipt tests.
+        self.assertEqual({c['name'] for c in production.load(self.record)['reviews']['release']['checks']},
+                         production.RELEASE_LANES)
+
     def test_generated_coverage_recipe_neutral_counterexamples(self):
         guide = (self.authoring / 'release-smoke.md').read_text()
         section = guide.split('## Optional scoped presentation coverage\n', 1)[1].split('## Optional performance cue bindings', 1)[0]
@@ -423,3 +442,4 @@ class ProductionTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

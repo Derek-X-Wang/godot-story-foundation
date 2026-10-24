@@ -114,6 +114,11 @@ The scaffold never overwrites an existing project's instructions or policy.
 
 ## Record a real review
 
+For timed interactions or promised review of transient facts, the generated
+`authoring/release-smoke.md` also covers fresh delayed clicks at reused coordinates
+and earned-only recoverability. Use the consumer's existing check reports; this is
+conditional guidance, not a new validator or a universal permanent transcript rule.
+
 ### Scope presentation completeness separately from a composition sample
 
 The generated `authoring/release-smoke.md` includes an optional
@@ -223,3 +228,4 @@ performance. Insertion and reordering cannot move a cue to another ID. The check
 compares supplied data only: generate actual bindings from the real resolver and
 use existing hashed reports and rendered-sequence gates for execution evidence.
 No private game text/assets or game-specific enum is included in this contract.
+

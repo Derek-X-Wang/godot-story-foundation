@@ -61,6 +61,8 @@ Flow-only work may proceed without art approval; say that it is flow-only.
 Before claiming complete presentation coverage, follow the optional scoped
 presentation_coverage recipe in authoring/release-smoke.md. Representative main
 route frames alone do not establish failure, recovery or alternate-route coverage.
+For timed interactions or recoverable transient facts, use the applicable timed
+presentation checks in authoring/release-smoke.md; input epochs alone are not proof.
 
 - Declare this game's representation convention before judging proportions.
   Symbolic/tile RPGs need internal logic, not literal building-to-person ratios.
@@ -263,6 +265,36 @@ rendered_sequence/playback evidence; headless checks do not prove pixels or emot
 Keep dialogue, story, assets, timing and state ownership in the game. This checker
 adds no renderer, acting quality score, or new release gate. Games without cues need
 no manifest and keep their existing review identities.
+
+## Timed presentation: input intent and recoverable facts
+
+Apply these checks when a consumer has timed interactions or promises later review
+of transient information. Declare that contract first, including intentionally
+unavailable facts; this is not a universal permanent transcript requirement.
+
+- Distinguish the finite measurement window from the result/review UI lifetime.
+  If review stays open, freeze measured outcomes at the declared boundary: idle,
+  repeated clicks, history round trips or resize must not accumulate new receipts,
+  knowledge or side effects. Test natural end, early exit and supported interruptions.
+- On the actual export, capture an active target and its settled rectangle, allow
+  the automatic transition, then issue a fresh press/release at the old coordinate.
+  It must not unexpectedly activate an unrelated replacement control. Test this
+  separately from held/repeated input and stale callbacks: an input epoch can reject
+  an old event but cannot by itself protect a new click based on an earlier view.
+  Use the consumer's deliberate transition/confirmation policy, not a fixed delay
+  or a mandated renderer. Check that explicit exit preserves the first manual result.
+- For facts the consumer promises can be reviewed, verify the actually earned
+  content is readable through its declared result/history path after the transient
+  display ends. Test each independently earned fact, their combinations and none.
+  Missing earned content and revealing unearned content must fail; reopening review
+  must not grant knowledge or duplicate effects. Keep timing, receipt semantics and
+  intentional inaccessible content in the consumer, not in a shared UI framework.
+
+Attach these consumer checks to existing integration/release checks and hashed
+check_report evidence for the executed candidate. Keep source/export assertions
+separate from normal-entry rendered transition evidence at declared viewports.
+The production checker validates records, not input safety, actual readability or
+human understanding. This recipe adds no schema, runtime or mandatory release lane.
 
 ## Visibility and interruption evidence has a scope
 
@@ -661,3 +693,4 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
