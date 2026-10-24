@@ -100,6 +100,60 @@ class ProductionTests(unittest.TestCase):
                         '--output', relocated.parent / 'another'], check=True, capture_output=True)
         self.assertEqual((relocated.parent / 'another/authoring/release-smoke.md').read_text(), guide)
 
+    def test_generated_coverage_recipe_neutral_counterexamples(self):
+        guide = (self.authoring / 'release-smoke.md').read_text()
+        section = guide.split('## Optional scoped presentation coverage\n', 1)[1].split('## Optional performance cue bindings', 1)[0]
+        self.assertIn('presentation_coverage', (self.workspace / 'AGENTS.md').read_text())
+        for boundary in ('independent expectation', 'consumer owns both traversal',
+                         'not "all histories"', 'adds no schema field or mandatory lane',
+                         'does not prove', 'natural-player discovery'):
+            self.assertIn(boundary, section)
+        # Execute only the shipped synthetic illustration, not an engine or
+        # an invented proof that a consumer's reachable inventory is complete.
+        namespace = {}
+        exec(section.split('```python\n', 1)[1].split('```', 1)[0], namespace)
+        expected = namespace['expected']
+        validate = namespace['check_presentation']
+        validate(expected, copy.deepcopy(expected))  # Includes explicit text mode.
+        mutations = [
+            ('terminal', ('visual', [])),
+            ('restored', ('text', ['text'])),
+            ('restored', ('visual', ['scene', 'text'])),
+        ]
+        for state, actual in mutations:
+            with self.subTest(state=state, actual=actual):
+                observed = copy.deepcopy(expected)
+                observed[state] = actual
+                with self.assertRaisesRegex(ValueError, 'presentation mismatch'):
+                    validate(expected, observed)
+        observed = copy.deepcopy(expected)
+        del observed['terminal']
+        with self.assertRaisesRegex(ValueError, 'inventory mismatch'):
+            validate(expected, observed)
+        observed = copy.deepcopy(expected)
+        observed['undeclared_terminal'] = ('text', ['text'])
+        with self.assertRaisesRegex(ValueError, 'inventory mismatch'):
+            validate(expected, observed)
+
+    def test_optional_coverage_uses_existing_check_report_and_identity(self):
+        self.ready()
+        review = self.data['reviews']['integration']
+        report_path = next(e['path'] for e in review['evidence'] if e['kind'] == 'check_report')
+        lane = dict(name='presentation_coverage', result='passed', evidence_path=report_path)
+        review['checks'].append(lane)
+        self.seal('integration')
+        self.check('integration')
+        for status in ('failed', 'blocked', 'unrun'):
+            lane['result'] = status
+            self.seal('integration')
+            with self.assertRaisesRegex(production.Invalid, 'failed, blocked or unrun'):
+                self.check('integration')
+        lane['result'] = 'passed'
+        self.seal('integration')
+        (self.authoring / report_path).write_text('Changed SYNTHETIC coverage report')
+        with self.assertRaisesRegex(production.Invalid, 'evidence bytes changed'):
+            self.check('integration')
+
     def test_v1_history_still_checks_until_release_with_actionable_migration(self):
         self.ready()
         self.data['schema_version'] = 1

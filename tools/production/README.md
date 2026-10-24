@@ -114,6 +114,23 @@ The scaffold never overwrites an existing project's instructions or policy.
 
 ## Record a real review
 
+### Scope presentation completeness separately from a composition sample
+
+The generated `authoring/release-smoke.md` includes an optional
+`presentation_coverage` recipe: declare intended modes/owner configurations,
+derive the in-scope reachable inventory from the consumer controller, and cover
+failures, recovery and explicit mode changes as well as the main route. An
+independent expectation must reject unintended legacy fallbacks even when old
+tests treated them as correct. Keep game-specific traversal and route names in
+the consumer; the neutral snippet is an illustration, not a generic traverser.
+
+Use existing integration/release `checks` and hashed `check_report` evidence to
+bind the consumer's result to the tested candidate. No schema or mandatory lane
+is added. Omitting the inventory/check is not automatically detectable: a passing
+record checker still cannot prove complete presentation. Distinguish a reviewed
+composition slice from a whole-game claim, presentation-equivalence coverage from
+all histories, and headless routing from actual rendered/export acceptance.
+
 Keep captures/logs beneath `authoring/`, for example `evidence/room-entry.png`.
 Review entries have `decision` (`pending` until explicitly accepted), `reviewer`,
 `reviewer_kind` (`human` or `agent` in production), `reviewed_at`, the exact accepted `scope`,
