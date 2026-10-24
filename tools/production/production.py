@@ -58,6 +58,9 @@ Before expanding the art batch, inspect a small actual rendered playable slice
 and close --gate composition. Before claiming integrated, close --gate integration;
 before claiming release-ready, close --gate release against the final candidate.
 Flow-only work may proceed without art approval; say that it is flow-only.
+Before claiming complete presentation coverage, follow the optional scoped
+presentation_coverage recipe in authoring/release-smoke.md. Representative main
+route frames alone do not establish failure, recovery or alternate-route coverage.
 
 - Declare this game's representation convention before judging proportions.
   Symbolic/tile RPGs need internal logic, not literal building-to-person ratios.
@@ -171,6 +174,65 @@ Passing the record checker proves declared evidence consistency, not execution.
   need actual validation. Prefer a versioned JSON object across the boundary with
   explicitly validated fields/types; reject malformed/missing/unexpected values.
   Do not silently truthiness-coerce them or claim typed JSON alone proves the bridge.
+
+## Optional scoped presentation coverage
+
+Use this recipe when claiming a slice or game's presentation is complete. Keep
+the scope narrow and explicit; a composition sample is not whole-game coverage.
+Declare the intended presentation modes and valid active-owner configurations
+before testing. Derive reachable states and offered transitions from the actual
+consumer controller, including terminal/failure pages, restore, retry, title/new
+entry and explicit mode switches when applicable. Record exclusions with reasons.
+Do not derive the expected contract from the same renderer's ownership predicate:
+a legacy fallback can be implemented intentionally and still violate the brief.
+
+Every in-scope reachable state must resolve to its declared presentation, without
+an accidental legacy fallback or conflicting owners. Session mode must survive
+recovery unless an explicit supported action changes it. A deliberately selected
+text/legacy mode remains valid; do not globally ban it. Some games compose several
+owners: validate their declared configuration rather than imposing one renderer.
+
+This neutral executable illustration assumes a single owner. It compares observed
+mode and active owners for the same declared in-scope inventory to an independent
+expectation; it does not traverse a game,
+render pixels or supply a production validator. The consumer owns both traversal
+and its reviewed contract. These labels are synthetic, not required route names.
+
+```python
+def check_presentation(expected, observed):
+    if set(expected) != set(observed):
+        raise ValueError("presentation inventory mismatch")
+    for state, contract in expected.items():
+        if observed.get(state) != contract:
+            raise ValueError("presentation mismatch: " + state)
+
+expected = {
+    "entry": ("visual", ["scene"]),
+    "terminal": ("visual", ["result"]),
+    "restored": ("visual", ["scene"]),
+    "explicit_text_entry": ("text", ["text"]),
+}
+```
+
+Exercise negative cases: missing terminal owner, recovery losing selected mode,
+and conflicting simultaneous owners must fail; explicit text entry must pass.
+Drive actual consumer actions and inspect active views, not only a router's label.
+Keep narrative/state parity checks independent. If pruning by presentation
+equivalence, document the key and why it preserves owner predicates and future
+offered actions; a traversal cut short by a safety bound is incomplete, not success.
+Report equivalence
+classes, transition/count definitions and uncovered cases, not "all histories".
+
+Attach the consumer's result as presentation_coverage in the existing integration
+and release checks, pointing to a hashed check_report with the executed candidate
+fingerprint. Include inventory provenance, expected contract, exclusions and exact
+source/export lanes. Failed, blocked or unrun declared checks cannot close a gate.
+This optional recipe adds no schema field or mandatory lane: the checker cannot
+infer an omitted inventory/check, execute the traversal, or verify report truth.
+List representative rendered states separately; retain actual normal-export,
+settled-layout and rendered transition evidence. Headless coverage does not prove
+pixels, sound, emotional impact or every history combination. Targeted route QA
+does not become natural-player discovery evidence in the playtesting protocol.
 
 ## Optional performance cue bindings
 
