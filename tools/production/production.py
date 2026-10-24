@@ -50,6 +50,9 @@ Before testing, declare verification.primary_target and optional_targets; for We
 start with Chrome on the cloud computer when capable, unless this game explicitly
 chooses another target. Native-only games name their native target. Safari is not
 an implicit requirement. Read authoring/release-smoke.md before release work.
+If using authored performance cues, read its optional cue-binding recipe. Stable
+beat IDs, not array positions, bind cues; validate resolved consumer data with
+python3 tools/production.py check-cues authoring/cues.json. Do not invent a pass.
 Before visual design or asset production, complete the production brief and run --gate brief.
 Before expanding the art batch, inspect a small actual rendered playable slice
 and close --gate composition. Before claiming integrated, close --gate integration;
@@ -169,6 +172,36 @@ Passing the record checker proves declared evidence consistency, not execution.
   explicitly validated fields/types; reject malformed/missing/unexpected values.
   Do not silently truthiness-coerce them or claim typed JSON alone proves the bridge.
 
+## Optional performance cue bindings
+
+For authored cues, use stable semantic beat IDs, never array positions. The portable
+checker accepts an optional performance_cues object in production.json at every gate,
+or a standalone file via `python3 tools/production.py check-cues authoring/cues.json`:
+
+    {"capabilities": {"pose": ["rest", "alert"]},
+     "cues": {"arrival.notice": {"pose": "alert"}},
+     "beats": [{"id": "arrival.notice", "performance": {"pose": "alert"}},
+               {"id": "arrival.pause", "performance": {}}]}
+
+Supply capability names/values from this game's renderer contract. Cues are keyed
+by globally unique stable beat IDs within this declared slice. Uncued beats still
+need distinct IDs and empty performance. Every cue must have one matching beat;
+unknown/duplicate IDs, unsupported capabilities and binding drift fail. Export the
+beats from the actual consumer resolver, not a second hand-copied expected sheet.
+A standalone file is not automatically attached to production review: include the
+object in production.json to bind its contents to review identity, or retain its
+hashed report and tested source in the existing check/evidence system.
+
+Test insertion/reordering of uncued narration, two distinct sequences and malformed
+bindings. In the actual consumer scene, assert chosen texture/atlas region, visible
+actor, camera, settled geometry and state purity, not merely cue dictionaries.
+Exercise manual advance, idle, repeated render, history/modal round trips and resize.
+Review the continuous sequence on the declared export/primary target using existing
+rendered_sequence/playback evidence; headless checks do not prove pixels or emotion.
+Keep dialogue, story, assets, timing and state ownership in the game. This checker
+adds no renderer, acting quality score, or new release gate. Games without cues need
+no manifest and keep their existing review identities.
+
 ## Visibility and interruption evidence has a scope
 
 Record separately: own-app/engine focus notifications; managed-browser tab/document
@@ -255,6 +288,51 @@ def load(path: Path) -> dict:
     return obj(data, "production record")
 
 
+def check_cues(data: dict) -> None:
+    """Validate a consumer-declared cue sheet against its actual resolved beat bindings.
+
+    This is a data contract, not a renderer or an execution attestation.
+    Capability names and string values belong entirely to the consumer.
+    """
+    data = obj(data, "performance_cues")
+    require(set(data) == {"capabilities", "cues", "beats"},
+            "performance_cues: expected capabilities, cues and beats only")
+    capabilities = obj(data["capabilities"], "capabilities")
+    for name, values in capabilities.items():
+        filled(name, "capability name")
+        require(isinstance(values, list) and bool(values), f"capability {name}: expected nonempty allowed values")
+        for value in values:
+            filled(value, f"capability {name} value")
+        require(len(values) == len(set(values)), f"capability {name}: duplicate allowed value")
+
+    def fields(value, label):
+        value = obj(value, label)
+        for name, selected in value.items():
+            require(name in capabilities, f"{label}: unsupported capability {name}")
+            require(isinstance(selected, str) and selected in capabilities[name],
+                    f"{label}: unsupported value for {name}")
+        return value
+
+    cues = obj(data["cues"], "cues")
+    for cue_id, cue in cues.items():
+        filled(cue_id, "cue ID")
+        require(bool(fields(cue, f"cue {cue_id}")), f"cue {cue_id}: empty cue")
+    beats = data["beats"]
+    require(isinstance(beats, list), "beats: expected a list")
+    seen = set()
+    for index, beat in enumerate(beats):
+        beat = obj(beat, f"beat {index}")
+        require(set(beat) == {"id", "performance"}, f"beat {index}: expected id and performance only")
+        beat_id = beat["id"]
+        filled(beat_id, f"beat {index} ID")
+        require(beat_id not in seen, f"beat {beat_id}: duplicate stable ID")
+        seen.add(beat_id)
+        actual = fields(beat["performance"], f"beat {beat_id}")
+        require(not actual or beat_id in cues, f"beat {beat_id}: unknown cue ID")
+        require(actual == cues.get(beat_id, {}), f"beat {beat_id}: cue binding drift or missing performance")
+    require(set(cues) <= seen, "cues: missing beat binding for " + ", ".join(sorted(set(cues) - seen)))
+
+
 def identity(data: dict, gate: str) -> str:
     review = obj(obj(data.get("reviews"), "reviews").get(gate), f"reviews.{gate}")
     # Direction survives unrelated source changes. A later gate still needs its
@@ -266,6 +344,8 @@ def identity(data: dict, gate: str) -> str:
         if gate != "release":
             verification.pop("export_path", None)
         basis["verification"] = verification
+    if "performance_cues" in data:
+        basis["performance_cues"] = data["performance_cues"]
     basis["review"] = {key: review.get(key) for key in ("reviewer", "reviewer_kind", "reviewed_at", "scope", "candidate_revision", "candidate_sha256", "evidence", "checks")}
     if gate != "composition":
         basis["assets"] = data.get("assets")
@@ -316,6 +396,8 @@ def artifact(root: Path, record: dict, label: str) -> None:
 
 def check(data: dict, root: Path, gate: str, allow_test_fixture: bool = False) -> None:
     require(gate in GATES, "unknown gate")
+    if "performance_cues" in data:
+        check_cues(data["performance_cues"])
     require(type(data.get("schema_version")) is int and data["schema_version"] in {1, 2}, "schema_version: expected 1 or 2")
     require(gate != "release" or data["schema_version"] == 2,
             "schema_version: release now needs version 2 verification; keep v1 history, add the primary target/bridge/export declaration and renew review bindings (see tools/production README migration)")
@@ -489,6 +571,8 @@ def main(argv=None) -> int:
         part.add_argument("--gate", choices=GATES if command == "check" else REVIEW_GATES, required=True)
         if command == "check":
             part.add_argument("--allow-test-fixture", action="store_true")
+    cues = sub.add_parser("check-cues", help="validate a consumer cue sheet against resolved beat bindings")
+    cues.add_argument("record", type=Path)
     args = parser.parse_args(argv)
     try:
         if args.command == "init":
@@ -496,7 +580,10 @@ def main(argv=None) -> int:
             print(f"Created {args.output}. Read AGENTS.md and fill authoring/production.json; no gate is accepted yet.")
         else:
             data = load(args.record)
-            if args.command == "identity":
+            if args.command == "check-cues":
+                check_cues(data)
+                print("Cue bindings valid; not proof of rendering or performance quality.")
+            elif args.command == "identity":
                 review = obj(obj(data.get("reviews"), "reviews").get(args.gate), "review")
                 review["candidate_sha256"] = candidate_digest(data, args.record.parent)
                 review["candidate_revision"] = data.get("revision")

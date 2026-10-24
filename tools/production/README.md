@@ -188,3 +188,21 @@ scaffold, relocation, v1 migration, primary-target release lanes, conditional br
 coverage, exported artifact changes, stage boundaries, both representation examples, stale input
 and evidence rejection, eligibility, asset maturity, paths and malformed records.
 The normal Foundation runtime/release suites remain unchanged and independent.
+
+## Optional stable performance cue bindings
+
+The portable `check-cues` command validates a neutral cue manifest against resolved
+consumer beats. See the generated `authoring/release-smoke.md` for the small JSON
+contract and actual-render test recipe. Consumers supply all capability names and
+allowed values; Foundation defines no characters, cameras, expressions or timing.
+An optional inline `performance_cues` object in `production.json` uses the same
+contract, is checked at every gate and participates in review identity. Omission
+preserves existing behavior and review identities. Standalone validation is useful
+for consumer-generated manifests but is not automatically production evidence.
+
+IDs are unique within the declared slice; use semantic prefixes for several scenes.
+All authored cues must bind once, while uncued beats have unique IDs and empty
+performance. Insertion and reordering cannot move a cue to another ID. The checker
+compares supplied data only: generate actual bindings from the real resolver and
+use existing hashed reports and rendered-sequence gates for execution evidence.
+No private game text/assets or game-specific enum is included in this contract.
