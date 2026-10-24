@@ -107,7 +107,7 @@ class ProductionTests(unittest.TestCase):
         for boundary in ('independent expectation', 'consumer owns both traversal',
                          'not "all histories"', 'adds no schema field or mandatory lane',
                          'does not prove', 'natural-player discovery'):
-            self.assertIn(boundary, section)
+            self.assertIn(boundary, ' '.join(section.split()))
         # Execute only the shipped synthetic illustration, not an engine or
         # an invented proof that a consumer's reachable inventory is complete.
         namespace = {}
