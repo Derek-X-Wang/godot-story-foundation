@@ -102,6 +102,13 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
+## Optional resource preview website
+
+The [static review adapter](tools/art/preview/README.md) builds an optional browser
+index of selected character/scene PNGs and existing character-atlas animations.
+Exact asset/version/tag/frame/pixel links and copyable feedback identify requested
+edits without introducing a CMS or replacing source, approval or checkpoint records.
+
 ## Prototype-to-production handoff
 
 The consumer-owned [production handoff worksheet](docs/production-handoff.md)

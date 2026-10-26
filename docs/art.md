@@ -397,3 +397,11 @@ visual review at native and intended game scale.
 The software checks do not assess style, anatomy, smoothness, grounded locomotion,
 likeness or user approval. They establish technical artifact compatibility and
 source preservation, not art approval or a promise that new characters are data-only.
+
+## Resource browsing and precise feedback
+
+Use the optional [static resource review adapter](../tools/art/preview/README.md)
+for a browser index of selected stills and existing character atlas output. It
+reuses atlas timing and identity, adds exact-version frame/pixel feedback links,
+and keeps private source/provenance records outside the generated site. It does
+not implement scene generation or replace composed-game review and approval.
