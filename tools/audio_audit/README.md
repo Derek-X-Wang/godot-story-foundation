@@ -112,3 +112,63 @@ and human hearing remain separate tests. Captured final-mix or 25%-gain review
 files can be measured as new assets, but this still does not prove they were
 heard. File hashes identify bytes, not rights or the identity of a recorded
 event. Source/license review and permission stay outside this tool.
+
+## Composition, source rights and evidence ownership
+
+This optional **offline measurement** stage complements the separate
+[Godot audio runtime controls](../../docs/audio.md); it does not replace buses,
+settings, envelopes or consumer-owned playback lifecycle. It has no Godot,
+narrative, preview-site or other Foundation module dependency. Copy this directory
+and run its script directly. Supply existing `ffmpeg` and `ffprobe` executables
+(or explicit `--ffmpeg` / `--ffprobe` paths); nothing is downloaded or installed.
+Those external tools retain their own licenses/build configuration. The tests
+create original mathematical PCM fixtures in temporary directories, plus a FLAC
+encoded from a fixture; no recording or third-party audio is bundled.
+
+Keep the stages distinct:
+
+1. The consumer records the original source, creator, license/permission evidence,
+   permitted edits/distribution, and intended role in its existing asset inventory.
+   File hashes and a passing report do not establish ownership or license clearance.
+2. Measure the exact selected source/derivative, keeping its existing stable ID.
+   Retain the report alongside source/build inputs in the existing private durable
+   checkpoint workflow. A normalized, resampled, edited or final-mix file is a new
+   set of bytes and needs its own hash/report; source approval does not transfer
+   automatically. This tool never normalizes, repairs or edits an asset.
+3. Link technical findings to an exact-version listening/review surface using the
+   existing consumer review channel. Keep `perception_verified: false` and
+   `listening_status: not_assessed` on this report even after a person listens;
+   store that separate review with its own identity and scope. Do not rewrite
+   automated evidence into a listening approval.
+4. Test actual playback, chosen loop region, gain/mute, interruption and browser
+   behavior in the consuming game. Final artistic or user acceptance is separate.
+
+The JSON schema is a structural report description, not a license verifier,
+perceptual validator or new mandatory pipeline gate. Tests assert required fields
+and important semantics; the CLI does not run a JSON Schema engine. No universal
+LUFS/true-peak target or numerical quality score is implied.
+
+Inputs are trusted local files and configuration, not hostile uploads. Absolute
+paths and local references are intentionally allowed; `file,pipe` limits decoder
+protocols but is **not** a filesystem sandbox or a guarantee against a vulnerable
+external decoder. Apply your own isolated execution policy for untrusted files.
+Reports can contain caller paths, IDs, tool versions and decoder error text.
+Keep private reports/source/license evidence out of the public Foundation repo and
+review them before sharing or hosting. Do not copy raw private report files into a
+public preview site. The preview generator does not ingest this report automatically.
+
+## Verification and optional dependency limits
+
+```sh
+python3 tools/audio_audit/test_audio_audit.py
+```
+
+The suite exercises known per-channel peaks/RMS/DC, silence, loop heuristics,
+source preservation, corrupt/truncated inputs, FLAC decoding, short SFX without a
+LUFS gate, resource caps, effective policy, output aliases and invalid thresholds.
+Pure measurement tests need only Python. Decode/CLI fixture tests explicitly skip
+if either external tool is missing; a skipped test is not decoded-audio evidence.
+The existing read-only CI job first requires both executables, then runs this
+suite so missing tools cannot silently count as a full CI pass. No new CI secrets,
+permissions, service, model call or installation step is added. Hosted execution
+results must still be checked for the exact candidate commit.
