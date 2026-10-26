@@ -168,7 +168,11 @@ source preservation, corrupt/truncated inputs, FLAC decoding, short SFX without 
 LUFS gate, resource caps, effective policy, output aliases and invalid thresholds.
 Pure measurement tests need only Python. Decode/CLI fixture tests explicitly skip
 if either external tool is missing; a skipped test is not decoded-audio evidence.
-The existing read-only CI job first requires both executables, then runs this
-suite so missing tools cannot silently count as a full CI pass. No new CI secrets,
-permissions, service, model call or installation step is added. Hosted execution
-results must still be checked for the exact candidate commit.
+The existing read-only CI job explicitly installs Ubuntu's `ffmpeg` package
+(which supplies both executables), records their versions, requires both commands,
+and runs this suite. The distribution package is not byte-pinned: retain the
+reported versions when comparing decoder-dependent results. A missing tool or
+failed installation is a CI failure, not a silent full pass. This ephemeral runner
+setup does not install anything on a user computer or in the runtime package.
+No new CI token permissions, secrets, service or model calls are added. Hosted
+execution results must still be checked for the exact candidate commit.

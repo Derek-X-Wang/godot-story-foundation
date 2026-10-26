@@ -32,6 +32,12 @@ jobs:
         run: |
           node tests/art_preview/test_viewer.cjs
           node tests/art_preview/test_viewer_dom.cjs
+      - name: Prepare offline audio test dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y ffmpeg
+          ffmpeg -version
+          ffprobe -version
       - name: Test optional offline audio measurements
         run: |
           command -v ffmpeg
