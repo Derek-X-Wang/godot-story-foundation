@@ -3,9 +3,20 @@
 <title>Resource review</title>
 <style>
 body{font:16px system-ui;margin:0;background:#171c25;color:#edf1f5}header,main{padding:1rem;max-width:1100px;margin:auto}h1{margin:.3rem 0}p{line-height:1.5}select,button,textarea{font:inherit;margin:.3rem;padding:.55rem;max-width:100%;box-sizing:border-box}button,select{background:#e6edf5;color:#152234;border:0;border-radius:4px}button:focus-visible,select:focus-visible{outline:3px solid #f5bc54}textarea{display:block;width:100%;min-height:9rem}#stage{overflow:auto;background:repeating-conic-gradient(#3e4550 0% 25%,#343b46 0% 50%) 50%/20px 20px;padding:1rem;max-height:65vh}canvas{display:block;image-rendering:pixelated;max-width:none;cursor:crosshair}code{overflow-wrap:anywhere}#error{color:#ffc875}label{display:inline-block}small{display:block;color:#bac7d9}a{color:#a9d5ff}
+/* Constrain the controls, not the source-pixel canvas inside its scroll region. */
+*,*::before,*::after{box-sizing:border-box}
+header,main{width:100%;min-width:0}
+.resource-controls{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:.75rem}
+.resource-controls label{display:block;min-width:0;max-width:100%}
+.resource-controls select{display:block;min-width:0;width:100%;max-width:100%;margin:.3rem 0}
+#identity,#position,#error,#direct{overflow-wrap:anywhere;min-width:0}
+textarea{margin:.3rem 0}
+#direct{display:block;margin:1rem 0 .9rem}
+label[for="notes"]{display:block;margin-bottom:.35rem}
+@media(max-width:600px){.resource-controls{grid-template-columns:minmax(0,1fr)}}
 </style>
 <header><h1 id="title">Resource review</h1><p>Candidate resource preview — not approval, a playable game, or a source backup. Animation starts paused. Feedback is local text only; copy and send it through your existing review channel.</p><p id="error" role="status"></p></header>
-<main><label>Resource <select id="assets"></select></label><label>Animation <select id="tags"></select></label><label>Scale <select id="scale"><option>1</option><option>2</option><option>4</option><option>8</option></select>×</label>
+<main><div class="resource-controls"><label>Resource <select id="assets"></select></label><label>Animation <select id="tags"></select></label><label>Scale <select id="scale"><option>1</option><option>2</option><option>4</option><option>8</option></select>×</label></div>
 <p id="identity"></p><div><button id="prev">Previous frame</button><button id="play">Play</button><button id="next">Next frame</button><span id="position"></span></div>
 <div id="stage"><canvas id="canvas" aria-label="Selected resource; click to identify source-pixel coordinates"></canvas></div>
 <p>Click a pixel to locate an issue. Frame numbers are zero-based; coordinates are local to the displayed frame/image, not the atlas.</p>

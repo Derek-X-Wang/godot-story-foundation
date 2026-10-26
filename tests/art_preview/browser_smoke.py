@@ -26,6 +26,22 @@ with tempfile.TemporaryDirectory() as name:
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(f'http://127.0.0.1:{server.server_port}/index.html');page.wait_for_function("document.querySelector('canvas').width === 8")
         check(page.locator('#play').inner_text()=='Play','animation defaults paused')
+        for width in (390,1440):
+            page.set_viewport_size({'width':width,'height':844})
+            layout=page.evaluate("""() => {
+                const box=id=>document.getElementById(id).getBoundingClientRect();
+                const a=box('assets'),i=box('identity'),d=box('direct');
+                const n=document.querySelector('label[for="notes"]').getBoundingClientRect();
+                return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+                    assetLeft:a.left,assetRight:a.right,identityLeft:i.left,identityRight:i.right,
+                    identityOverflow:document.getElementById('identity').scrollWidth>i.width+1,
+                    gap:n.top-d.bottom};
+            }""")
+            check(layout['scroll']<=layout['width'] and layout['assetLeft']>=0 and layout['assetRight']<=width
+                  and layout['identityLeft']>=0 and layout['identityRight']<=width and not layout['identityOverflow']
+                  and layout['gap']>=8, f'{width}px controls/hash fit and feedback label separated')
+        page.set_viewport_size({'width':390,'height':844})
+
         page.locator('#scale').select_option('8');page.locator('#canvas').click(position={'x':20,'y':20})
         page.locator('#next').click();page.locator('#notes').fill('Check frame contact');page.locator('#feedback').click()
         text=page.locator('#output').input_value();link=page.locator('#direct').evaluate('(a)=>a.href')

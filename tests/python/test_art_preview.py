@@ -37,6 +37,16 @@ class PreviewTests(unittest.TestCase):
         for name in a['files']:
             self.assertEqual((self.root/'a'/name).read_bytes(),(self.root/'b'/name).read_bytes())
         with self.assertRaises(ArtError):self.run_build('a')
+    def test_responsive_template_is_delivered(self):
+        self.run_build()
+        html=(self.root/'out/index.html').read_text()
+        # Static template regression only; actual layout needs browser measurement.
+        for rule in ('class="resource-controls"', 'grid-template-columns:minmax(0,1fr)',
+                     'width:100%;min-width:0', '#identity,#position,#error,#direct',
+                     'overflow-wrap:anywhere', '#direct{display:block;margin:1rem 0 .9rem}',
+                     'textarea{margin:.3rem 0}'):
+            self.assertIn(rule,html)
+
     def test_version_changes_with_playback(self):
         a=self.run_build('a')['assets'][0]['version']
         p=self.root/'sprite/atlas.json';d=json.loads(p.read_text());d['frames'][0]['duration_ms']+=1;d['tags'][0]['durations_ms'][0]+=1;p.write_text(json.dumps(d))
