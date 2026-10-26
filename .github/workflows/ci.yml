@@ -28,6 +28,10 @@ jobs:
           python3 -m unittest discover -s tools/impact/tests -v
           python3 -m unittest discover -s tools/playtesting/tests -v
           python3 -m unittest discover -s tools/library_sync/tests -v
+      - name: Test optional resource preview logic
+        run: |
+          node tests/art_preview/test_viewer.cjs
+          node tests/art_preview/test_viewer_dom.cjs
       - name: Test optional art Godot serializer
         run: python3 -m unittest discover -s tests/art_godot -v
       - name: Fetch verified dependency and engine

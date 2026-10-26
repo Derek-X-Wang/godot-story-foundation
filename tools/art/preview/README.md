@@ -128,12 +128,16 @@ resource preview is not full composed-game, route, story or emotional acceptance
 ```sh
 python3 -m unittest discover -s tests/python -p test_art_preview.py -v
 node tests/art_preview/test_viewer.cjs
+node tests/art_preview/test_viewer_dom.cjs
 # Optional browser smoke; provide installed dependencies, no auto-install:
 PYTHONPATH=. python3 tests/art_preview/browser_smoke.py --chromium /path/to/chromium --report .build/preview-browser.json
 ```
 
 Python checks deterministic output, hashes, identity, malformed data and nonleaking
-metadata. Node checks authored timing, strict deep-link resolution and feedback.
+metadata. Node checks authored timing, strict deep-link resolution and feedback. Controlled
+DOM/Image scheduling checks loading failures, stale callbacks and feedback snapshots;
+they are not browser rendering tests. These Node checks and Python tests run in the
+existing read-only CI job; the optional browser smoke remains separate.
 The optional real-browser smoke checks controls with neutral fixtures; it is not
 artistic acceptance, supported-device certification or a hosted-origin isolation
 test. Missing dependencies or blocked browser execution remain unrun, not passed.
