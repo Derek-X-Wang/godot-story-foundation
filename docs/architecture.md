@@ -254,3 +254,12 @@ The bridge includes `release_dialogue_resource(resource)` for the pinned Dialogu
 Manager version's transient visited-line back-references. Call it only after
 pending line requests finish and when no other view uses the resource; the demo
 releases its resource on exit. Upstream addon files are not patched.
+
+### Optional offline audio measurements
+
+`tools/audio_audit` is a standalone local decoded-PCM report stage with supplied
+FFmpeg/ffprobe executables and synthetic tests. It has no runtime or other-module
+dependency and changes no audio bus/player lifecycle. Reports bind input hashes
+and explicit technical policy, never listening, rights or artistic approval;
+source/license records and private reports remain consumer-owned. This is not
+a complete audio asset production pipeline or a hosted evaluation service.

@@ -102,6 +102,14 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
+## Optional offline audio measurements
+
+The [local audio report tool](tools/audio_audit/README.md) uses supplied FFmpeg
+executables to measure decoded samples, silence and whole-file loop-boundary risk.
+Its versioned reports retain source hashes and explicit policy; they never claim
+listening, rights clearance or artistic acceptance. Runtime audio controls remain
+independent, and no audio recording or model service is included.
+
 ## Optional resource preview website
 
 The [static review adapter](tools/art/preview/README.md) builds an optional browser

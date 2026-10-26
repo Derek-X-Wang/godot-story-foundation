@@ -284,3 +284,12 @@ The existing public workflow runs the native audio runner and Python packaging
 checks using its installed Godot and Python. Both driver tests remain
 opt-in/local-only. The workflow gains no new permissions, secrets, dependencies
 or triggers; a configured step is not an observed hosted result.
+
+## Optional offline technical asset reports
+
+The separate [local audio audit tool](../tools/audio_audit/README.md) measures
+decoded source/derivative files with explicitly supplied FFmpeg executables. It
+reports per-channel sample peaks, RMS/DC, silence and whole-file boundary risk,
+not audible correctness, true peak, LUFS, licensing or acceptance. It is independent
+of these runtime helpers; selecting one does not require the other. The consuming
+game retains source/license evidence, review identity and actual playback checks.
