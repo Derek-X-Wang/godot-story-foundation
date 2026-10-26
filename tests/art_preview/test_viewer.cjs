@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const P=require('../../tools/art/preview/viewer.js');
+const tag={name:'idle & down',start:1,count:3,durations_ms:[90,130,210],loop:true};
+assert.deepEqual([0,89,90,219,220,429,430,520].map(t=>P.frameAt(tag,t)),[1,1,2,2,3,3,1,2]);
+assert.equal(P.frameAt({...tag,loop:false},999),3);
+const asset={asset_id:'neutral',version:'a'.repeat(64),width:10,height:10,atlas:{tags:[tag],frames:Array.from({length:4},()=>({rect:[0,0,10,10]}))}};
+const data={assets:[asset]};
+const url=P.link(asset,tag.name,2,[3,4]);
+assert.deepEqual(P.resolve(data,url),{index:0,tag,frame:2,point:[3,4]});
+for(const bad of [url.replace('a'.repeat(64),'b'.repeat(64)),url.replace('frame=2','frame=9'),url.replace('x=3','x=10'),url.replace('tag=idle+%26+down','tag=absent')])assert.throws(()=>P.resolve(data,bad));
+assert.equal(P.resolve(data,'').frame,1);
+const text=P.feedback(asset,tag.name,2,[3,4],'https://example.test/review/'+url,'Fix contact');
+assert(text.includes('Pixel (frame-local): 3, 4'));assert(text.includes('Fix contact'));assert(text.includes(asset.version));
+console.log('viewer timing, exact links, rejection and feedback checks passed');

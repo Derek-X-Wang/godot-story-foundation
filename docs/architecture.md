@@ -130,7 +130,9 @@ below and [verification record](testing.md) describe the current narrower scope.
   validation, deterministic atlases, optional Aseprite source and Godot consumer
   adapters. No narrative runtime dependency. Contract v1 is experimental; two
   private native character sources have exercised static and moving export/consumer
-  reuse. Pose authoring, gait approval and game integration are separate. See [art boundaries](art.md)
+  reuse. The optional static preview adapter consumes existing atlas output or
+  selected PNG stills; it adds no asset canon, runtime dependency or feedback service.
+  Pose authoring, gait approval and game integration are separate. See [art boundaries](art.md)
 
 There is no custom editor plugin in v0.1. The runtime scripts do not need a Plugins
 checkbox and are not `@tool`. The example uses Dialogue Manager's own editor

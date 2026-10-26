@@ -58,7 +58,8 @@ def prepare(index: Path, stage: Path) -> dict:
                 seen.extend(indexes)
             require(seen == list(range(len(frames))), 'tags must partition ordered frames')
             # Only playback data crosses the publication boundary, not provenance notes.
-            atlas = {'frames': frames, 'tags': tags}
+            atlas = {'frames': [{k: f[k] for k in ('rect', 'duration_ms')} for f in frames],
+                     'tags': [{k: t[k] for k in ('name', 'start', 'count', 'durations_ms', 'loop')} for t in tags]}
         require((entry['kind'] == 'animation') == (atlas is not None), 'animation requires atlas; still image must omit atlas')
         version = hashlib.sha256(canonical({'image': entry['image']['sha256'], 'atlas': atlas})).hexdigest()
         identity = (entry['asset_id'], version)

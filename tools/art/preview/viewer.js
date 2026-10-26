@@ -15,6 +15,7 @@ const Preview = (() => {
   function resolve(data,hash) {
     const p=new URLSearchParams(hash.replace(/^#/,''));
     const asset=p.get('asset');
+    if(asset===null&&p.toString())throw Error('A location link requires an exact asset and version.');
     const index=asset===null?0:data.assets.findIndex(a=>a.asset_id===asset&&a.version===p.get('version'));
     if(index<0)throw Error('Requested asset/version is absent. No substitute version was selected.');
     const a=data.assets[index], tags=a.atlas?.tags||[];
@@ -33,13 +34,15 @@ const Preview = (() => {
 if(typeof module!=='undefined')module.exports=Preview;
 if(typeof document!=='undefined') (()=>{
   const $=id=>document.getElementById(id), data=window.PREVIEW;
-  let state, image, playing=false, start=0, base=0, generation=0;
+  let state, image, playing=false, start=0, base=0, generation=0, loaded=false;
   const stop=()=>{playing=false;$('play').textContent='Play';};
   const current=()=>data.assets[state.index];
-  function updateLink(){const a=current();$('direct').href=Preview.link(a,state.tag?.name,state.frame,state.point);}
-  function draw(){if(!image||!image.complete||!image.naturalWidth)return;const a=current(),r=a.atlas?.frames[state.frame].rect||[0,0,a.width,a.height],c=$('canvas');c.width=r[2];c.height=r[3];c.style.width=r[2]*Number($('scale').value)+'px';c.style.height=r[3]*Number($('scale').value)+'px';c.getContext('2d').drawImage(image,...r,0,0,r[2],r[3]);$('position').textContent=`Frame ${state.frame}${state.tag?' / '+(state.tag.start+state.tag.count-1):''}`;updateLink();}
-  function select(){stop();const a=current();$('identity').textContent=`${a.asset_id} · ${a.kind} · version ${a.version}`;$('assets').value=state.index;$('tags').replaceChildren();for(const t of a.atlas?.tags||[]){const o=new Option(t.name,t.name);$('tags').add(o);}if(state.tag)$('tags').value=state.tag.name;for(const id of ['tags','play','prev','next'])$(id).disabled=!state.tag;$('error').textContent='';const gen=++generation;image=new Image();image.onload=()=>{if(gen===generation)draw();};image.onerror=()=>{if(gen===generation)$('error').textContent='Preview image failed to load; no visual acceptance established.';};image.src=a.image;}
-  function load(){try{state=Preview.resolve(data,location.hash);select();}catch(e){stop();image=null;$('canvas').width=0;$('error').textContent=e.message;for(const id of ['tags','play','prev','next','feedback','copy'])$(id).disabled=true;}}
+  function block(){loaded=false;stop();$('canvas').width=0;$('position').textContent='';$('direct').removeAttribute('href');$('output').value='';for(const id of ['tags','play','prev','next','feedback','copy','scale'])$(id).disabled=true;}
+  function ready(){loaded=true;for(const id of ['feedback','scale'])$(id).disabled=false;for(const id of ['tags','play','prev','next'])$(id).disabled=!state.tag;}
+  function updateLink(){$('output').value='';$('copy').disabled=true;const a=current();$('direct').href=Preview.link(a,state.tag?.name,state.frame,state.point);}
+  function draw(){if(!loaded||!image||!image.complete||!image.naturalWidth)return;const a=current(),r=a.atlas?.frames[state.frame].rect||[0,0,a.width,a.height],c=$('canvas');c.width=r[2];c.height=r[3];c.style.width=r[2]*Number($('scale').value)+'px';c.style.height=r[3]*Number($('scale').value)+'px';c.getContext('2d').drawImage(image,...r,0,0,r[2],r[3]);$('position').textContent=`Frame ${state.frame}${state.tag?' / '+(state.tag.start+state.tag.count-1):''}${state.point?' · Pixel '+state.point.join(', '):''}`;updateLink();}
+  function select(){block();const a=current();$('identity').textContent=`${a.asset_id} · ${a.kind} · version ${a.version}`;$('assets').value=state.index;$('tags').replaceChildren();for(const t of a.atlas?.tags||[]){const o=new Option(t.name,t.name);$('tags').add(o);}if(state.tag)$('tags').value=state.tag.name;$('error').textContent='';const gen=++generation;image=new Image();image.onload=()=>{if(gen===generation){ready();draw();}};image.onerror=()=>{if(gen===generation){block();$('error').textContent='Preview image failed to load; no visual acceptance established.';}};image.src=a.image;}
+  function load(){try{state=Preview.resolve(data,location.hash);select();}catch(e){generation++;block();image=null;$('error').textContent=e.message;}}
   $('title').textContent=data.title;data.assets.forEach((a,i)=>$('assets').add(new Option(`${a.label} [${a.kind}] · ${a.version.slice(0,10)}`,i)));
   $('assets').onchange=()=>{const a=data.assets[Number($('assets').value)];location.hash=Preview.link(a,a.atlas?.tags[0].name,a.atlas?.tags[0].start||0,null);};
   $('tags').onchange=()=>{stop();state.tag=current().atlas.tags.find(t=>t.name===$('tags').value);state.frame=state.tag.start;state.point=null;draw();};
@@ -47,8 +50,8 @@ if(typeof document!=='undefined') (()=>{
   for(const [id,delta] of [['prev',-1],['next',1]])$(id).onclick=()=>{stop();state.frame=Math.max(state.tag.start,Math.min(state.tag.start+state.tag.count-1,state.frame+delta));state.point=null;draw();};
   $('play').onclick=()=>{if(playing){stop();return;}playing=true;state.point=null;start=performance.now();base=state.tag.durations_ms.slice(0,state.frame-state.tag.start).reduce((a,b)=>a+b,0);$('play').textContent='Pause';};
   function tick(now){if(playing){state.frame=Preview.frameAt(state.tag,base+now-start);draw();if(!state.tag.loop&&base+now-start>=state.tag.durations_ms.reduce((a,b)=>a+b,0))stop();}requestAnimationFrame(tick);}
-  $('canvas').onclick=e=>{stop();const r=$('canvas').getBoundingClientRect();state.point=[Math.min($('canvas').width-1,Math.floor((e.clientX-r.left)*$('canvas').width/r.width)),Math.min($('canvas').height-1,Math.floor((e.clientY-r.top)*$('canvas').height/r.height))];updateLink();};
-  $('feedback').onclick=()=>{$('output').value=Preview.feedback(current(),state.tag?.name,state.frame,state.point,$('direct').href,$('notes').value);};
-  $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('output').value);$('error').textContent='Feedback copied; send it through your existing review channel.';}catch(_){$('output').focus();$('output').select();$('error').textContent='Automatic clipboard unavailable. Copy the selected feedback text manually.';}};
+  $('canvas').onclick=e=>{if(!loaded)return;stop();const r=$('canvas').getBoundingClientRect();state.point=[Math.min($('canvas').width-1,Math.floor((e.clientX-r.left)*$('canvas').width/r.width)),Math.min($('canvas').height-1,Math.floor((e.clientY-r.top)*$('canvas').height/r.height))];draw();};
+  $('feedback').onclick=()=>{stop();$('output').value=Preview.feedback(current(),state.tag?.name,state.frame,state.point,$('direct').href,$('notes').value);$('copy').disabled=false;};
+  $('copy').onclick=async()=>{if(!$('output').value)return;try{await navigator.clipboard.writeText($('output').value);$('error').textContent='Feedback copied; send it through your existing review channel.';}catch(_){$('output').focus();$('output').select();$('error').textContent='Automatic clipboard unavailable. Copy the selected feedback text manually.';}};
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('blur',stop);window.addEventListener('hashchange',load);load();requestAnimationFrame(tick);
 })();
