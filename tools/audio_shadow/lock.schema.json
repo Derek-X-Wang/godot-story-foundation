@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:godot-story-foundation:audio-shadow-lock:v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "model",
+    "packages",
+    "labels",
+    "assets"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "id",
+        "revision",
+        "files"
+      ]
+    },
+    "packages": {
+      "type": "object"
+    },
+    "labels": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ]
+      }
+    },
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "path",
+          "sha256",
+          "expected_label",
+          "windows"
+        ]
+      }
+    }
+  },
+  "description": "Structural outline. contract.validate additionally enforces exact fields, package/model file sets, SHA formats, unique IDs, finite windows and budgets."
+}

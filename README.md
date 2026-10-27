@@ -110,6 +110,11 @@ Its versioned reports retain source hashes and explicit policy; they never claim
 listening, rights clearance or artistic acceptance. Runtime audio controls remain
 independent, and no audio recording or model service is included.
 
+The separately optional [semantic shadow adapter](tools/audio_shadow/README.md)
+uses a caller-provided local model and frozen labels/windows for auxiliary cosine
+ranking. It installs/downloads nothing; synthetic CI tests are not real inference
+or quality approval. The technical reporter remains model-independent.
+
 ## Optional resource preview website
 
 The [static review adapter](tools/art/preview/README.md) builds an optional browser

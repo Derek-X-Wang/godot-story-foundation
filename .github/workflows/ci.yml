@@ -32,6 +32,8 @@ jobs:
         run: |
           node tests/art_preview/test_viewer.cjs
           node tests/art_preview/test_viewer_dom.cjs
+      - name: Test optional audio shadow contract (synthetic only)
+        run: python3 tools/audio_shadow/test_shadow.py
       - name: Prepare offline audio test dependency
         run: |
           sudo apt-get update

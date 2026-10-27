@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:godot-story-foundation:audio-semantic-shadow:v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "mode",
+    "gating",
+    "quality_approval",
+    "perception_verified",
+    "listening_status",
+    "evidence_kind",
+    "lock_sha256",
+    "model",
+    "packages",
+    "labels",
+    "assets",
+    "rows",
+    "limits",
+    "method"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "audio-semantic-shadow.v1"
+    },
+    "status": {
+      "const": "completed"
+    },
+    "mode": {
+      "const": "shadow"
+    },
+    "gating": {
+      "const": false
+    },
+    "quality_approval": {
+      "const": false
+    },
+    "perception_verified": {
+      "const": false
+    },
+    "listening_status": {
+      "const": "not_assessed"
+    },
+    "evidence_kind": {
+      "enum": [
+        "synthetic_embedding_fixture",
+        "local_clap_inference"
+      ]
+    },
+    "lock_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "window_index",
+          "cosine_similarity",
+          "ranking",
+          "top_minus_second",
+          "hint",
+          "hint_is_rejection"
+        ],
+        "properties": {
+          "hint": {
+            "enum": [
+              "none",
+              "expected_label_not_top"
+            ]
+          },
+          "hint_is_rejection": {
+            "const": false
+          }
+        }
+      }
+    }
+  },
+  "description": "Report outline, not authenticity or quality validation. Synthetic fixtures never establish real-model execution."
+}
