@@ -53,11 +53,15 @@ No change to those packages is attempted on mismatch.
 
 A private experiment supplied the small loader/preprocessing/ranking method. Its
 real-model results and review remain separate consumer evidence; they are not
-copied into this public repository. This extracted adapter has **synthetic contract
-and boundary tests**, not a new independent real-model accuracy validation. A future
-actual run produces separately labeled `local_clap_inference` evidence. Model
-output may still be wrong, and a small exploratory contrast does not establish an
-automatic acceptance/rejection threshold or user preference predictor.
+copied into this public repository. The extracted adapter also completed one cached local integration smoke using an
+unchanged previously frozen source/window/label set. That checks model loading,
+preprocessing, invocation and report completion, not a new independent sample,
+accuracy estimate or listening approval. Its private lock/report/guard/source record
+is retained separately, not published here. Public CI still uses only synthetic
+contract and boundary fixtures. Actual runs produce separately labeled
+`local_clap_inference` evidence. Model output may still be wrong, and a small
+exploratory contrast does not establish an automatic acceptance/rejection threshold
+or user preference predictor.
 
 ## Fixed method and report
 
