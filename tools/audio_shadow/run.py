@@ -4,6 +4,7 @@ import array
 import importlib.metadata
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -38,6 +39,9 @@ def decode(path, ffmpeg, target):
 
 def run(lock, model_dir, base_dir, ffmpeg):
     C.validate(lock);root=resolve_model(model_dir,lock)
+    decoder=shutil.which(ffmpeg);C.require(decoder is not None,'ffmpeg executable missing')
+    decoder_hash=C.sha(decoder)
+    decoder_version=subprocess.run([decoder,'-version'],capture_output=True,text=True,check=True,timeout=30).stdout.splitlines()[0]
     versions={k:importlib.metadata.version(k) for k in C.PACKAGES}
     C.require(versions==lock['packages'],'installed dependency versions differ from lock; no install attempted')
     paths=[(base_dir/a['path']).resolve() for a in lock['assets']]
@@ -70,7 +74,7 @@ def run(lock, model_dir, base_dir, ffmpeg):
     rows=[]
     for a,path in zip(lock['assets'],paths):
         with tempfile.TemporaryDirectory(prefix='audio-shadow-pcm-') as d:
-            pcm=decode(path,ffmpeg,Path(d)/'audio.f32le')
+            pcm=decode(path,decoder,Path(d)/'audio.f32le')
             for i,w in enumerate(a['windows']):
                 start=round(w['start_seconds']*48000);n=round(w['duration_seconds']*48000)
                 C.require(n>0 and start+n<=len(pcm),'requested window exceeds decoded audio; no shortened crop')
@@ -81,7 +85,10 @@ def run(lock, model_dir, base_dir, ffmpeg):
                     **C.rank(lock['labels'],text_vectors,embedding,a['expected_label'])})
         C.require(C.sha(path)==a['sha256'],'asset changed during inference')
     resolve_model(root,lock) # Bind completion to unchanged model/tokenizer/config bytes.
-    return C.report(lock,rows,evidence_kind='local_clap_inference',versions=versions)
+    C.require(C.sha(decoder)==decoder_hash,'decoder changed during inference')
+    result=C.report(lock,rows,evidence_kind='local_clap_inference',versions=versions)
+    result['decoder']={'version':decoder_version,'executable_sha256':decoder_hash}
+    return result
 
 
 def main(argv=None):

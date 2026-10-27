@@ -41,7 +41,8 @@ def text(value):
 
 
 def number(value):
-    return type(value) in (int,float) and math.isfinite(value)
+    try: return type(value) in (int,float) and math.isfinite(value)
+    except OverflowError: return False
 
 
 def hash_value(value):
@@ -80,6 +81,8 @@ def validate(lock):
 
 def rank(labels, text_vectors, audio_vector, expected_label=None):
     require(len(labels)==len(text_vectors) and len(labels)>=2, 'label/vector count mismatch')
+    require(len({x['id'] for x in labels})==len(labels), 'duplicate label id')
+    require(expected_label is None or expected_label in [x['id'] for x in labels], 'unknown expected label')
     require(isinstance(audio_vector,list) and 0<len(audio_vector)<=16384, 'invalid embedding size')
     def unit(v):
         require(isinstance(v,list) and len(v)==len(audio_vector) and all(number(x) for x in v),'nonfinite or mismatched embedding')
@@ -108,6 +111,10 @@ def report(lock, rows, *, evidence_kind, versions):
             'listening_status':'not_assessed','evidence_kind':evidence_kind,
             'lock_sha256':hashlib.sha256(canonical(lock)).hexdigest(),
             'model':lock['model'],'packages':versions,'labels':lock['labels'],
+            'method':{'sample_rate_hz':48000,'channels':1,'sample_format':'float32',
+                      'normalization':'PCM scale only; no loudness normalization',
+                      'embedding_normalization':'L2; cosine similarity, not probability',
+                      'seed':0,'cpu_threads':2,'batch_size':1,'short_window':'model-owned repeatpad/fusion'},
             'assets':[{k:v for k,v in a.items() if k!='path'} for a in lock['assets']], 'rows':rows,
             'limits':['Cosine ranking is relative to these labels, not probability or quality.',
                       'Overlapping windows are not independent samples.',

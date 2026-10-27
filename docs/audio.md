@@ -293,3 +293,9 @@ reports per-channel sample peaks, RMS/DC, silence and whole-file boundary risk,
 not audible correctness, true peak, LUFS, licensing or acceptance. It is independent
 of these runtime helpers; selecting one does not require the other. The consuming
 game retains source/license evidence, review identity and actual playback checks.
+
+The optional [semantic shadow runner](../tools/audio_shadow/README.md) is a separate
+consumer-selected offline stage: locked local model/files/labels/windows, relative
+cosine ranks and non-gating mismatch hints only. It does not add Torch to these
+runtime helpers or the technical audit tool; CI synthetic vectors are not listening
+or real-model acceptance evidence.
