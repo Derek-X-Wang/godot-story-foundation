@@ -65,8 +65,10 @@ The runner uses built-in `ClapModel`, `ClapFeatureExtractor`, `RobertaTokenizerF
 `local_files_only=True`, safetensors and `trust_remote_code=False`. CPU/eval/inference
 mode, batch 1, two CPU threads and seed 0 are fixed; the seed is reset per window.
 It decodes the first audio stream to 48 kHz mono float32 with PCM scale conversion,
-without loudness normalization. Short windows use the locked model preprocessor's
-repeatpad/fusion behavior: they are not extra independent audio observations.
+without loudness normalization. The runner requires the exercised 48 kHz, ten-second preprocessor settings
+(`max_length_s`/`chunk_length_s` 10, 480000 samples, repeatpad/fusion, right zero padding)
+before importing model packages; a differently configured model fails closed.
+Short windows use that locked preprocessor's repeatpad/fusion behavior: they are not extra independent audio observations.
 
 Text features are calculated once; each audio window is compared with L2-normalized
 text/audio vectors using cosine similarity, **not softmax, probability, calibrated

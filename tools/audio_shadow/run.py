@@ -20,6 +20,7 @@ def resolve_model(model_dir, lock):
     C.require(all(p.is_file() and not p.is_symlink() and p.name in allowed for p in root.iterdir()), 'unsupported file/subdirectory/symlink in model directory')
     for name,h in lock['model']['files'].items():
         p=root/name;C.require(p.is_file() and not p.is_symlink() and C.sha(p)==h,'model file missing or hash mismatch: '+name)
+    C.validate_preprocessor(C.load(root/'preprocessor_config.json'))
     return root
 
 

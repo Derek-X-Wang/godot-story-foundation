@@ -12,6 +12,12 @@ import contract as C
 import run as runner
 
 
+def preprocessing():
+    return {'feature_extractor_type':'ClapFeatureExtractor','sampling_rate':48000,
+        'max_length_s':10,'chunk_length_s':10,'nb_max_samples':480000,
+        'padding':'repeatpad','truncation':'fusion','padding_side':'right','padding_value':0.0}
+
+
 def fixture():
     return {'schema_version':1,'model':{'id':'synthetic-fixture','revision':'not-a-model',
         'files':{k:'a'*64 for k in C.MODEL_FILES}},'packages':{k:'fixture' for k in C.PACKAGES},
@@ -78,11 +84,22 @@ class ShadowTests(unittest.TestCase):
             root=Path(d);lock=fixture()
             for name in C.MODEL_FILES:
                 (root/name).write_bytes(b'synthetic-not-a-model');lock['model']['files'][name]=C.sha(root/name)
+            (root/'preprocessor_config.json').write_text(json.dumps(preprocessing()))
+            lock['model']['files']['preprocessor_config.json']=C.sha(root/'preprocessor_config.json')
             self.assertEqual(runner.resolve_model(root,lock),root)
             (root/'untrusted.py').write_text('')
             with self.assertRaises(ValueError):runner.resolve_model(root,lock)
             (root/'untrusted.py').unlink();(root/'config.json').write_bytes(b'changed')
             with self.assertRaises(ValueError):runner.resolve_model(root,lock)
+
+    def test_preprocessing_contract_cannot_silently_change(self):
+        self.assertEqual(C.validate_preprocessor(preprocessing()),preprocessing())
+        for key,value in [('padding','pad'),('truncation','rand_trunc'),('max_length_s',20),
+                          ('chunk_length_s',20),('nb_max_samples',960000),('sampling_rate',44100),
+                          ('padding_side','left'),('padding_value',True)]:
+            config=preprocessing();config[key]=value
+            with self.assertRaises(ValueError):C.validate_preprocessor(config)
+        with self.assertRaises(ValueError):C.validate_preprocessor({})
 
     def test_existing_output_never_overwritten(self):
         with tempfile.TemporaryDirectory() as d:

@@ -79,6 +79,19 @@ def validate(lock):
     return lock
 
 
+def validate_preprocessor(config):
+    """Only the exercised fused/repeatpad ten-second CLAP input contract."""
+    expected={'feature_extractor_type':'ClapFeatureExtractor','sampling_rate':48000,
+              'max_length_s':10,'chunk_length_s':10,'nb_max_samples':480000,
+              'padding':'repeatpad','truncation':'fusion','padding_side':'right','padding_value':0.0}
+    require(isinstance(config,dict), 'preprocessor config must be an object')
+    for key,value in expected.items():
+        actual=config.get(key)
+        require(actual==value and (type(actual) is str if isinstance(value,str) else number(actual)),
+                'unsupported CLAP preprocessor setting: '+key)
+    return config
+
+
 def rank(labels, text_vectors, audio_vector, expected_label=None):
     require(len(labels)==len(text_vectors) and len(labels)>=2, 'label/vector count mismatch')
     require(len({x['id'] for x in labels})==len(labels), 'duplicate label id')
