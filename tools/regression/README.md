@@ -295,3 +295,16 @@ subprocess tests in `tests/test_gate_completion.py` demonstrate this boundary
 with neutral source mutations and final-write fault injection. This is a
 consumer test recipe, not automatic source-integrity enforcement by the runner;
 consumer adapters still own complete inventories, symlink policy, and coverage.
+
+Keep this result contract intact in consumer adapters, including separate source
+and exported/native-PCK entrypoints: require a JSON object with every required
+field, literal boolean `passed: true`, and an explicitly present empty `failures`
+array. Do not replace strict validation with truthiness or a missing-field default.
+At each actual entrypoint, inject `passed: "false"`, `passed: 1`, missing/null/
+nonempty `failures`, and a non-object payload; require rejection while a valid
+success envelope remains accepted. Run these checks through the consumer's real
+source and packed launch paths, not just a parser helper or a renamed lane.
+Foundation already enforces these types and fields; this recipe prevents a
+consumer wrapper from weakening that boundary. Preserve the existing process,
+diagnostic, identity and coverage checks as well: a well-typed result alone is
+not a passing run.
