@@ -115,6 +115,13 @@ uses a caller-provided local model and frozen labels/windows for auxiliary cosin
 ranking. It installs/downloads nothing; synthetic CI tests are not real inference
 or quality approval. The technical reporter remains model-independent.
 
+## Optional character-design provenance
+
+The [design record checker](docs/character-design.md) compares local source/output
+hashes with declared character identity and caller expectations. It supports
+concepts, design sheets and pose studies without pixel constraints or a provider
+dependency. It never generates artwork or grants art/integration approval.
+
 ## Optional resource preview website
 
 The [static review adapter](tools/art/preview/README.md) builds an optional browser

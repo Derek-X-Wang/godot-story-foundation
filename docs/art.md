@@ -1,7 +1,7 @@
 # Optional art subpipelines
 
 Foundation's art tools are **offline and independently optional**. The implemented
-module is `character_sprite_v1`: a small pixel-sprite contract, checks, deterministic
+pixel module is `character_sprite_v1`: a small pixel-sprite contract, checks, deterministic
 export and optional Aseprite/Godot adapters. It does not require the narrative
 runtime, Dialogue Manager, AI, an API key, or an editor for PNG input. The existing
 runtime addon/package does not include or depend on these tools.
@@ -10,6 +10,7 @@ runtime addon/package does not include or depend on these tools.
 
 | Subpipeline | Current status | Owns |
 | --- | --- | --- |
+| Character design provenance | Implemented, optional record v1 | Local source/output identity and hashes; no generator or art approval |
 | Character sprites | Implemented, experimental contract v1 | Authored frames → validation → atlas → optional Godot resources |
 | Character portraits | Future, not implemented | Separate portrait source, crop, size and delivery contract |
 | Scenes/environments | Future, not implemented | Separate tile/background/layer/placement contracts |
@@ -35,6 +36,11 @@ not automatically art/layout references; review the composed scene with actors,
 movement and UI separately from individual asset compatibility.
 
 ## Character design: concept before pixels
+
+The optional [design provenance record and checker](character-design.md) separates
+concept, design and pose-study evidence from runtime assets. Concepts may be
+generated directly and retained; body/pose providers are optional references.
+Its byte/identity checks do not apply pixel constraints or approve artwork.
 
 For new characters, this optional game-owned authoring sequence precedes the
 existing technical sprite pipeline; it adds no generator or runtime dependency.
