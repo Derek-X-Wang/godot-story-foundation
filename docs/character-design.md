@@ -128,3 +128,9 @@ Animation control code and each character's mouth/mask calibration have separate
 ownership. Logic tests, actual rendered behavior and user acceptance are different
 evidence. A fair comparison remains pending; this change selects no animation
 backend and implements no animation framework.
+
+Record portrait performance under [character portraits: idle and talking](character-portraits.md).
+That design guide covers blinks, resting versus talking mouth behavior, selected
+chest/torso breathing emphasis and separate visual review for every character.
+It preserves intentional character differences and does not extend this provenance
+checker's schema or turn its byte checks into animation approval.
