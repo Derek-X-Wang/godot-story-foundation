@@ -12,7 +12,7 @@ runtime addon/package does not include or depend on these tools.
 | --- | --- | --- |
 | Character design provenance | Implemented, optional record v1 | Local source/output identity and hashes; no generator or art approval |
 | Character sprites | Implemented, experimental contract v1 | Authored frames → validation → atlas → optional Godot resources |
-| Character portraits | Future, not implemented | Separate portrait source, crop, size and delivery contract |
+| Character portraits | Design/review guidance only; runtime contract not implemented | Separate portrait source, crop, size and delivery contract; [idle/talking guidance](character-portraits.md) |
 | Scenes/environments | Future, not implemented | Separate tile/background/layer/placement contracts |
 | UI/icons | Future, not implemented | Separate sizing, states and readability contracts |
 | VFX | Future, not implemented | Separate timing, blending and effect contracts |
