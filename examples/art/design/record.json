@@ -1,0 +1,34 @@
+{
+  "character": {
+    "id": "sample_marker",
+    "revision": "draft-1"
+  },
+  "kind": "character_design",
+  "limitations": [
+    "Entirely synthetic geometric fixture; not a character quality or geometry test.",
+    "No model, remote storage, runtime integration or human art acceptance exercised."
+  ],
+  "output": {
+    "path": "design.svg",
+    "sha256": "eb31482bcc29799601bb2833ba15436a829c2d9790220a9c54c7f2461adc6689"
+  },
+  "producer": {
+    "name": "hand_authored_svg",
+    "version": "fixture-1"
+  },
+  "references": [
+    {
+      "path": "reference.svg",
+      "role": "concept",
+      "sha256": "a6c9c0bc5123f52d87a605806cb26547a1ae1cfb87cadc3eb3958e5bda94eaa6"
+    }
+  ],
+  "review": {
+    "basis_sha256": null,
+    "notes": "Synthetic test data; no human approval.",
+    "reviewer": null,
+    "status": "pending"
+  },
+  "schema_version": 1,
+  "stage": "design"
+}
