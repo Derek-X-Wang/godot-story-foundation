@@ -102,6 +102,12 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
+## Optional portrait idle lifecycle
+
+The independently optional [idle-host driver](docs/portrait-idle-runtime.md)
+owns a supplied portrait clock and follows explicit visibility/pause flags. It
+adds no artwork, deformation, dialogue UI, speaker mapping or art approval.
+
 ## Optional offline audio measurements
 
 The [local audio report tool](tools/audio_audit/README.md) uses supplied FFmpeg
@@ -202,6 +208,7 @@ python3 -m unittest discover -s tests/art_godot -v
 python3 scripts/test_art_godot.py
 python3 scripts/test_scene.py
 python3 scripts/package_scene.py
+python3 scripts/test_portrait_idle.py
 python3 scripts/test_audio.py
 python3 scripts/package_audio.py
 python3 scripts/fetch_dependencies.py

@@ -1,0 +1,87 @@
+extends SceneTree
+class FakePortrait extends Node2D:
+	var running := false
+	var elapsed := 0.0
+	func resume_motion(): running = true
+	func pause_motion(): running = false
+	func advance_motion(delta: float):
+		if running: elapsed += delta
+var checks := 0
+func check(value: bool, reason: String):
+	checks += 1
+	if not value:
+		push_error(reason)
+		quit(1)
+		assert(value, reason)
+func _initialize(): call_deferred("run")
+func run():
+	var host := Node2D.new()
+	root.add_child(host)
+	var p := FakePortrait.new()
+	host.add_child(p)
+	p.set_process(true)
+	var unattached = load("res://addons/story_foundation/presentation/idle_host_adapter.gd").new()
+	check(not unattached.attach_portrait(p), "reject pre-tree driver")
+	unattached.free()
+	check(p.is_processing() and not p.has_meta(&"_idle_host_adapter_owner"), "pre-tree driver free leaves portrait untouched")
+	var driver = load("res://addons/story_foundation/presentation/idle_host_adapter.gd").new()
+	root.add_child(driver)
+	driver.set_process(false)
+	var not_ready := FakePortrait.new()
+	check(not driver.attach_portrait(not_ready), "reject pre-tree portrait before clock ownership")
+	not_ready.free()
+	check(driver.attach_portrait(p), "valid portrait")
+	var rival = load("res://addons/story_foundation/presentation/idle_host_adapter.gd").new()
+	root.add_child(rival)
+	rival.set_process(false)
+	check(not rival.attach_portrait(p), "reject second clock owner")
+	check(driver._portrait == p and rival._portrait == null, "failed competing attach preserves owner")
+	rival.free()
+	check(not p.is_processing(), "exclusive clock ownership")
+	for flags in 32:
+		var started := bool(flags & 1)
+		var paused := bool(flags & 2)
+		var bg := bool(flags & 4)
+		var shown := bool(flags & 8)
+		var ending := bool(flags & 16)
+		driver.set_host_state(started,paused,bg,shown,ending)
+		var before := p.elapsed
+		driver.tick(0.25)
+		var expected := started and shown and not(paused or bg or ending)
+		check(is_equal_approx(p.elapsed-before,0.25 if expected else 0.0),"host matrix %d"%flags)
+	driver.set_host_state(true,false,false,true,false)
+	host.hide()
+	var phase := p.elapsed
+	driver.tick(1)
+	check(p.elapsed == phase,"hidden ancestor")
+	host.show()
+	driver.tick(0.5)
+	check(p.elapsed == phase+0.5,"resume phase")
+	driver.tick(NAN)
+	driver.tick(-1)
+	check(p.elapsed == phase+0.5,"invalid delta")
+	var invalid := Node2D.new()
+	root.add_child(invalid)
+	check(not driver.attach_portrait(invalid),"invalid interface rejected")
+	check(driver._portrait == p,"failed attach preserves old portrait")
+	driver.detach_portrait()
+	check(p.is_processing() and not p.running,"detach returns clock ownership paused")
+	check(is_instance_valid(p) and p.get_parent()==host,"driver never owns or deletes art node")
+	var successor = load("res://addons/story_foundation/presentation/idle_host_adapter.gd").new()
+	root.add_child(successor)
+	successor.set_process(false)
+	check(successor.attach_portrait(p),"ownership available after detach")
+	successor.free()
+	check(not p.has_meta(driver.OWNER_KEY),"owner cleanup on driver exit")
+	check(p.is_processing(),"driver exit restores original true process flag")
+	p.set_process(false)
+	check(driver.attach_portrait(p),"attach originally nonprocessing portrait")
+	driver.detach_portrait()
+	check(not p.is_processing(),"detach preserves original false process flag")
+	check(driver.attach_portrait(p),"reattach")
+	p.free()
+	driver.tick(1)
+	driver.detach_portrait()
+	check(true,"freed portrait tolerated")
+	print("PASS: ",checks," idle-host assertions (32 host-state combinations)")
+	quit()
