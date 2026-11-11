@@ -60,6 +60,8 @@ jobs:
         run: python3 scripts/test_art_godot.py
       - name: Test standalone audio primitives and relocated settings
         run: python3 scripts/test_audio.py
+      - name: Test standalone portrait idle lifecycle (synthetic only)
+        run: python3 scripts/test_portrait_idle.py
       - name: Assemble example
         run: python3 scripts/prepare_example.py
       - name: Import project
