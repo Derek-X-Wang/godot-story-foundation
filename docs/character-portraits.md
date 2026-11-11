@@ -42,6 +42,36 @@ character. Reusable control logic does not establish that another face, pose or
 outfit is calibrated correctly. No fixed blink rate, breath duration, deformation
 formula, layer count, rig or provider is prescribed here.
 
+## Coordinate optional arm motion with breathing
+
+When a portrait includes subtle upper-arm or forearm motion, compose it with the
+selected breathing behavior as one performance. Check how the shoulder carries
+the arm and how the sleeve, wrist and torso boundaries remain connected. A shared
+phase can help coordinate these regions, but it is an implementation choice, not
+a requirement that every character use the same cycle or move every region in
+lockstep. Keep each character's timing and amplitude in the consuming game.
+
+Use only the control detail the shot needs. A small idle gesture can keep the
+hand unchanged and carry it with the forearm; it does not require separate
+control for every finger or joint. Where a grasp is actually needed, a separate
+thumb and grouped fingers may suffice for that angle. Held props, alternate grips
+and large arm gestures are separate work with their own visual review, not a
+prerequisite for a simple idle. Do not transfer a small-angle mesh deformation's
+acceptance to a larger pose range.
+
+## Define portrait visibility and pause behavior
+
+Before runtime integration, choose how a portrait behaves when it or its parent
+panel is hidden, paused, removed or shown again. For a simple idle, suspending
+hidden updates and resuming from the held pose is one valid policy. Other games
+may deliberately reset or resynchronize; record the choice rather than silently
+advancing hidden time and jumping on reappearance.
+
+Verify repeated hide/show and pause/resume transitions, parent visibility and
+multiple portrait instances. Explicit hiding does not establish automatic
+screen-off culling. This guide does not implement a lifecycle adapter or claim
+that a standalone sample has been integrated into a dialogue UI.
+
 ## Review every character separately
 
 Inspect the actual rendered portrait at its intended crop and display size,
@@ -57,6 +87,12 @@ blinks, a full breathing cycle where selected, and idle/talking transitions.
   merely whole-image drift, uniform zoom or unrelated chest bounce.
 - [ ] Facial features, torso, clothing and crop stay coherent through the motion
   and transitions. Record visible mask seams, clipping or distortion as defects.
+- [ ] Where arm motion is selected, breathing, shoulders, arms and clothing read
+  as one performance without detached joints, edge tears or unrelated swaying.
+  Check a complete loop at the intended display size, not only enlarged stills.
+- [ ] In the consuming UI, verify the selected visibility and pause policy across
+  repeated transitions; one portrait's state must not unintentionally alter
+  another instance. Preserve the accepted appearance when adding lifecycle logic.
 - [ ] Repeat these checks for every character and affected pose/outfit revision.
   A working first character does not approve the next; male portraits need not
   pass a chest-motion requirement that was not selected for them.
