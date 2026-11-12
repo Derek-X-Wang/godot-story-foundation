@@ -1,4 +1,4 @@
-# Optional idle-host driver (candidate)
+# Optional idle-host driver
 
 Godot 4.6.3 built-ins only; no narrative, art, audio, plugin or autoload dependency.
 This is a visibility/pause/clock adapter, not an animation generator or portrait UI.
