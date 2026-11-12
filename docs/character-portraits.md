@@ -69,8 +69,10 @@ advancing hidden time and jumping on reappearance.
 
 Verify repeated hide/show and pause/resume transitions, parent visibility and
 multiple portrait instances. Explicit hiding does not establish automatic
-screen-off culling. This guide does not implement a lifecycle adapter or claim
-that a standalone sample has been integrated into a dialogue UI.
+screen-off culling. The optional [idle-host driver](portrait-idle-runtime.md)
+implements explicit visibility, pause and clock ownership for a ready portrait.
+This guide does not implement those behaviors itself, and neither the guide nor
+the driver establishes integration into a game's dialogue UI.
 
 ## Review every character separately
 
