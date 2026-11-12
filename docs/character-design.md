@@ -122,12 +122,14 @@ There is no provider request, remote read-back or durable-storage verification.
 of the recorded status. Rights, provenance authenticity and reviewer identity
 also need separate evidence; this record supplies no legal clearance.
 
-## Deferred animation boundary
+## Animation boundary
 
 Animation control code and each character's mouth/mask calibration have separate
 ownership. Logic tests, actual rendered behavior and user acceptance are different
-evidence. A fair comparison remains pending; this change selects no animation
-backend and implements no animation framework.
+evidence. Foundation provides an optional Godot [idle-host driver](portrait-idle-runtime.md)
+for visibility, pause and clock ownership; it does not generate animation or select
+a portrait animation backend. Backend comparisons and character acceptance belong
+to the consuming game's records.
 
 Record portrait performance under [character portraits: idle and talking](character-portraits.md).
 That design guide covers blinks, resting versus talking mouth behavior, selected
