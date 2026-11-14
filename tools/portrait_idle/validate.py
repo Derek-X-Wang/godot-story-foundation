@@ -55,8 +55,8 @@ def art(root, relative, canvas, name, errors):
 
 def validate(record, root):
     errors, queue = [], []
-    if not isinstance(record, dict) or record.get("schema_version") != 1:
-        return {"status": "invalid", "errors": ["schema_version must be 1"], "manual_queue": []}
+    if not isinstance(record, dict) or type(record.get("schema_version")) is not int or record["schema_version"] != 1:
+        return {"status": "invalid", "errors": ["schema_version must be integer 1"], "manual_queue": []}
     ident = record.get("id")
     if not isinstance(ident, str) or not ident.strip():
         errors.append("id: nonempty string required")
