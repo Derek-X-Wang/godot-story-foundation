@@ -42,6 +42,19 @@ class IdleBatchTests(unittest.TestCase):
         self.assertEqual(result["status"], "machine_ready")
         self.assertIn("eyes_static_no_blink_or_gaze", result["manual_queue"])
 
+    def test_schema_version_requires_integer_one(self):
+        for version in (True, 1.0, False, 2):
+            with self.subTest(version=version):
+                record = sample()
+                record["schema_version"] = version
+                self.assertEqual(validator.validate(record, self.root)["status"], "invalid")
+                path = self.root / "version.json"
+                path.write_text(json.dumps(record))
+                report = validator.batch([path], self.root)
+                self.assertEqual(report["counts"]["invalid"], 1)
+                self.assertIn("schema_version", report["records"][0]["errors"][0])
+        self.assertEqual(validator.validate(sample(), self.root)["status"], "machine_ready")
+
     def test_layered_eyes_require_registered_images(self):
         record = sample()
         record["eyes"] = {"mode": "layered", "region": [1, 1, 8, 4], "half": "half.png", "closed": "closed.png"}
