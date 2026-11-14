@@ -90,3 +90,30 @@ regions over 49 samples, unchanged chest-only points when gesture changes, pivot
 rotation, bounded channels and missing eye capability fallback. They do not prove
 visual naturalness. Actual character acceptance, screenshots and private art stay
 in the consuming game. See the [performance review guide](character-portraits.md).
+
+## Optional GPU deformation include
+
+`presentation/portrait_idle_motion.gdshaderinc` offers
+`sf_idle_deform_point(rest, inhale, displacement, pivot, angle_radians, weights, pinned)`
+for CanvasItem shaders, with the same argument order and local-coordinate contract
+as the CPU helper. Unlike the CPU convenience default, the shader requires an
+explicit `pinned` argument. It has no uniforms, clock, material or renderer of its
+own. Include it with a project-relative `res://` path. Apply it to rest-space
+`VERTEX` in a consumer-owned mesh; the consumer supplies per-vertex weights and pins.
+Do not move the root or repeatedly feed deformed output back as rest geometry.
+
+Pins return the input point. NaN/infinite arguments return the input point too,
+including nonfinite rest points: this is not a geometry sanitizer. As with CPU,
+finite inputs large enough to overflow intermediate math are outside the useful
+coordinate range. Validate geometry and use ordinary local scene units. GPU float
+rounding can differ from CPU math; bit-identical results are not guaranteed.
+
+`python3 scripts/test_portrait_idle.py --gpu` requires an actual display and OpenGL
+renderer (on Linux CI, `xvfb-run -a` with Mesa). It relocates only optional helpers
+and neutral tests into a fresh project, compiles both shader stages and checks
+229 rendered cases against CPU results within 0.0002 local units. This includes
+49 cycle samples, masks, pins, clamping and nonfinite channel inputs. It is not a
+character art acceptance test or a performance benchmark. Headless dummy rendering
+is not a substitute. The CI target is native Godot 4.6.3 Compatibility/OpenGL,
+not a Web export: browser/WebGL driver behavior and exported integration remain
+consumer acceptance work. No Web validation or GPU speedup is claimed.
