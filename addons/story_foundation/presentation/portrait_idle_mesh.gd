@@ -38,6 +38,7 @@ func configure(record: Dictionary) -> void:
 	var height: int = dimensions[1]
 	var step: int = record.rig.grid_px
 	assert(width > 0 and height > 0 and step > 0 and width % step == 0 and height % step == 0)
+	assert((width / step + 1) * (height / step + 1) <= 65536)
 	texture = load("res://" + record.base)
 	assert(texture is Texture2D and texture.get_width() == width and texture.get_height() == height)
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR

@@ -97,6 +97,11 @@ class IdleBatchTests(unittest.TestCase):
         record["rig"]["grid_px"] = 1
         self.assertEqual(validator.validate(record, self.root)["status"], "invalid")
 
+    def test_side_anchor_outside_canvas_is_rejected(self):
+        record = sample()
+        record["rig"]["breath"]["side"] = [999, 4]
+        self.assertEqual(validator.validate(record, self.root)["status"], "invalid")
+
     def test_duplicate_ids_and_keys_fail_closed(self):
         first = self.root / "one.json"
         second = self.root / "two.json"

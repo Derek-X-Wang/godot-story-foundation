@@ -96,8 +96,8 @@ def validate(record, root):
         if nums(pin, 2) and nums(breath.get("y_fade"), 4) and not pin[0] <= breath["y_fade"][0] < breath["y_fade"][3] <= pin[1]:
             errors.append("rig.breath.y_fade: must taper within unpinned band")
         side = breath.get("side")
-        if not nums(breath.get("displacement"), 2) or not nums(side, 2) or side[1] <= 0:
-            errors.append("rig.breath: displacement and [center, positive radius] required")
+        if not nums(breath.get("displacement"), 2) or not nums(side, 2) or not 0 <= side[0] <= canvas[0] or side[1] <= 0:
+            errors.append("rig.breath: displacement and in-canvas [center, positive radius] required")
         elbow = rig.get("elbow")
         if elbow is not None:
             if not isinstance(elbow, dict):
