@@ -1,5 +1,8 @@
 # Optional idle-host driver
 
+For the optional manifest preflight and grid assembler, see
+[portrait idle batch contract](portrait-idle-batch.md).
+
 Godot 4.6.3 built-ins only; no narrative, art, audio, plugin or autoload dependency.
 This is a visibility/pause/clock adapter, not an animation generator or portrait UI.
 Consumers own characters, geometry, phase/amplitude, timing and visual acceptance.

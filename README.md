@@ -108,7 +108,10 @@ The independently optional [idle-host driver](docs/portrait-idle-runtime.md)
 owns a supplied portrait clock and follows explicit visibility/pause flags.
 Optional stateless motion primitives supply breathing, local pivot gestures and
 capability-gated eye samples; games still own assets, masks, timing and visual approval. Neither module
-adds artwork, a renderer, dialogue UI, speaker mapping or art approval.
+adds artwork, dialogue UI, speaker mapping or art approval. The separately optional
+[idle manifest and batch preflight](docs/portrait-idle-batch.md) can assemble one
+declared grid mesh pose. Custom rigs remain game-owned and are reported separately;
+the machine-ready status never means visual approval.
 
 ## Optional offline audio measurements
 
