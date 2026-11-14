@@ -36,3 +36,57 @@ Run the synthetic tests in a temporary Godot project containing just the driver 
 tests/portrait_idle/test.gd. The test fixture draws no image and uses no private art.
 The tests cover all 32 host flags, hide/show, invalid input, ownership, lifetime and
 return of original true/false process flags. Passing them is not visual approval.
+
+## Optional motion primitives
+
+`addons/story_foundation/presentation/portrait_idle_motion.gd` is a stateless,
+independently optional `RefCounted` utility (Godot 4.6.3 built-ins only). It can be
+used without the driver or narrative systems. It does not load art, attach nodes,
+move the root, own a clock, serialize state or generate masks/rigs.
+
+- `breath(cycle)` gives a smooth 0 → 1 → 0 inhale weight for a cycle measured in
+  turns. The host/portrait chooses a positive duration and advances the clock.
+- `deform_point(rest, inhale, displacement, pivot, angle_radians, weights, pinned)`
+  composes rest-space breathing displacement with a pivot gesture. The two
+  weights independently control breathing and gesture, clamped to [0, 1]. A pin
+  overrides both exactly. Always start with the original rest point, never last
+  frame's output. Coordinates, offsets and pivot use the same local units.
+- `blink(elapsed, duration, has_eyelid_layer)` supplies one scheduled closure
+  pulse, returning 0 outside the interval or without authored eyelid support.
+  It does not schedule blinks or fabricate a closed-eye picture.
+- `gaze(direction, extent, has_iris_layer)` bounds movement of an authored iris
+  layer, returning zero when unsupported. The consumer owns eyelid clipping and
+  safe gaze extents; this does not move an eye painted into a flattened texture.
+
+Invalid timing and channel parameters fail stationary/open. Deformation returns
+its original point on invalid arguments, so callers must still validate the
+original geometry. There is no automatic art-capability detection. A boolean
+capability is a declaration by the game adapter, not proof of suitable art.
+
+A portrait implementing the existing driver interface can hold a clock, pause it
+in `pause_motion()`, and in `advance_motion(delta)` sample `breath(time / period)`.
+It then applies the sample only to its own mesh or layers. For example, for every
+rest vertex:
+
+```gdscript
+const Motion = preload("res://addons/story_foundation/presentation/portrait_idle_motion.gd")
+# Game-owned arrays: rest_points, breath_offsets, weights, pins; game-owned pivot.
+var inhale = Motion.breath(motion_time / period)
+for i in rest_points.size():
+    vertices[i] = Motion.deform_point(rest_points[i], inhale, breath_offsets[i],
+        elbow_pivot, gesture_angle, weights[i], pins[i])
+```
+
+The sample is deliberately not a full mesh renderer. A GPU adapter may implement
+these same equations, but this CPU helper does not establish GPU equivalence or
+performance. It never moves a Node2D root. Game-owned masks must taper through
+connected sleeve/shoulder regions; separate chest-only vertices use gesture
+weight zero. Pin the support regions before tuning amplitude. An accepted small
+angle does not validate a larger one or another pose.
+
+Standalone motion tests run through `scripts/test_portrait_idle.py` with no art,
+plugin or narrative dependency. They check loop closure, exact pinned/outside-mask
+regions over 49 samples, unchanged chest-only points when gesture changes, pivot
+rotation, bounded channels and missing eye capability fallback. They do not prove
+visual naturalness. Actual character acceptance, screenshots and private art stay
+in the consuming game. See the [performance review guide](character-portraits.md).

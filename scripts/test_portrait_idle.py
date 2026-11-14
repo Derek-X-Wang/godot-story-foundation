@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 Derek Wang
-"""Run the optional idle driver with only synthetic standalone dependencies."""
+"""Run optional idle lifecycle and motion with synthetic standalone dependencies."""
 from pathlib import Path
 import os
 import shutil
@@ -20,21 +20,26 @@ def main():
             env[key] = str(dest)
         project = base / "relocated"
         for rel in ("addons/story_foundation/presentation/idle_host_adapter.gd",
-                    "tests/portrait_idle/test.gd"):
+                    "addons/story_foundation/presentation/portrait_idle_motion.gd",
+                    "tests/portrait_idle/motion.gd", "tests/portrait_idle/test.gd"):
             target = project / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / rel, target)
         (project / "project.godot").write_text('config_version=5\n')
-        result = subprocess.run([os.environ.get("GODOT", "godot"), "--headless",
-            "--path", str(project), "--script", "res://tests/portrait_idle/test.gd"],
-            env=env, capture_output=True, text=True, timeout=90)
-        output = result.stdout + result.stderr
-        print(output, end="")
-        if result.returncode or any(line.lstrip().startswith(("ERROR:", "SCRIPT ERROR:"))
-                                   for line in output.splitlines()):
-            raise SystemExit("Idle adapter engine test failed")
-        if "PASS: 53 idle-host assertions" not in output:
-            raise SystemExit("Idle adapter result missing or assertion count changed")
+        run_test(project, env, "test.gd", "PASS: 53 idle-host assertions")
+        run_test(project, env, "motion.gd", "PASS: 169 portrait-motion assertions")
+
+def run_test(project, env, script, marker):
+    result = subprocess.run([os.environ.get("GODOT", "godot"), "--headless",
+        "--path", str(project), "--script", "res://tests/portrait_idle/" + script],
+        env=env, capture_output=True, text=True, timeout=90)
+    output = result.stdout + result.stderr
+    print(output, end="")
+    if result.returncode or any(line.lstrip().startswith(("ERROR:", "SCRIPT ERROR:"))
+                               for line in output.splitlines()):
+        raise SystemExit("Idle adapter engine test failed")
+    if marker not in output:
+        raise SystemExit("Idle adapter result missing or assertion count changed")
 
 if __name__ == "__main__":
     main()
