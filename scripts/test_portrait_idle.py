@@ -8,6 +8,8 @@ import os
 import shutil
 import subprocess
 import tempfile
+import struct
+import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,14 +28,23 @@ def main():
         for rel in ("addons/story_foundation/presentation/idle_host_adapter.gd",
                     "addons/story_foundation/presentation/portrait_idle_motion.gd",
                     "addons/story_foundation/presentation/portrait_idle_motion.gdshaderinc",
+                    "addons/story_foundation/presentation/portrait_idle_mesh.gd",
                     "tests/portrait_idle/gpu.gd",
-                    "tests/portrait_idle/motion.gd", "tests/portrait_idle/test.gd"):
+                    "tests/portrait_idle/motion.gd", "tests/portrait_idle/test.gd",
+                    "tests/portrait_idle/assembly.gd"):
             target = project / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / rel, target)
         (project / "project.godot").write_text('config_version=5\n')
+        def chunk(kind, data):
+            return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+        pixels = b"".join(b"\0" + b"\xff\xff\xff\xff" * 16 for _ in range(16))
+        (project / "neutral.png").write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 16, 16, 8, 6, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(pixels)) + chunk(b"IEND", b""))
+        subprocess.run([os.environ.get("GODOT", "godot"), "--headless", "--path", str(project), "--editor", "--import"],
+                       env=env, check=True, capture_output=True, text=True, timeout=90)
         run_test(project, env, "test.gd", "PASS: 53 idle-host assertions")
         run_test(project, env, "motion.gd", "PASS: 169 portrait-motion assertions")
+        run_test(project, env, "assembly.gd", "PASS: 7 portrait-assembler assertions")
 
         if args.gpu:
             run_test(project, env, "gpu.gd", "PASS: 229 GPU portrait-motion assertions", gpu=True)
