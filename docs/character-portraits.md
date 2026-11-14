@@ -2,9 +2,36 @@
 
 Category: **Art → Character portraits → Idle and talking**. Use this design and
 visual-review guide when authoring animated standing portraits or dialogue busts.
-It is not a runtime implementation, portrait asset schema or automated quality
-gate. Portrait source/crop/delivery contracts and animation backends remain
+This guide is not a portrait asset schema or automated quality gate.
+The optional [motion primitives](portrait-idle-runtime.md#optional-motion-primitives)
+implement small numerical building blocks, not automatic portrait animation. Portrait source/crop/delivery contracts and animation backends remain
 unimplemented in Foundation; see [art boundaries and status](art.md#boundaries-and-status).
+
+## Compose a living portrait, not a moving card
+
+Use two independently optional layers of performance:
+
+1. **Base idle:** chest/torso breathing, blinking and subtle gaze movement where
+   the actual art supports them. This gives a listening character a quiet sense
+   of life; it is not a requirement to animate every region continuously.
+2. **Pose-specific gesture:** add motion that the posture invites. An extended
+   forearm may rotate slightly around its elbow while the shoulder participates
+   in the breathing. Do not substitute whole-hand translation for an elbow
+   gesture, or force the same gesture onto every character and pose.
+
+Keep planted feet and the intended support/contact regions fixed. Root rotation,
+whole-card scaling or drifting the entire painting is not a shortcut to body
+motion. Keep chest amplitude separate from forearm amplitude so approved breathing
+can remain unchanged while a gesture is tuned. Small-angle local mesh deformation
+is one option, not independent bones, physical simulation or a universal rig.
+
+Missing eyelid/iris layers are missing capabilities, not an invitation to invent
+them at runtime: omit those channels and preserve the original image. A single
+flattened portrait may still support reviewed local breathing or pose deformation.
+Eyeballs must not slide the painted eyelids or leave their sockets; blink overlays
+must not leave duplicate open eyes. Add these channels only after suitable assets
+and visual validation exist. Keep game-specific masks, pivots and calibration in
+the consuming game.
 
 ## Choose the character's performance
 

@@ -102,11 +102,13 @@ through the foundation's command bridge and transaction kernel.
   timing checks, deterministic PNG/JSON export and optional Aseprite/Godot adapters;
   no AI provider/editor required for PNG input, no art runtime dependency
 
-## Optional portrait idle lifecycle
+## Optional portrait idle lifecycle and motion
 
 The independently optional [idle-host driver](docs/portrait-idle-runtime.md)
-owns a supplied portrait clock and follows explicit visibility/pause flags. It
-adds no artwork, deformation, dialogue UI, speaker mapping or art approval.
+owns a supplied portrait clock and follows explicit visibility/pause flags.
+Optional stateless motion primitives supply breathing, local pivot gestures and
+capability-gated eye samples; games still own assets, masks, timing and visual approval. Neither module
+adds artwork, a renderer, dialogue UI, speaker mapping or art approval.
 
 ## Optional offline audio measurements
 
