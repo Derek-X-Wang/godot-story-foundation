@@ -34,7 +34,7 @@ def fade(value, name, limit, errors):
 
 
 def art(root, relative, canvas, name, errors):
-    if not isinstance(relative, str) or not relative or relative.startswith("res://"):
+    if not isinstance(relative, str) or not relative or relative.startswith("res://") or Path(relative).is_absolute():
         errors.append(f"{name}: project-relative PNG required")
         return
     path = (root / relative).resolve()
@@ -141,11 +141,12 @@ def batch(paths, root):
         except (OSError, ValueError) as exc:
             result = {"status": "invalid", "errors": [str(exc)], "manual_queue": []}
         result["manifest"] = str(path)
-        if result.get("id") in seen and result["status"] != "invalid":
+        ident = result.get("id")
+        if isinstance(ident, str) and ident in seen and result["status"] != "invalid":
             result["status"] = "invalid"
             result["errors"].append("duplicate pose id")
-        if result.get("id") is not None:
-            seen.add(result["id"])
+        if isinstance(ident, str):
+            seen.add(ident)
         records.append(result)
     return {"schema_version": 1, "records": records, "counts": {s: sum(r["status"] == s for r in records) for s in ("machine_ready", "adapter_only", "invalid")}, "manual_queue": [{"id": r.get("id"), "manifest": r["manifest"], "reasons": r["manual_queue"]} for r in records if r["manual_queue"]]}
 

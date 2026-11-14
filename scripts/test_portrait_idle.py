@@ -44,7 +44,7 @@ def main():
                        env=env, check=True, capture_output=True, text=True, timeout=90)
         run_test(project, env, "test.gd", "PASS: 53 idle-host assertions")
         run_test(project, env, "motion.gd", "PASS: 169 portrait-motion assertions")
-        run_test(project, env, "assembly.gd", "PASS: 7 portrait-assembler assertions")
+        run_test(project, env, "assembly.gd", "PASS: 10 portrait-assembler assertions")
 
         if args.gpu:
             run_test(project, env, "gpu.gd", "PASS: 229 GPU portrait-motion assertions", gpu=True)

@@ -47,7 +47,7 @@ uses rest-space geometry, Foundation's GPU deformation include and a caller
 supplied inhale phase; it does not generate a clock or move the root. The game
 must pass a prevalidated manifest to `configure(record)`. The Godot assembler's
 assertions catch basic dimensions and missing texture, but the Python preflight
-is the required detailed data gate. If an elbow is absent, gesture weight is
+is the required detailed data gate. If an elbow is absent or explicitly `null`, gesture weight is
 zero. Do not mark the elbow present until an artist has registered its pivot and
 fade through the connected sleeve.
 

@@ -111,6 +111,34 @@ class IdleBatchTests(unittest.TestCase):
         second.write_text('{"schema_version":1,"schema_version":1}')
         self.assertIn("duplicate JSON key", validator.batch([second], self.root)["records"][0]["errors"][0])
 
+    def test_non_string_ids_do_not_abort_batch(self):
+        paths = []
+        for index, ident in enumerate(([], {}, "valid")):
+            record = sample()
+            record["id"] = ident
+            path = self.root / f"id_{index}.json"
+            path.write_text(json.dumps(record))
+            paths.append(path)
+        report = validator.batch(paths, self.root)
+        self.assertEqual(report["counts"], {"machine_ready": 1, "adapter_only": 0, "invalid": 2})
+        self.assertEqual(len(report["records"]), 3)
+
+    def test_absolute_project_path_is_rejected(self):
+        record = sample()
+        record["base"] = str((self.root / "base.png").resolve())
+        result = validator.validate(record, self.root)
+        self.assertEqual(result["status"], "invalid")
+        self.assertIn("project-relative", " ".join(result["errors"]))
+
+    def test_null_and_absent_elbow_share_no_gesture_contract(self):
+        record = sample()
+        record["rig"]["elbow"] = None
+        self.assertEqual(validator.validate(record, self.root)["status"], "machine_ready")
+        del record["rig"]["elbow"]
+        self.assertEqual(validator.validate(record, self.root)["status"], "machine_ready")
+        record["rig"]["elbow"] = "not an anchor"
+        self.assertEqual(validator.validate(record, self.root)["status"], "invalid")
+
 
 if __name__ == "__main__":
     unittest.main()

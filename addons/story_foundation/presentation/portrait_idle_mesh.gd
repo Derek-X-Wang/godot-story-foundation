@@ -74,7 +74,8 @@ func configure(record: Dictionary) -> void:
 	idle_material.shader = shader
 	material = idle_material
 	var breath: Dictionary = record.rig.breath
-	var elbow: Dictionary = record.rig.get("elbow", {})
+	var elbow_value: Variant = record.rig.get("elbow", null)
+	var elbow: Dictionary = elbow_value if elbow_value is Dictionary else {}
 	idle_material.set_shader_parameter("breath_x", _vec4(breath.x_fade))
 	idle_material.set_shader_parameter("breath_y", _vec4(breath.y_fade))
 	idle_material.set_shader_parameter("breath_side", Vector2(breath.side[0], breath.side[1]))
