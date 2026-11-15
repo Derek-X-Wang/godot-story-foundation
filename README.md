@@ -7,7 +7,7 @@ optional offline dialogue authoring and review workflow.
 **Status: v0.1.0.** Native GDScript only. The example uses the actual official
 [Dialogue Manager 3.10.4](https://github.com/nathanhoad/godot_dialogue_manager/releases/tag/v3.10.4)
 addon, pinned by commit and checksum. No Rust, GECS, model service, API key or
-network connection is needed at runtime. Python tooling uses only the standard
+network connection is needed at runtime. Core Python tooling uses only the standard
 library. Dependencies are downloaded once from public official sources.
 
 Foundation's direction is a composable toolkit of independently optional modules
@@ -299,3 +299,7 @@ not relicensed under the first-party copyright.
 
 For the optional, manually registered layered portrait adapter and its limits,
 see [registered portraits](docs/registered-portrait.md).
+
+
+The optional [portrait structural export gate](tools/portrait_preflight/README.md)
+uses Pillow; it is isolated from core Python tooling and tested separately in CI.
