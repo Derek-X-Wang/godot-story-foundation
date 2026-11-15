@@ -214,6 +214,7 @@ python3 scripts/test_art_godot.py
 python3 scripts/test_scene.py
 python3 scripts/package_scene.py
 python3 scripts/test_portrait_idle.py
+python3 scripts/test_registered_portrait.py
 python3 scripts/test_audio.py
 python3 scripts/package_audio.py
 python3 scripts/fetch_dependencies.py
@@ -295,3 +296,6 @@ First-party code and public fixtures: **MIT, Copyright © 2026 Derek Wang**.
 Dialogue Manager and Godot retain their own MIT notices. See
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and `licenses/`; third-party code is
 not relicensed under the first-party copyright.
+
+For the optional, manually registered layered portrait adapter and its limits,
+see [registered portraits](docs/registered-portrait.md).
