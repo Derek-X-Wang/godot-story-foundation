@@ -57,3 +57,11 @@ Run the neutral suite without downloaded dependencies:
 ```sh
 python3 scripts/test_registered_portrait.py
 ```
+
+
+## Optional pre-export file checks
+
+[Portrait preflight](../tools/portrait_preflight/README.md) supplies a separately
+optional PNG/import checker and fail-closed export-command wrapper. This checks
+a file naming convention, not the entire runtime definition contract or visual
+naturalness. Consumers must opt into the wrapper for their export pipeline.
