@@ -303,3 +303,10 @@ see [registered portraits](docs/registered-portrait.md).
 
 The optional [portrait structural export gate](tools/portrait_preflight/README.md)
 uses Pillow; it is isolated from core Python tooling and tested separately in CI.
+
+### Optional portrait local review
+
+An independent [offline review adapter](docs/portrait-review.md) renders supplied
+local-region candidates against exact PNG source hashes. It needs only Python
+standard library; it does not run models, approve anatomy, change art, or gate
+game builds. It is separate from the registered-layer structural preflight.

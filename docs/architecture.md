@@ -265,3 +265,12 @@ dependency and changes no audio bus/player lifecycle. Reports bind input hashes
 and explicit technical policy, never listening, rights or artistic approval;
 source/license records and private reports remain consumer-owned. This is not
 a complete audio asset production pipeline or a hosted evaluation service.
+
+## Optional portrait review reports
+
+`tools/art/portraits/review.py` is an independently optional offline region-review
+adapter. It uses the shared bounded PNG codec and standard library, not the sprite
+pipeline, narrative runtime, model service or Godot. It renders supplied
+review-only regions against exact image hashes and never approves anatomy or
+gates export. This is distinct from the opt-in registered-layer structural
+preflight. See [contract and limits](portrait-review.md).
