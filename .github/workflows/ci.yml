@@ -39,12 +39,8 @@ jobs:
           node tests/art_preview/test_viewer_dom.cjs
       - name: Test optional audio shadow contract (synthetic only)
         run: python3 tools/audio_shadow/test_shadow.py
-      - name: Prepare offline audio test dependency
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y ffmpeg xvfb libgl1-mesa-dri xauth
-          ffmpeg -version
-          ffprobe -version
+      - name: Prepare offline audio and native OpenGL test dependencies
+        run: bash scripts/prepare_ci_dependencies.sh prepare-packages
       - name: Test optional offline audio measurements
         run: |
           command -v ffmpeg
@@ -69,6 +65,8 @@ jobs:
         run: python3 scripts/test_portrait_idle.py
       - name: Test registered layered portrait adapter (neutral only)
         run: python3 scripts/test_registered_portrait.py
+      - name: Probe native OpenGL readiness (not a portrait test)
+        run: bash scripts/prepare_ci_dependencies.sh probe-renderer
       - name: Test optional GPU portrait math (native software OpenGL, not Web)
         run: LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a python3 scripts/test_portrait_idle.py --gpu
       - name: Assemble example
