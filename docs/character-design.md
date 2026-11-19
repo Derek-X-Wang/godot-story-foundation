@@ -23,7 +23,10 @@ are different decisions. A successful provenance check is neither art approval n
 integration approval. Use the existing [production gates](../tools/production/README.md)
 for flow, brief, composition, integration and release; this optional record does
 not replace or automatically close any of them. An accepted concept does not
-approve a derived asset or its rendered scene.
+approve a derived asset or its rendered scene. An optional [pending static portrait
+import](static-portrait-import.md) can stage a PNG from an exact selected concept
+and accepted design; it requires a receipt from the consuming project's trusted
+approval source and still does not approve or integrate the portrait.
 
 Nvwa is one optional, replaceable source of body/pose reference. It is not a
 required provider, the final character, or a guarantee of identity, anatomical or
