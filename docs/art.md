@@ -12,7 +12,7 @@ runtime addon/package does not include or depend on these tools.
 | --- | --- | --- |
 | Character design provenance | Implemented, optional record v1 | Local source/output identity and hashes; no generator or art approval |
 | Character sprites | Implemented, experimental contract v1 | Authored frames → validation → atlas → optional Godot resources |
-| Character portraits | Design/review guidance plus optional [local review report](portrait-review.md) | Source-bound region display, no anatomy gate; [idle/talking guidance](character-portraits.md) |
+| Character portraits | Optional [pending static import](static-portrait-import.md) and [local review report](portrait-review.md) | Source-bound handoff and region display, no anatomy gate or runtime integration; [idle/talking guidance](character-portraits.md) |
 | Scenes/environments | Future, not implemented | Separate tile/background/layer/placement contracts |
 | UI/icons | Future, not implemented | Separate sizing, states and readability contracts |
 | VFX | Future, not implemented | Separate timing, blending and effect contracts |

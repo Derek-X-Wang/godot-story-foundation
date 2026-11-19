@@ -4,8 +4,10 @@ Category: **Art → Character portraits → Idle and talking**. Use this design 
 visual-review guide when authoring animated standing portraits or dialogue busts.
 This guide is not a portrait asset schema or automated quality gate.
 The optional [motion primitives](portrait-idle-runtime.md#optional-motion-primitives)
-implement small numerical building blocks, not automatic portrait animation. Portrait source/crop/delivery contracts and animation backends remain
-unimplemented in Foundation; see [art boundaries and status](art.md#boundaries-and-status).
+implement small numerical building blocks, not automatic portrait animation. An
+optional [static import](static-portrait-import.md) stages private pending review
+artifacts only. Runtime portrait source/crop/delivery contracts and animation
+backends remain unimplemented in Foundation; see [art boundaries and status](art.md#boundaries-and-status).
 
 ## Compose a living portrait, not a moving card
 
