@@ -4,7 +4,17 @@ set -euo pipefail
 
 fail() { printf 'CI dependency preflight: %s\n' "$*" >&2; exit 1; }
 work="$(mktemp -d)"
-trap 'rm -rf -- "$work"' EXIT
+apt_work=
+cleanup() {
+    local status=$?
+    rm -rf -- "$work"
+    if [[ -n "$apt_work" ]] && ! sudo -n rm -rf -- "$apt_work"; then
+        printf 'CI dependency preflight: could not clean temporary APT state\n' >&2
+        exit 1
+    fi
+    exit "$status"
+}
+trap cleanup EXIT
 
 installed() {
     [[ "$(dpkg-query -W -f='${db:Status-Status}' "$1" 2>/dev/null)" == installed ]]
@@ -34,7 +44,8 @@ probe_audio() {
         fail 'ffprobe could not read the generated PCM WAV'
     fi
     [[ "$codec" == pcm_s16le ]] || fail "ffprobe returned unexpected audio codec: $codec"
-    printf 'Ready: ffmpeg and ffprobe PCM smoke passed.\n'
+    printf 'Ready: ffmpeg and ffprobe PCM smoke passed (%s, %s).\n' \
+        "$(command -v ffmpeg)" "$(command -v ffprobe)"
 }
 
 probe_xvfb() {
@@ -43,6 +54,56 @@ probe_xvfb() {
         fail 'xvfb-run could not start an X11 display with an xauth cookie'
     fi
     printf 'Ready: Xvfb/xauth startup passed.\n'
+}
+
+prepare_ubuntu_apt() {
+    # This workflow's runner is x64 Noble. Do not install Ubuntu packages on
+    # another host or mutate its configured sources, mirror list or keyrings.
+    if [[ "$(lsb_release -is)" != Ubuntu || "$(lsb_release -cs)" != noble ||
+          "$(dpkg --print-architecture)" != amd64 ]]; then
+        fail 'Ubuntu archive HTTPS fallback supports Ubuntu Noble amd64 only'
+    fi
+    apt_work="$(mktemp -d /tmp/foundation-ci-apt.XXXXXXXX)"
+    mkdir -m 0755 -- "$apt_work/sources.d"
+    cat > "$apt_work/sources.d/ubuntu.sources" <<'SOURCES'
+Types: deb
+URIs: https://archive.ubuntu.com/ubuntu/
+Suites: noble noble-updates noble-backports
+Components: main restricted universe multiverse
+Architectures: amd64
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+Types: deb
+URIs: https://security.ubuntu.com/ubuntu/
+Suites: noble-security
+Components: main restricted universe multiverse
+Architectures: amd64
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+SOURCES
+    chmod 0644 -- "$apt_work/sources.d/ubuntu.sources"
+    # APT update and install write root-owned state, while _apt must already
+    # be able to read sources and traverse into its own partial directories.
+    sudo -n install -d -o root -g root -m 0755 "$apt_work/lists" "$apt_work/archives"
+    sudo -n install -d -o _apt -g root -m 0700 "$apt_work/lists/partial" "$apt_work/archives/partial"
+    chmod 0755 -- "$apt_work"
+    if ! sudo -n -u _apt sh -ec '
+        test -r "$1/sources.d/ubuntu.sources"
+        test -r /usr/share/keyrings/ubuntu-archive-keyring.gpg
+        test -w "$1/lists/partial"
+        test -w "$1/archives/partial"
+    ' sh "$apt_work"; then
+        fail 'Ubuntu archive keyring or temporary APT state inaccessible to _apt'
+    fi
+}
+
+run_scoped_apt() {
+    local phase=$1
+    shift
+    local log="$work/apt-$phase.log"
+    "$@" 2>&1 | tee -- "$log" || return "$?"
+    if grep -Eiq 'unsandboxed as root|can not drop privileges' "$log"; then
+        fail "APT $phase lost the _apt download sandbox; not accepting the result"
+    fi
 }
 
 prepare_packages() {
@@ -59,13 +120,23 @@ prepare_packages() {
     if (( ${#missing[@]} == 0 )); then
         printf 'Required commands/Mesa package present; skipping apt.\n'
     else
-        printf 'Installing missing CI packages from configured Ubuntu sources: %s\n' "${missing[*]}"
-        local -a apt=(apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=10
-            -o Acquire::https::Timeout=10 -o DPkg::Lock::Timeout=10)
-        if ! sudo -n timeout -k 5s 90s "${apt[@]}" -o APT::Update::Error-Mode=any update; then
+        prepare_ubuntu_apt
+        printf 'Installing missing CI packages from signed Canonical HTTPS archives: %s\n' "${missing[*]}"
+        local -a apt=(apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=10 -o DPkg::Lock::Timeout=10
+            -o "Dir::Etc::sourcelist=/dev/null" -o "Dir::Etc::sourceparts=$apt_work/sources.d"
+            -o "Dir::State::lists=$apt_work/lists" -o "Dir::Cache::archives=$apt_work/archives"
+            -o Dir::Cache::pkgcache= -o Dir::Cache::srcpkgcache=
+            -o Acquire::Languages=none -o Acquire::IndexTargets::deb::DEP-11::DefaultEnabled=false
+            -o Acquire::IndexTargets::deb::CNF::DefaultEnabled=false
+            -o APT::Sandbox::User=_apt -o APT::Get::AllowUnauthenticated=false
+            -o Acquire::AllowInsecureRepositories=false -o Acquire::AllowDowngradeToInsecureRepositories=false
+            -o Acquire::https::Verify-Peer=true -o Acquire::https::Verify-Host=true
+            -o Acquire::https::AllowRedirect=false)
+        if ! run_scoped_apt update sudo -n env LC_ALL=C timeout -k 5s 90s \
+            "${apt[@]}" -o APT::Update::Error-Mode=any update; then
             fail 'apt update failed or exceeded 90s; required CI packages were not prepared'
         fi
-        if ! sudo -n env DEBIAN_FRONTEND=noninteractive timeout -k 5s 240s \
+        if ! run_scoped_apt install sudo -n env LC_ALL=C DEBIAN_FRONTEND=noninteractive timeout -k 5s 240s \
             "${apt[@]}" install --no-install-recommends -y "${missing[@]}"; then
             fail 'apt install failed or exceeded 240s; required CI packages were not prepared'
         fi
